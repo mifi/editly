@@ -1,0 +1,13 @@
+{
+  fast: true,
+  outPath: './resizeHorizontal.mp4',
+  defaults: {
+    transition: { duration: 0 },
+    layer: { fontPath: './Patua_One/PatuaOne-Regular.ttf', backgroundColor: 'white' },
+  },
+  clips: [
+    { layers: [{ type: 'video', path: './IMG_4605.MOV', cutFrom: 0.4, cutTo: 2 }] },
+    { layers: [{ type: 'video', path: './IMG_4605.MOV', cutFrom: 0.4, cutTo: 2, resizeMode: 'contain' }] },
+    { layers: [{ type: 'video', path: './IMG_4605.MOV', cutFrom: 0.4, cutTo: 2, resizeMode: 'stretch' }] },
+  ],
+}

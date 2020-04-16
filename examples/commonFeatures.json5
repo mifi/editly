@@ -1,0 +1,36 @@
+{
+  // fast: true,
+  // width: 2166, height: 1650, fps: 30,
+  outPath: './out.mp4',
+  // outPath: './out.gif',
+  // verbose: true,
+  // enableFfmpegLog: true,
+  audioFilePath: './High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a',
+  defaults: {
+    transition: { name: 'random' },
+    layer: { fontPath: './Patua_One/PatuaOne-Regular.ttf' },
+  },
+  clips: [
+    { duration: 3, transition: { name: 'directional-left' }, layers: [{ type: 'title-background', text: 'EDITLY\nVideo editing framework', background: { type: 'linear-gradient', colors: ['#02aab0', '#00cdac'] } }] },
+    { duration: 4, transition: { name: 'dreamyzoom' }, layers: [{ type: 'title-background', text: 'Multi-line text with animated linear or radial gradients', background: { type: 'radial-gradient' } }] },
+    { duration: 3, transition: { name: 'directional-right' }, layers: [{ type: 'rainbow-colors' }, { type: 'title', text: 'Colorful backgrounds' }] },
+    { duration: 3, layers: [{ type: 'pause' }, { type: 'title', text: 'and separators' }] },
+
+    { duration: 3, transition: { name: 'fadegrayscale' }, layers: [{ type: 'title-background', text: 'Image slideshows with Ken Burns effect', background: { type: 'linear-gradient' } }] },
+    { duration: 2.5, transition: { name: 'directionalWarp' }, layers: [{ type: 'image', path: './vertical.jpg', zoomDirection: 'out' }] },
+    { duration: 3, transition: { name: 'dreamyzoom' }, layers: [{ type: 'image', path: './img1.jpg', duration: 2.5, zoomDirection: 'in' }, { type: 'subtitle', text: 'Indonesia has many spectacular locations. Here is the volcano Kelimutu, which has three lakes in its core, some days with three different colors!' }, { type: 'title', position: 'top', text: 'With text' }] },
+    { duration: 3, transition: { name: 'colorphase' }, layers: [{ type: 'image', path: './img2.jpg', zoomDirection: 'out' }, { type: 'subtitle', text: 'Komodo national park is the only home of the endangered Komodo dragons' }] },
+    { duration: 2.5, transition: { name: 'simplezoom' }, layers: [{ type: 'image', path: './img3.jpg', zoomDirection: 'in' }] },
+
+    { duration: 1.5, transition: { name: 'crosszoom', duration: 0.3 }, layers: [{ type: 'video', path: '/Users/mifi/Desktop/photos/drone koh lipe/DJI_0402.MOV', cutTo: 58 }, { type: 'title', text: 'Videos' }] },
+    { duration: 3, transition: { name: 'fade' }, layers: [{ type: 'video', path: '/Users/mifi/Desktop/photos/drone koh lipe/DJI_0402.MOV', cutFrom: 58 }] },
+    { transition: { name: 'fade' }, layers: [{ type: 'video', path: '/Users/mifi/Desktop/photos/drone koh lipe/DJI_0403.MOV', cutTo: 2.5 }] },
+    { duration: 1.5, layers: [{ type: 'video', path: '/Users/mifi/Desktop/photos/drone koh lipe/DJI_0401.MOV', cutFrom: 3, cutTo: 30 }] },
+
+    { duration: 3, transition: { name: 'crosszoom' }, layers: [{ type: 'gl', fragmentPath: './shaders/3l23Rh.frag' }, { type: 'title', text: 'OpenGL\nshaders' }] },
+    { duration: 3, layers: [{ type: 'gl', fragmentPath: './shaders/MdXyzX.frag' }] },
+    { duration: 3, layers: [{ type: 'gl', fragmentPath: './shaders/30daysofshade_010.frag' }] },
+    { duration: 3, layers: [{ type: 'gl', fragmentPath: './shaders/wd2yDm.frag', speed: 5 }] },
+    { duration: 3, layers: [{ type: 'editly-banner' }] },
+  ],
+}

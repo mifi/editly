@@ -1,0 +1,7 @@
+{
+  // fast: true,
+  outPath: './transparentGradient.mp4',
+  clips: [
+    { duration: 0.1, layers: [{ type: 'fill-color', color: 'green' }, { type: 'linear-gradient', colors: ['#ffffffff', '#ffffff00'] }] },
+  ],
+}

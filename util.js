@@ -1,0 +1,34 @@
+const execa = require('execa');
+
+function parseFps(fps) {
+  const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
+  if (match) {
+    const num = parseInt(match[1], 10);
+    const den = parseInt(match[2], 10);
+    if (den > 0) return num / den;
+  }
+  return undefined;
+}
+
+async function readFileInfo(p) {
+  const { stdout } = await execa('ffprobe', [
+    '-select_streams', 'v:0', '-show_entries', 'stream', '-of', 'json', p,
+  ]);
+  const json = JSON.parse(stdout);
+  const stream = json.streams[0];
+  return {
+    // numFrames: parseInt(stream.nb_frames, 10),
+    duration: parseFloat(stream.duration, 10),
+    width: stream.width, // TODO coded_width?
+    height: stream.height,
+    framerateStr: stream.r_frame_rate,
+  };
+}
+
+const multipleOf2 = (x) => (x + (x % 2));
+
+module.exports = {
+  parseFps,
+  readFileInfo,
+  multipleOf2,
+};

@@ -1,0 +1,14 @@
+{
+  width: 240, height: 320, fps: 15,
+  outPath: './resizeVertical.mp4',
+  defaults: {
+    transition: { duration: 0 },
+    layer: { fontPath: './Patua_One/PatuaOne-Regular.ttf' },
+  },
+  clips: [
+    { duration: 2, layers: [{ type: 'title-background', text: 'Editly can handle all formats and sizes with different fits', background: { type: 'radial-gradient' } }] },
+    { layers: [{ type: 'video', path: './IMG_4605.MOV', cutFrom: 0, cutTo: 2, resizeMode: 'contain' }, { type: 'title-background', text: 'Contain' }] },
+    { layers: [{ type: 'video', path: './IMG_4605.MOV', cutFrom: 0, cutTo: 2, resizeMode: 'stretch' }, { type: 'title-background', text: 'Stretch' }] },
+    { layers: [{ type: 'video', path: './IMG_4605.MOV', cutFrom: 0, cutTo: 2 }, { type: 'title-background', text: 'Cover' }] },
+  ],
+}
