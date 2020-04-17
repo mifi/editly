@@ -8,7 +8,7 @@ const assert = require('assert');
 
 const editly = require('.');
 
-
+// See also readme
 const cli = meow(`
   Usage
     $ editly CLIP1 [CLIP2 [CLIP3 ...]]

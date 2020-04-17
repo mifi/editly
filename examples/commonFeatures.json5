@@ -1,8 +1,8 @@
 {
   // fast: true,
   // width: 2166, height: 1650, fps: 30,
-  outPath: './out.mp4',
-  // outPath: './out.gif',
+  outPath: './commonFeatures.mp4',
+  // outPath: './commonFeatures.gif',
   // verbose: true,
   // enableFfmpegLog: true,
   audioFilePath: './High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a',
