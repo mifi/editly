@@ -113,7 +113,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, enable
   });
 
   const close = () => {
-    console.log('Close', path);
+    if (verbose) console.log('Close', path);
     ps.cancel();
   };
 
