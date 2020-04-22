@@ -1,6 +1,6 @@
 const editly = require('..');
 
-async function func({ width, height, canvas }) {
+async function func({ canvas }) {
   async function onRender(progress) {
     const context = canvas.getContext('2d');
     const centerX = canvas.width / 2;
