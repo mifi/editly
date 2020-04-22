@@ -8,7 +8,7 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 
 [![demo](https://github.com/mifi/gifs/raw/master/commonFeatures.gif)](https://youtu.be/LNeclLkxUEY)
 
-This GIF/youtube was created with this command: `editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)"
+This GIF/youtube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)"
 
 See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples)
 
