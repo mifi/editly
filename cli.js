@@ -23,11 +23,11 @@ const cli = meow(`
 
   Options
     --out  Out video path (defaults to ./editly-out.mp4) - can also be a .gif
-    --json  Use JSON config, all other options will be ignored
-    --transition-name  Name of default transition to use
+    --json  Use JSON edit spec
+    --transition-name  Name of default transition to use (default: random)
     --transition-duration  Default transition duration in milliseconds
-    --width  Width which all videos will be converted to
-    --height  Height which all videos will be converted to
+    --width  Width which all media will be converted to
+    --height  Height which all media will be converted to
     --fps  FPS which all videos will be converted to
     --font-path  Set default font to a .ttf
     --audio-file-path  Add an audio track
@@ -35,9 +35,12 @@ const cli = meow(`
     --fast, -f  Fast mode (low resolution and FPS, useful for getting a quick preview)
     --verbose
 
+  For more detailed explanation, see:
+  https://github.com/mifi/editly
+
   Examples
     $ editly title:'My video' clip1.mov clip2.mov title:'My slideshow' img1.jpg img2.jpg title:'THE END' --audio-file-path /path/to/music.mp3 --font-path /path/to/my-favorite-font.ttf
-    $ editly --json my-editly.json --out output.gif
+    $ editly my-editly.json5 --out output.gif
 `, {
   flags: {
     fast: { type: 'boolean', alias: 'f' },
@@ -49,11 +52,16 @@ const cli = meow(`
 });
 
 (async () => {
+  let { json } = cli.flags;
+  // eslint-disable-next-line prefer-destructuring
+  if (cli.input.length === 1 && /\.(json|json5|js)$/.test(cli.input[0].toLowerCase())) json = cli.input[0];
+
   let params = {
     defaults: {},
   };
-  if (cli.flags.json) {
-    params = JSON5.parse(fs.readFileSync(cli.flags.json, 'utf-8'));
+
+  if (json) {
+    params = JSON5.parse(fs.readFileSync(json, 'utf-8'));
   } else {
     const clipsIn = cli.input;
     if (clipsIn.length < 1) cli.showHelp();
@@ -62,7 +70,13 @@ const cli = meow(`
       const match = clip.match(/^title:(.+)$/);
       if (match) return { type: 'title-background', text: match[1] };
 
-      const { mime } = await FileType.fromFile(clip);
+      const fileType = await FileType.fromFile(clip);
+      if (!fileType) {
+        console.error('Invalid file for clip', clip);
+        cli.showHelp();
+      }
+
+      const { mime } = fileType;
 
       if (mime.startsWith('video')) return { type: 'video', path: clip };
       if (mime.startsWith('image')) return { type: 'image', path: clip };
