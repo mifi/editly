@@ -27,8 +27,9 @@ async function func({ width, height, fabric, canvas }) {
 }
 
 editly({
-  fast: true,
-  outPath: './fabric.mp4',
+  // fast: true,
+  outPath: './customFabric.gif',
+  // outPath: './customFabric.mp4',
   clips: [
     { duration: 2, layers: [{ type: 'fabric', func }] },
   ],

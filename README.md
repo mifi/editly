@@ -8,9 +8,9 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 
 [![demo](https://github.com/mifi/gifs/raw/master/commonFeatures.gif)](https://youtu.be/LNeclLkxUEY)
 
-https://youtu.be/LNeclLkxUEY
+https://youtu.be/LNeclLkxUEY - This GIF/youtube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)"
 
-This GIF/youtube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)"
+See [more examples here](https://github.com/mifi/editly/blob/master/examples/)
 
 ## Requirements
 
@@ -22,23 +22,23 @@ Make sure you have `ffmpeg` and `ffprobe` installed and available in `PATH`
 ## Features
 
 - Edit videos with code! Declarative API with fun defaults
-- Create colorful videos with random colors generated from aesthetically pleasing pallettes with random effects
+- Create colorful videos with random colors generated from aesthetically pleasing pallettes and random effects
 - Supports any size like 4K video and DSLR photos
 - Can output to any dimensions, like *Instagram post* (1:1), *Instagram story* (9:16), *YouTube* (16:9), or any other dimensions you like.
 - Content will be scaled and letterboxed automatically, even if input aspect ratio is not same, and framerate will be converted.
-- Speeds up / slow down videos automatically to match `cutFrom`/`cutTo` with each clip's `duration`
-- Output GIF
+- Speeds up / slow down videos automatically to match `cutFrom`/`cutTo` segment length with each clip's `duration`
 - Overlay text and subtitles on videos, images or backgrounds
 - Accepts custom HTML5 Canvas / Fabric.js Javascript code for custom screens or dynamic overlays
-- Render GL shaders (for example from [shadertoy](https://www.shadertoy.com/))
+- Render custom GL shaders (for example from [shadertoy](https://www.shadertoy.com/))
+- Output GIF
 
 ## Use cases
 
 - Create a slideshow from a set of pictures with text overlay
-- Create a fast paced video trailer with clips
-- Create a tutorial video
+- Create a fast paced trailer or promo video
+- Create a tutorial video with help text
 - Simply convert a video to a GIF
-- Resize video to any size or framerate and automatically letterbox/crop (e.g. if you need to upload a video somewhere and the site complains **video dimensions must be 1337x1000**
+- Resize video to any size or framerate and with automatic letterbox/crop (e.g. if you need to upload a video somewhere and the site complains **video dimensions must be 1337x1000**
 
 See [examples](https://github.com/mifi/editly/tree/master/examples)
 
@@ -61,10 +61,10 @@ editly \
   img1.jpg \
   img2.jpg \
   title:'THE END' \
-  --audio-file-path /path/to/music.mp3 \
+  --audio-file-path /path/to/music.mp3
 ```
 
-Or create a GIF (or MP4) from a JSON or JSON5 edit spec *(JSON5 is just a more friendly JSON format)*:
+Or create an MP4 (or GIF) from a JSON or JSON5 edit spec *(JSON5 is just a more friendly JSON format)*:
 
 ```sh
 editly my-editly.json5 --out output.gif
@@ -160,7 +160,7 @@ Edit specs are Javascript / JSON ojects describing the whole edit operation.
 
 ### Layer types
 
-For example usage see [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)
+See [examples](https://github.com/mifi/editly/tree/master/examples) and [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)
 
 #### Layer type 'video'
 
@@ -231,9 +231,8 @@ See [customFabric.js](https://github.com/mifi/editly/blob/master/examples/custom
 
 Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/examples/gl.json5) and [rainbow-colors.frag](https://github.com/mifi/editly/blob/master/shaders/rainbow-colors.frag)
 
-
 - `fragmentPath`
-- `vertexPath`
+- `vertexPath` (optional)
 
 ## TODO
 

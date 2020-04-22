@@ -24,9 +24,14 @@ async function func({ canvas }) {
 }
 
 editly({
-  fast: true,
-  outPath: './canvas.mp4',
+  // fast: true,
+  // outPath: './customCanvas.mp4',
+  outPath: './customCanvas.gif',
   clips: [
-    { duration: 2, layers: [{ type: 'canvas', func }] },
+    { duration: 2,
+      layers: [
+        { type: 'rainbow-colors' },
+        { type: 'canvas', func },
+      ] },
   ],
 }).catch(console.error);

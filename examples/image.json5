@@ -1,7 +1,0 @@
-{
-  fast: true,
-  outPath: './image.mp4',
-  clips: [
-    { layers: [{ type: 'image', path: './vertical.jpg', zoomDirection: 'out' }] },
-  ],
-}
