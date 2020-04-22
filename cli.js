@@ -25,7 +25,7 @@ const cli = meow(`
     --out  Out video path (defaults to ./editly-out.mp4) - can also be a .gif
     --json  Use JSON edit spec
     --transition-name  Name of default transition to use (default: random)
-    --transition-duration  Default transition duration in milliseconds
+    --transition-duration  Default transition duration
     --width  Width which all media will be converted to
     --height  Height which all media will be converted to
     --fps  FPS which all videos will be converted to
