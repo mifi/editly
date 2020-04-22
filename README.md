@@ -8,16 +8,9 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 
 [![demo](https://github.com/mifi/gifs/raw/master/commonFeatures.gif)](https://youtu.be/LNeclLkxUEY)
 
-https://youtu.be/LNeclLkxUEY - This GIF/youtube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)"
+This GIF/youtube was created with this command: `editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)"
 
-See [more examples here](https://github.com/mifi/editly/blob/master/examples/)
-
-## Requirements
-
-- [Node.js installed](https://nodejs.org/en/) (Recommended to use newest stable version)
-- Should work on Windows, MacOS and Linux. Needs at least Node.js v12.16.2 on MacOS ([see issue](https://github.com/sindresorhus/meow/issues/144)). See also https://github.com/stackgl/headless-gl#system-dependencies
-
-Make sure you have `ffmpeg` and `ffprobe` installed and available in `PATH`
+See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples)
 
 ## Features
 
@@ -41,6 +34,13 @@ Make sure you have `ffmpeg` and `ffprobe` installed and available in `PATH`
 - Resize video to any size or framerate and with automatic letterbox/crop (e.g. if you need to upload a video somewhere and the site complains **video dimensions must be 1337x1000**
 
 See [examples](https://github.com/mifi/editly/tree/master/examples)
+
+## Requirements
+
+- [Node.js installed](https://nodejs.org/en/) (Recommended to use newest stable version)
+- Should work on Windows, MacOS and Linux. Needs at least Node.js v12.16.2 on MacOS ([see issue](https://github.com/sindresorhus/meow/issues/144)). See also https://github.com/stackgl/headless-gl#system-dependencies
+
+Make sure you have `ffmpeg` and `ffprobe` installed and available in `PATH`
 
 ## Installing
 
@@ -234,16 +234,10 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 - `fragmentPath`
 - `vertexPath` (optional)
 
-## TODO
-
-- Implement audio from source files
-- Allow specifying path to ffmpeg and ffprobe
-- Full power of the HTML to create visuals and animations (maybe puppeteer)
-- three.js
-
 ## See also
 
 - https://github.com/transitive-bullshit/awesome-ffmpeg
 - https://github.com/h2non/videoshow
 - https://github.com/transitive-bullshit/ffmpeg-concat
 - https://github.com/sjfricke/awesome-webgl
+- https://www.mltframework.org/docs/melt/
