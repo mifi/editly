@@ -1,7 +1,7 @@
 {
   "name": "editly",
   "description": "Simple, sexy, declarative video editing",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "index.js",
   "author": "Mikael Finstad <finstaden@gmail.com>",
   "license": "MIT",
