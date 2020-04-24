@@ -234,6 +234,10 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 - `fragmentPath`
 - `vertexPath` (optional)
 
+## Troubleshooting
+
+- If you get `Error: The specified module could not be found.`, try: `npm un -g editly && npm i -g --build-from-source editly` (see [#15](https://github.com/mifi/editly/issues/15))
+
 ## See also
 
 - https://github.com/transitive-bullshit/awesome-ffmpeg
