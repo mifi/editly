@@ -15,6 +15,9 @@ const GlTransitions = require('./glTransitions');
 // Cache
 const loadedFonts = [];
 
+// See #16
+const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', `Invalid transition ${transition}`);
+
 
 module.exports = async (config = {}) => {
   const {
@@ -35,6 +38,8 @@ module.exports = async (config = {}) => {
   const isGif = outPath.toLowerCase().endsWith('.gif');
 
   const audioFilePath = isGif ? undefined : audioFilePathIn;
+
+  checkTransition(defaultsIn.transition);
 
   const defaults = {
     duration: 4,
@@ -107,7 +112,9 @@ module.exports = async (config = {}) => {
   }
 
   const clips = await pMap(clipsIn, async (clip, clipIndex) => {
-    const { transition: userTransition, duration: userDuration, layers } = { ...clip };
+    const { transition: userTransition, duration: userDuration, layers } = clip;
+
+    checkTransition(userTransition);
 
     const videoLayers = layers.filter((layer) => layer.type === 'video');
     assert(videoLayers.length <= 1, 'Max 1 video per layer');
