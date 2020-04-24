@@ -137,8 +137,8 @@ Edit specs are Javascript / JSON ojects describing the whole edit operation.
 | Parameter | CLI equivalent | Description | Default | |
 |-|-|-|-|-|
 | `outPath` | `--out` | Out path (mp4, mkv), can also be a GIF | | |
-| `width` | `--width` | Width which all media will be converted to | First video width or `640` | |
-| `height` | `--height` | Height which all media will be converted to | auto based on `width` | |
+| `width` | `--width` | Width which all media will be converted to | `640` | |
+| `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of first video | |
 | `fps` | `--fps` | FPS which all videos will be converted to | First video FPS or `25` | |
 | `audioFilePath` | `--audio-file-path` | Set an audio track to the whole output video | | |
 | `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview) | `false` | |
