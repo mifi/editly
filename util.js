@@ -16,12 +16,15 @@ async function readFileInfo(p) {
   ]);
   const json = JSON.parse(stdout);
   const stream = json.streams[0];
+
+  const rotation = stream.tags && stream.tags.rotate && parseInt(stream.tags.rotate, 10);
   return {
     // numFrames: parseInt(stream.nb_frames, 10),
     duration: parseFloat(stream.duration, 10),
     width: stream.width, // TODO coded_width?
     height: stream.height,
     framerateStr: stream.r_frame_rate,
+    rotation: !Number.isNaN(rotation) ? rotation : undefined,
   };
 }
 
