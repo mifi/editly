@@ -1,4 +1,5 @@
 {
+  width: 320, height: 240,
   outPath: './resizeHorizontal.mp4',
   defaults: {
     transition: null,
