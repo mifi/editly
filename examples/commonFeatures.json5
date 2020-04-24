@@ -1,7 +1,8 @@
 {
   // width: 2166, height: 1650, fps: 30,
-  // outPath: './commonFeatures.mp4',
-  outPath: './commonFeatures.gif',
+  width: 720, height: 1280, fps: 30,
+  outPath: './commonFeatures.mp4',
+  // outPath: './commonFeatures.gif',
   audioFilePath: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a',
   defaults: {
     transition: { name: 'random' },
