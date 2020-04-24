@@ -38,8 +38,8 @@ function calcTransition(defaults, transition) {
 
   assert(!transitionOrDefault.duration || transitionOrDefault.name, 'Please specify transition name or set duration to 0');
 
-  if (transitionOrDefault.name === 'random') {
-    transitionOrDefault = { easing: transitionOrDefault.easing, name: getRandomTransition(), duration: 0.5 };
+  if (transitionOrDefault.name === 'random' && transitionOrDefault.duration) {
+    transitionOrDefault = { easing: transitionOrDefault.easing, name: getRandomTransition(), duration: transitionOrDefault.duration };
   }
 
   const getTransitionByAlias = () => {

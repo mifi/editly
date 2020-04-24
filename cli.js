@@ -91,11 +91,10 @@ const cli = meow(`
 
   const { verbose, transitionName, transitionDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath } = cli.flags;
 
-  if (transitionName || transitionDuration) {
-    params.defaults.transition = {
-      name: transitionName,
-      duration: transitionDuration,
-    };
+  if (transitionName || transitionDuration != null) {
+    params.defaults.transition = {};
+    if (transitionName) params.defaults.transition.name = transitionName;
+    if (transitionDuration) params.defaults.transition.duration = transitionDuration;
   }
 
   if (fontPath) {
