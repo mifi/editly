@@ -124,7 +124,7 @@ module.exports = async (config = {}) => {
       if (type === 'video') {
         const { cutFrom: cutFromIn, cutTo: cutToIn, path } = layer;
         const fileInfo = await readFileInfo(path);
-        const { duration: fileDuration, width, height, framerateStr } = fileInfo;
+        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = fileInfo;
         let cutFrom;
         let cutTo;
         let trimmedSourceDuration = fileDuration;
@@ -145,6 +145,10 @@ module.exports = async (config = {}) => {
           duration = trimmedSourceDuration;
           framePtsFactor = 1;
         }
+
+        const isRotated = rotation === 90 || rotation === 270;
+        const width = isRotated ? heightIn : widthIn;
+        const height = isRotated ? widthIn : heightIn;
 
         return { ...layer, cutFrom, cutTo, width, height, framerateStr, framePtsFactor };
       }
@@ -193,9 +197,9 @@ module.exports = async (config = {}) => {
     height = isGif ? calculatedHeight : multipleOf2(calculatedHeight); // x264 requires multiple of 2
     width = desiredWidth;
   } else {
-    // Cannot detect width/height from video, set defaults
     width = desiredWidth;
     height = desiredWidth;
+    // console.log(`Cannot detect width/height from video, set defaults ${width}x${height}`);
   }
 
   // User override?
