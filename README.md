@@ -1,29 +1,27 @@
-# editly
-
-Editly is a tool and framework for declarative NLE (non-linear video editing) using Node.js and ffmpeg. It allows you to **easily and programmatically** create a video from set of clips, images and titles, with smooth transitions between.
-
-There is a simple command line for quickly assembling a video from a set of clips or images, or you can use it from Javascript!
-
-Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat). The problem with that project is that it is quite slow and uses an extreme amount of disk space, especially for HD/4K videos. This projects solves that by doing **streaming** editing, so it doesn't store any temporary files.
+# editly 🏄‍♀️
 
 [![demo](https://github.com/mifi/gifs/raw/master/commonFeatures.gif)](https://youtu.be/LNeclLkxUEY)
 
-This GIF/youtube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)"
+This GIF / YouTube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)". See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples).
 
-See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples)
+**Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from **set of clips, images and titles**, with smooth transitions between and music overlaid.
+
+Editly has a simple CLI for quickly assembling a video from a set of clips or images, or you can use its more flexible Javascript API.
+
+Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat), editly is much faster and doesn't require much storage because it uses **streaming** editing. Editly aims to be very extensible and feature rich with a pluggable interface for adding new **dynamic content**.
 
 ## Features
 
 - Edit videos with code! Declarative API with fun defaults
 - Create colorful videos with random colors generated from aesthetically pleasing pallettes and random effects
-- Supports any size like 4K video and DSLR photos
-- Can output to any dimensions, like *Instagram post* (1:1), *Instagram story* (9:16), *YouTube* (16:9), or any other dimensions you like.
+- Supports any input size like 4K video and DSLR photos
+- Can output to any dimensions and aspect ratio, like *Instagram post* (1:1), *Instagram story* (9:16), *YouTube* (16:9), or any other dimensions you like.
 - Content will be scaled and letterboxed automatically, even if input aspect ratio is not same, and framerate will be converted.
 - Speeds up / slow down videos automatically to match `cutFrom`/`cutTo` segment length with each clip's `duration`
 - Overlay text and subtitles on videos, images or backgrounds
 - Accepts custom HTML5 Canvas / Fabric.js Javascript code for custom screens or dynamic overlays
 - Render custom GL shaders (for example from [shadertoy](https://www.shadertoy.com/))
-- Output GIF
+- Can output GIF
 
 ## Use cases
 
@@ -31,7 +29,7 @@ See [more examples here](https://github.com/mifi/editly/tree/master/examples#exa
 - Create a fast paced trailer or promo video
 - Create a tutorial video with help text
 - Simply convert a video to a GIF
-- Resize video to any size or framerate and with automatic letterbox/crop (e.g. if you need to upload a video somewhere and the site complains **video dimensions must be 1337x1000**
+- Resize video to any size or framerate and with automatic letterbox/crop (e.g. if you need to upload a video somewhere but the site complains `Video must be 1337x1000 30fps`)
 
 See [examples](https://github.com/mifi/editly/tree/master/examples)
 
@@ -90,7 +88,7 @@ await editly(editSpec)
 
 ## Edit spec
 
-Edit specs are Javascript / JSON ojects describing the whole edit operation.
+Edit specs are Javascript / JSON ojects describing the whole edit operation with the following structure:
 
 ```js
 {
@@ -136,27 +134,27 @@ Edit specs are Javascript / JSON ojects describing the whole edit operation.
 
 | Parameter | CLI equivalent | Description | Default | |
 |-|-|-|-|-|
-| `outPath` | `--out` | Out path (mp4, mkv), can also be a GIF | | |
+| `outPath` | `--out` | Out path (mp4, mkv), can also be a `.gif` | | |
 | `width` | `--width` | Width which all media will be converted to | `640` | |
-| `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of first video | |
+| `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of **first video** | |
 | `fps` | `--fps` | FPS which all videos will be converted to | First video FPS or `25` | |
 | `audioFilePath` | `--audio-file-path` | Set an audio track to the whole output video | | |
 | `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview) | `false` | |
 | `defaults.layer.fontPath` | `--font-path` | Set default font to a .ttf | System font | |
-| `defaults.layer.*` | | Set any layer value that all layers will inherit | | |
+| `defaults.layer.*` | | Set any layer parameter that all layers will inherit | | |
 | `defaults.duration` | | Set default clip duration for clips that don't have an own duration | `4` | sec |
-| `defaults.transition` | | An object `{ name, duration }` describing the transition. Set to **null** to disable transition | | |
-| `defaults.transition.duration` | `--transition-duration` | Set default transition duration | `0.5` | sec |
-| `defaults.transition.name` | `--transition-name` | Set default transition type. See **Transition types** | `random` | |
-| `clips[]` | | List of clips that will be concatenated in sequence | | |
+| `defaults.transition` | | An object `{ name, duration }` describing the default transition. Set to **null** to disable transitions | | |
+| `defaults.transition.duration` | `--transition-duration` | Default transition duration | `0.5` | sec |
+| `defaults.transition.name` | `--transition-name` | Default transition type. See **Transition types** | `random` | |
+| `clips[]` | | List of clip objects that will be concatenated in sequence | | |
 | `clips[].duration` | | Clip duration. See `defaults.duration` | `defaults.duration` | |
-| `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.duration` | |
-| `clips[].layers[]` | | List of layers within the current clip that will be overlayed in their natural order (last layer on top) | | |
+| `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.transition` | |
+| `clips[].layers[]` | | List of layers within the current clip that will be overlaid in their natural order (last layer on top) | | |
 | `clips[].layers[].type` | | Layer type, see below | | |
 
 ### Transition types
 
-`transition.name` can be any of [gl-transitions](https://gl-transitions.com/gallery), in addition to: `directional-left`, `directional-right`, `directional-up`, `directional-down` and `random`.
+`transition.name` can be any of [gl-transitions](https://gl-transitions.com/gallery), or any of the following: `directional-left`, `directional-right`, `directional-up`, `directional-down` and `random`.
 
 ### Layer types
 
@@ -164,14 +162,14 @@ See [examples](https://github.com/mifi/editly/tree/master/examples) and [commonF
 
 #### Layer type 'video'
 
-For video layers, if parent `clip.duration` is specified, the video will be slowed/sped-up to match the `clip.duration`. If `cutFrom`/`cutTo` is set, the resulting segment will be slowed/sped-up to match the `clip.duration`.
+For video layers, if parent `clip.duration` is specified, the video will be slowed/sped-up to match `clip.duration`. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`.
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
 | `path` | Path to video file | | |
-| `resizeMode` | One of `cover`, `contain`, `stretch` | | |
+| `resizeMode` | One of `cover`, `contain`, `stretch` | `contain` | |
 | `cutFrom` | Time value to cut from | `0` | sec |
-| `cutTo` | Time value to cut from | video duration | sec |
+| `cutTo` | Time value to cut from | *end of video* | sec |
 | `backgroundColor` | Background of letterboxing | `#000000` | |
 
 #### Layer type 'image'
