@@ -264,6 +264,7 @@ module.exports = async (config = {}) => {
       '-movflags', 'faststart',
       '-y', outPath,
     ];
+
     const args = [
       ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'panic']),
 
@@ -275,6 +276,10 @@ module.exports = async (config = {}) => {
       '-i', '-',
 
       ...(audioFilePath ? ['-i', audioFilePath, '-shortest'] : []),
+
+      '-map', '0:v:0',
+      ...(audioFilePath ? ['-map', '1:a:0'] : []),
+
       ...(audioFilePath ? ['-acodec', 'aac', '-b:a', '128k'] : []),
 
       ...outputArgs,
