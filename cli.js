@@ -33,7 +33,7 @@ const cli = meow(`
     --audio-file-path  Add an audio track
 
     --fast, -f  Fast mode (low resolution and FPS, useful for getting a quick preview)
-    --verbose
+    --verbose, -v
 
   For more detailed explanation, see:
   https://github.com/mifi/editly
@@ -43,6 +43,7 @@ const cli = meow(`
     $ editly my-editly.json5 --out output.gif
 `, {
   flags: {
+    verbose: { type: 'boolean', alias: 'v' },
     fast: { type: 'boolean', alias: 'f' },
     transitionDuration: { type: 'number' },
     width: { type: 'number' },
