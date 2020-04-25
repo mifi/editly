@@ -194,8 +194,9 @@ module.exports = async (config = {}) => {
   let height;
 
   let desiredWidth;
-  if (requestedWidth) desiredWidth = requestedWidth;
-  else if (fast) desiredWidth = 320;
+
+  if (fast) desiredWidth = 320;
+  else if (requestedWidth) desiredWidth = requestedWidth;
   else if (isGif) desiredWidth = 320;
   else desiredWidth = 640;
 
@@ -210,7 +211,7 @@ module.exports = async (config = {}) => {
   }
 
   // User override?
-  if (requestedWidth && requestedHeight) {
+  if (!fast && requestedWidth && requestedHeight) {
     width = requestedWidth;
     height = requestedHeight;
   }
@@ -221,12 +222,12 @@ module.exports = async (config = {}) => {
   let fps;
   let framerateStr;
 
-  if (requestedFps && typeof requestedFps === 'number') {
-    fps = requestedFps;
-    framerateStr = String(requestedFps);
-  } else if (fast) {
+  if (fast) {
     fps = 15;
     framerateStr = String(fps);
+  } else if (requestedFps && typeof requestedFps === 'number') {
+    fps = requestedFps;
+    framerateStr = String(requestedFps);
   } else if (isGif) {
     fps = 10;
     framerateStr = String(fps);
