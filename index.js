@@ -243,6 +243,12 @@ module.exports = async (config = {}) => {
 
   console.log(`${width}x${height} ${fps}fps`);
 
+  const estimatedTotalFrames = fps * clips.reduce((acc, c, i) => {
+    let newAcc = acc + c.duration;
+    if (i !== clips.length - 1) newAcc -= c.transition.duration;
+    return newAcc;
+  }, 0);
+
   const channels = 4;
 
   const { runTransitionOnFrame } = GlTransitions({ width, height, channels });
@@ -329,6 +335,11 @@ module.exports = async (config = {}) => {
       const transitionFrameAt = fromClipFrameCount - (fromClipNumFrames - transitionNumFramesSafe);
 
       if (verbose) console.log('Frame', totalFrameCount, 'from', fromClipFrameCount, `(clip ${transitionFromClipId})`, 'to', toClipFrameCount, `(clip ${getTransitionToClipId()})`);
+
+      if (!verbose) {
+        const percentDone = Math.floor(100 * (totalFrameCount / estimatedTotalFrames));
+        if (totalFrameCount % 10 === 0) process.stdout.write(`${String(percentDone).padStart(3, ' ')}% `);
+      }
 
       if (!frameData1 || transitionFrameAt >= transitionNumFramesSafe - 1) {
       // if (!frameData1 || transitionFrameAt >= transitionNumFramesSafe) {
