@@ -316,7 +316,7 @@ module.exports = async (config = {}) => {
 
       const clipTransition = getTransitionFromClip().transition;
 
-      const transitionNumFrames = Math.round((clipTransition.duration || 0) * fps);
+      const transitionNumFrames = Math.round(clipTransition.duration * fps);
 
       // Each clip has two transitions, make sure we leave enough room:
       const transitionNumFramesSafe = Math.floor(Math.min(Math.min(fromClipNumFrames, toClipNumFrames != null ? toClipNumFrames : Number.MAX_SAFE_INTEGER) / 2, transitionNumFrames));

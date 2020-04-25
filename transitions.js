@@ -57,7 +57,7 @@ function calcTransition(defaults, transition) {
 
   return {
     name: outTransition.name,
-    duration: outTransition.duration,
+    duration: outTransition.duration || 0,
     params: outTransition.params,
     easingFunction: getTransitionEasingFunction(outTransition.easing, outTransition.name),
   };
