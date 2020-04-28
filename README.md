@@ -77,6 +77,8 @@ By default without `--fast` it will use the **width**, **height** and **frame ra
 
 **TIP:** Use this tool in conjunction with [LosslessCut](https://github.com/mifi/lossless-cut)
 
+**TIP:** If you need catchy music for your video, have a look at [this YouTube](https://www.youtube.com/channel/UCht8qITGkBvXKsR1Byln-wA) or the [YouTube audio library](https://www.youtube.com/audiolibrary/music?nv=1). Then use [youtube-dl](https://github.com/ytdl-org/youtube-dl) to download the video, and then point `--audio-file-path` at the video file. *Be sure to respect their license!*
+
 ## Javascript library
 
 ```js
