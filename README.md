@@ -59,22 +59,23 @@ editly \
   img1.jpg \
   img2.jpg \
   title:'THE END' \
+  --fast \
   --audio-file-path /path/to/music.mp3
 ```
 
 Or create an MP4 (or GIF) from a JSON or JSON5 edit spec *(JSON5 is just a more friendly JSON format)*:
 
 ```sh
-editly my-editly.json5 --out output.gif
+editly my-editly.json5 --fast --out output.gif
 ```
 
 For examples of how to make an JSON edit spec, see below or https://github.com/mifi/editly/tree/master/examples
 
-By default it will use the **width**, **height** and **frame rate** from the **first** input video. **all other clips will be converted to these dimensions** You can override these parameters however. If none are specified, it will use defaults.
+When you run with `--fast` or `fast: true` it will render a much quicker low resolution preview ⏩
 
-**TIP 1:** Run with `--fast` or `fast: true` first to improve speed while testing your edit ⏩
+By default without `--fast` it will use the **width**, **height** and **frame rate** from the **first** input video. **all other clips will be converted to these dimensions.** You can of course override any or all of these parameters.
 
-**TIP 2:** Use this tool in conjunction with [LosslessCut](https://github.com/mifi/lossless-cut)
+**TIP:** Use this tool in conjunction with [LosslessCut](https://github.com/mifi/lossless-cut)
 
 ## Javascript library
 

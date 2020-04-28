@@ -198,16 +198,24 @@ module.exports = async (config = {}) => {
   if (fast) desiredWidth = 320;
   else if (requestedWidth) desiredWidth = requestedWidth;
   else if (isGif) desiredWidth = 320;
-  else desiredWidth = 640;
 
   if (detectedWidth && detectedHeight) {
-    const calculatedHeight = Math.round((detectedHeight / detectedWidth) * desiredWidth);
-    height = isGif ? calculatedHeight : multipleOf2(calculatedHeight); // x264 requires multiple of 2
-    width = desiredWidth;
-  } else {
+    if (desiredWidth) {
+      const calculatedHeight = Math.round((detectedHeight / detectedWidth) * desiredWidth);
+      height = isGif ? calculatedHeight : multipleOf2(calculatedHeight); // x264 requires multiple of 2
+      width = desiredWidth;
+    } else {
+      width = detectedWidth;
+      height = detectedHeight;
+    }
+  } else if (desiredWidth) {
     width = desiredWidth;
     height = desiredWidth;
     // console.log(`Cannot detect width/height from video, set defaults ${width}x${height}`);
+  } else {
+    // No video
+    width = 640;
+    height = 640;
   }
 
   // User override?
