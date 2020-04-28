@@ -91,7 +91,7 @@ await editly(editSpec)
 
 ## Edit spec
 
-Edit specs are Javascript / JSON ojects describing the whole edit operation with the following structure:
+Edit specs are Javascript / JSON objects describing the whole edit operation with the following structure:
 
 ```js
 {
@@ -100,10 +100,10 @@ Edit specs are Javascript / JSON ojects describing the whole edit operation with
   height,
   fps,
   defaults: {
-    duration = 4,
+    duration: 4,
     transition: {
-      duration = 0.5,
-      name = 'random',
+      duration: 0.5,
+      name: 'random',
     },
     layer: {
       fontPath,
@@ -127,9 +127,9 @@ Edit specs are Javascript / JSON ojects describing the whole edit operation with
   ],
 
   // Testing options:
-  enableFfmpegLog = false,
-  verbose = false,
-  fast = false,
+  enableFfmpegLog: false,
+  verbose: false,
+  fast: false,
 }
 ```
 
