@@ -16,7 +16,7 @@ const GlTransitions = require('./glTransitions');
 const loadedFonts = [];
 
 // See #16
-const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', `Invalid transition ${transition}`);
+const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', 'Transition must be an object');
 
 
 module.exports = async (config = {}) => {
