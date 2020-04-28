@@ -118,4 +118,7 @@ const cli = meow(`
   if (!params.outPath) params.outPath = './editly-out.mp4';
 
   await editly(params);
-})().catch(console.error);
+})().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});
