@@ -62,6 +62,14 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, enable
       resolve();
     }
 
+    function cleanup() {
+      stream.pause();
+      // eslint-disable-next-line no-use-before-define
+      stream.removeListener('data', handleChunk);
+      stream.removeListener('end', onEnd);
+      stream.removeListener('error', reject);
+    }
+
     function handleChunk(chunk) {
       // console.log('chunk', chunk.length);
       const nCopied = length + chunk.length > targetSize ? targetSize - length : chunk.length;
@@ -86,22 +94,16 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, enable
         // inFrameCount += 1;
 
         clearTimeout(timeout);
-        stream.pause();
-        stream.removeListener('data', handleChunk);
-        stream.removeListener('end', onEnd);
-        stream.removeListener('error', reject);
+        cleanup();
         resolve(out);
       }
     }
 
     timeout = setTimeout(() => {
       console.warn('Timeout on read video frame');
-      stream.pause();
-      stream.removeListener('data', handleChunk);
-      stream.removeListener('end', onEnd);
-      stream.removeListener('error', reject);
+      cleanup();
       resolve();
-    }, 10000);
+    }, 20000);
 
     stream.on('data', handleChunk);
     stream.on('end', onEnd);
