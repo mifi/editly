@@ -26,6 +26,7 @@ const cli = meow(`
     --json  Use JSON edit spec
     --transition-name  Name of default transition to use (default: random)
     --transition-duration  Default transition duration
+    --clip-duration  Default clip duration
     --width  Width which all media will be converted to
     --height  Height which all media will be converted to
     --fps  FPS which all videos will be converted to
@@ -46,6 +47,7 @@ const cli = meow(`
     verbose: { type: 'boolean', alias: 'v' },
     fast: { type: 'boolean', alias: 'f' },
     transitionDuration: { type: 'number' },
+    clipDuration: { type: 'number' },
     width: { type: 'number' },
     height: { type: 'number' },
     fps: { type: 'number' },
@@ -90,13 +92,15 @@ const cli = meow(`
     params.clips = clips.map((clip) => ({ layers: [clip] }));
   }
 
-  const { verbose, transitionName, transitionDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath } = cli.flags;
+  const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath } = cli.flags;
 
   if (transitionName || transitionDuration != null) {
     params.defaults.transition = {};
     if (transitionName) params.defaults.transition.name = transitionName;
     if (transitionDuration) params.defaults.transition.duration = transitionDuration;
   }
+
+  if (clipDuration) params.defaults.duration = clipDuration;
 
   if (fontPath) {
     params.defaults.layer = {
