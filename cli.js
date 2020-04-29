@@ -92,7 +92,7 @@ const cli = meow(`
     params.clips = clips.map((clip) => ({ layers: [clip] }));
   }
 
-  const { verbose, transitionName, transitionDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath } = cli.flags;
+  const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath } = cli.flags;
 
   if (transitionName || transitionDuration != null) {
     params.defaults.transition = {};
