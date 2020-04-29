@@ -145,7 +145,7 @@ Edit specs are Javascript / JSON objects describing the whole edit operation wit
 | `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview) | `false` | |
 | `defaults.layer.fontPath` | `--font-path` | Set default font to a .ttf | System font | |
 | `defaults.layer.*` | | Set any layer parameter that all layers will inherit | | |
-| `defaults.duration` | | Set default clip duration for clips that don't have an own duration | `4` | sec |
+| `defaults.duration` | `--clip-duration` | Set default clip duration for clips that don't have an own duration | `4` | sec |
 | `defaults.transition` | | An object `{ name, duration }` describing the default transition. Set to **null** to disable transitions | | |
 | `defaults.transition.duration` | `--transition-duration` | Default transition duration | `0.5` | sec |
 | `defaults.transition.name` | `--transition-name` | Default transition type. See **Transition types** | `random` | |
