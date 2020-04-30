@@ -94,13 +94,24 @@ async function imageFrameSource({ verbose, params, width, height, canvas }) {
   if (blurredImg.height > blurredImg.width) blurredImg.scaleToWidth(width);
   else blurredImg.scaleToHeight(height);
 
+  const defaultScaleFactor = 1;
+  const scaleFns = {
+    in: (progress, zoomAmount = 0.1) => 1 + progress * zoomAmount,
+    out: (progress, zoomAmount = 0.1) => 1 + zoomAmount * (1 - progress),
+  };
 
   async function onRender(progress) {
-    const { zoomDirection = 'in', zoomAmount = 0.1 } = params;
+    const { zoomDirection, zoomAmount } = params;
 
     const img = getImg();
 
-    const scaleFactor = zoomDirection === 'in' ? (1 + progress * zoomAmount) : (1 + zoomAmount * (1 - progress));
+    let scaleFactor;
+    if (scaleFns[zoomDirection]) {
+      scaleFactor = scaleFns[zoomDirection](progress, zoomAmount);
+    } else {
+      scaleFactor = defaultScaleFactor;
+    }
+
     if (img.height > img.width) img.scaleToHeight(height * scaleFactor);
     else img.scaleToWidth(width * scaleFactor);
 
