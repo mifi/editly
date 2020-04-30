@@ -37,6 +37,7 @@ See [examples](https://github.com/mifi/editly/tree/master/examples)
 
 - [Node.js installed](https://nodejs.org/en/) (Recommended to use newest stable version)
 - Should work on Windows, MacOS and Linux. Needs at least Node.js v12.16.2 on MacOS ([see issue](https://github.com/sindresorhus/meow/issues/144)). See also https://github.com/stackgl/headless-gl#system-dependencies
+- (Linux) may require some extra steps, see [headless-gl](https://github.com/stackgl/headless-gl#system-dependencies).
 
 Make sure you have `ffmpeg` and `ffprobe` installed and available in `PATH`
 
@@ -73,7 +74,7 @@ For examples of how to make an JSON edit spec, see below or https://github.com/m
 
 When you run with `--fast` or `fast: true` it will render a much quicker low resolution preview ⏩
 
-By default without `--fast` it will use the **width**, **height** and **frame rate** from the **first** input video. **all other clips will be converted to these dimensions.** You can of course override any or all of these parameters.
+Without `--fast` it will default to using the **width**, **height** and **frame rate** from the **first** input video. **all other clips will be converted to these dimensions.** You can of course override any or all of these parameters.
 
 **TIP:** Use this tool in conjunction with [LosslessCut](https://github.com/mifi/lossless-cut)
 
@@ -238,6 +239,7 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 ## Troubleshooting
 
 - If you get `Error: The specified module could not be found.`, try: `npm un -g editly && npm i -g --build-from-source editly` (see [#15](https://github.com/mifi/editly/issues/15))
+- If you get an error about gl returning null, see Requirements.
 
 ## See also
 
