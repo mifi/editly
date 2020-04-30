@@ -1,7 +1,7 @@
 const execa = require('execa');
 const assert = require('assert');
 
-module.exports = async ({ width, height, channels, framerateStr, verbose, enableFfmpegLog, params }) => {
+module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpegPath, enableFfmpegLog, params }) => {
   const targetSize = width * height * channels;
 
   // TODO assert that we have read the correct amount of frames
