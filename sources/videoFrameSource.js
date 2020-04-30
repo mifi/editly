@@ -29,7 +29,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, enable
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
   const args = [
-    ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'panic']),
+    ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']),
     ...(cutFrom ? ['-ss', cutFrom] : []),
     '-i', path,
     ...(cutTo ? ['-t', (cutTo - cutFrom) * framePtsFactor] : []),

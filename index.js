@@ -280,7 +280,7 @@ module.exports = async (config = {}) => {
     ];
 
     const args = [
-      ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'panic']),
+      ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']),
 
       '-f', 'rawvideo',
       '-vcodec', 'rawvideo',
@@ -308,6 +308,13 @@ module.exports = async (config = {}) => {
 
   try {
     outProcess = startFfmpegWriterProcess();
+    let outProcessError;
+
+    // If we don't catch it here, the whole process will crash and we cannot process the error
+    outProcess.stdin.on('error', (err) => {
+      console.error('Output ffmpeg caught error', err);
+      outProcessError = err;
+    });
 
     let totalFrameCount = 0;
     let fromClipFrameCount = 0;
@@ -394,7 +401,8 @@ module.exports = async (config = {}) => {
 
         // If we don't await we get EINVAL when dealing with high resolution files (big writes)
         await new Promise((r) => outProcess.stdin.write(outFrameData, () => r()));
-        // outProcess.stdin.write(outFrameData);
+
+        if (outProcessError) throw outProcessError;
 
         fromClipFrameCount += 1;
       }
