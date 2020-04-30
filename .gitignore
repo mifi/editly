@@ -103,6 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
+# macOS
+.DS_Store
 
 /examples/assets
 /examples/*.mp4
