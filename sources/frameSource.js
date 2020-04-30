@@ -6,7 +6,7 @@ const createVideoFrameSource = require('./videoFrameSource');
 const { createGlFrameSource } = require('./glFrameSource');
 
 
-async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, enableFfmpegLog, framerateStr }) {
+async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, enableFfmpegLog, framerateStr }) {
   const { layers, duration } = clip;
 
   const frameSources = await pMap(layers, async (layer, layerIndex) => {
@@ -29,7 +29,7 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
 
     const createFrameSourceFunc = frameSourceFuncs[type];
 
-    return createFrameSourceFunc({ width, height, duration, channels, verbose, enableFfmpegLog, framerateStr, params });
+    return createFrameSourceFunc({ ffmpegPath, width, height, duration, channels, verbose, enableFfmpegLog, framerateStr, params });
   }, { concurrency: 1 });
 
   async function readNextFrame(...args) {

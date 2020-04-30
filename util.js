@@ -10,8 +10,8 @@ function parseFps(fps) {
   return undefined;
 }
 
-async function readFileInfo(p) {
-  const { stdout } = await execa('ffprobe', [
+async function readFileInfo(ffprobePath, p) {
+  const { stdout } = await execa(ffprobePath, [
     '-select_streams', 'v:0', '-show_entries', 'stream', '-of', 'json', p,
   ]);
   const json = JSON.parse(stdout);

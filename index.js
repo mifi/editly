@@ -33,6 +33,9 @@ module.exports = async (config = {}) => {
     fps: requestedFps,
     defaults: defaultsIn = {},
     audioFilePath: audioFilePathIn,
+
+    ffmpegPath = 'ffmpeg',
+    ffprobePath = 'ffprobe',
   } = config;
 
   const isGif = outPath.toLowerCase().endsWith('.gif');
@@ -130,7 +133,7 @@ module.exports = async (config = {}) => {
 
       if (type === 'video') {
         const { cutFrom: cutFromIn, cutTo: cutToIn, path } = layer;
-        const fileInfo = await readFileInfo(path);
+        const fileInfo = await readFileInfo(ffprobePath, path);
         const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = fileInfo;
         let cutFrom;
         let cutTo;
@@ -299,7 +302,7 @@ module.exports = async (config = {}) => {
       ...outputArgs,
     ];
     if (verbose) console.log('ffmpeg', args.join(' '));
-    return execa('ffmpeg', args, { encoding: null, buffer: false, stdin: 'pipe', stdout: process.stdout, stderr: process.stderr });
+    return execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'pipe', stdout: process.stdout, stderr: process.stderr });
   }
 
   let outProcess;
@@ -326,7 +329,7 @@ module.exports = async (config = {}) => {
     const getTransitionFromClip = () => clips[transitionFromClipId];
     const getTransitionToClip = () => clips[getTransitionToClipId()];
 
-    const getSource = (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, enableFfmpegLog, framerateStr });
+    const getSource = (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, enableFfmpegLog, framerateStr });
 
     const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
     frameSource1 = await getSource(getTransitionFromClip(), transitionFromClipId);

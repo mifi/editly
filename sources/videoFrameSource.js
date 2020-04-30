@@ -42,7 +42,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, enable
   ];
   if (verbose) console.log(args.join(' '));
 
-  const ps = execa('ffmpeg', args, { encoding: null, buffer: false, stdin: 'ignore', stdout: 'pipe', stderr: process.stderr });
+  const ps = execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'ignore', stdout: 'pipe', stderr: process.stderr });
 
   const stream = ps.stdout;
 
