@@ -1,4 +1,6 @@
 {
+  // verbose: true,
+  // enableFfmpegLog: true,
   outPath: './videos.mp4',
   defaults: {
     transition: {
