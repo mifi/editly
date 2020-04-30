@@ -8,6 +8,10 @@ const createTexture = require('gl-texture2d');
 module.exports = ({ width, height, channels }) => {
   const gl = GL(width, height);
 
+  if (!gl) {
+    throw new Error('gl returned null, this probably means that some dependencies are not installed. See README.');
+  }
+
   function runTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams = {} }) {
     function convertFrame(buf) {
       // @see https://github.com/stackgl/gl-texture2d/issues/16
