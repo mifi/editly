@@ -11,3 +11,5 @@ node ../cli.js --json subtitle.json5
 node ../cli.js --json transitionEasing.json5
 node ../cli.js --json transparentGradient.json5
 node ../cli.js --json commonFeatures.json5
+node ../cli.js --json kenBurns.json5
+node ../cli.js --json slideshow.json5
