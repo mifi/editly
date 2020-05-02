@@ -240,6 +240,7 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 
 - If you get `Error: The specified module could not be found.`, try: `npm un -g editly && npm i -g --build-from-source editly` (see [#15](https://github.com/mifi/editly/issues/15))
 - If you get an error about gl returning null, see Requirements.
+- If you get an error `/bin/sh: pkg-config: command not found`, try to use newest Node.js LTS version
 
 ## See also
 
