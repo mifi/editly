@@ -6,5 +6,6 @@
   clips: [
     { duration: 3, layers: [{ type: 'image', path: './assets/img2.jpg', zoomDirection: 'out' }] },
     { duration: 3, layers: [{ type: 'image', path: './assets/img3.jpg', zoomDirection: 'in' }] },
+    { duration: 3, layers: [{ type: 'image', path: './assets/img1.jpg', zoomDirection: null }] },
   ],
 }

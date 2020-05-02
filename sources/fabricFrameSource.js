@@ -100,7 +100,10 @@ async function imageFrameSource({ verbose, params, width, height, canvas }) {
 
     const img = getImg();
 
-    const scaleFactor = zoomDirection === 'in' ? (1 + progress * zoomAmount) : (1 + zoomAmount * (1 - progress));
+    let scaleFactor = 1;
+    if (zoomDirection === 'in') scaleFactor = (1 + progress * zoomAmount);
+    else if (zoomDirection === 'out') scaleFactor = (1 + zoomAmount * (1 - progress));
+
     if (img.height > img.width) img.scaleToHeight(height * scaleFactor);
     else img.scaleToWidth(width * scaleFactor);
 

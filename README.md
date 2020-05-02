@@ -181,7 +181,7 @@ For video layers, if parent `clip.duration` is specified, the video will be slow
 | Parameter  | Description | Default | |
 |-|-|-|-|
 | `path` | Path to image file | | |
-| `zoomDirection` | Zoom direction for Ken Burns effect: `in` or `out` | `in` | |
+| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out` or `null` to disable | `in` | |
 | `zoomAmount` | Zoom amount for Ken Burns effect | `0.1` | |
 
 #### Layer type 'title'
