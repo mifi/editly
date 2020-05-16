@@ -249,3 +249,11 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 - https://github.com/transitive-bullshit/ffmpeg-concat
 - https://github.com/sjfricke/awesome-webgl
 - https://www.mltframework.org/docs/melt/
+
+---
+
+Made with ❤️ in 🇳🇴
+
+[More apps by mifi.no](https://mifi.no/)
+
+Follow me on [GitHub](https://github.com/mifi/), [YouTube](https://www.youtube.com/channel/UC6XlvVH63g0H54HSJubURQA), [IG](https://www.instagram.com/mifi.no/), [Twitter](https://twitter.com/mifi_no) for more awesome content!
