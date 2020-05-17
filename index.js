@@ -4,6 +4,7 @@ const pMap = require('p-map');
 const { basename, join } = require('path');
 const flatMap = require('lodash/flatMap');
 const JSON5 = require('json5');
+const fs = require('fs-extra');
 
 const { parseFps, readFileInfo, multipleOf2 } = require('./util');
 const { registerFont } = require('./sources/fabricFrameSource');
@@ -17,6 +18,8 @@ const loadedFonts = [];
 
 // See #16
 const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', 'Transition must be an object');
+
+const assertFileExists = async (path) => assert(await fs.exists(path), `File does not exist ${path}`);
 
 
 module.exports = async (config = {}) => {
@@ -42,6 +45,8 @@ module.exports = async (config = {}) => {
 
   const audioFilePath = isGif ? undefined : audioFilePathIn;
 
+  if (audioFilePath) await assertFileExists(audioFilePath);
+
   checkTransition(defaultsIn.transition);
 
   const defaults = {
@@ -61,6 +66,13 @@ module.exports = async (config = {}) => {
 
   async function handleLayer(layer) {
     const { type, ...restLayer } = layer;
+
+    // https://github.com/mifi/editly/issues/39
+    if (type === 'image') {
+      await assertFileExists(restLayer.path);
+    } else if (type === 'gl') {
+      await assertFileExists(restLayer.fragmentPath);
+    }
 
     if (['fabric', 'canvas'].includes(type)) assert(typeof layer.func === 'function', '"func" must be a function');
 
