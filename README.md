@@ -4,40 +4,41 @@
 
 This GIF / YouTube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)". See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples).
 
-**Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from **set of clips, images and titles**, with smooth transitions between and music overlaid.
+**Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images and titles**, with smooth transitions and music overlaid.
 
-Editly has a simple CLI for quickly assembling a video from a set of clips or images, or you can use its more flexible Javascript API.
+Editly has a simple CLI for quickly assembling a video from a set of clips or images, or you can use its more flexible JavaScript API.
 
 Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat), editly is much faster and doesn't require much storage because it uses **streaming** editing. Editly aims to be very extensible and feature rich with a pluggable interface for adding new **dynamic content**.
 
 ## Features
 
 - Edit videos with code! Declarative API with fun defaults
-- Create colorful videos with random colors generated from aesthetically pleasing pallettes and random effects
-- Supports any input size like 4K video and DSLR photos
-- Can output to any dimensions and aspect ratio, like *Instagram post* (1:1), *Instagram story* (9:16), *YouTube* (16:9), or any other dimensions you like.
-- Content will be scaled and letterboxed automatically, even if input aspect ratio is not same, and framerate will be converted.
-- Speeds up / slow down videos automatically to match `cutFrom`/`cutTo` segment length with each clip's `duration`
+- Create colorful videos with random colors generated from aesthetically pleasing palettes and random effects
+- Supports any input size, e.g. 4K video and DSLR photos
+- Can output to any dimensions and aspect ratio, e.g. *Instagram post* (1:1), *Instagram story* (9:16), *YouTube* (16:9), or any other dimensions you like.
+- Content is scaled and letterboxed automatically, even if the input aspect ratio is not the same and the framerate will be converted.
+- Speed up / slow down videos automatically to match the `cutFrom`/`cutTo` segment length with each clip's `duration`
 - Overlay text and subtitles on videos, images or backgrounds
-- Accepts custom HTML5 Canvas / Fabric.js Javascript code for custom screens or dynamic overlays
+- Accepts custom HTML5 Canvas / Fabric.js JavaScript code for custom screens or dynamic overlays
 - Render custom GL shaders (for example from [shadertoy](https://www.shadertoy.com/))
 - Can output GIF
 
 ## Use cases
 
 - Create a slideshow from a set of pictures with text overlay
-- Create a fast paced trailer or promo video
+- Create a fast-paced trailer or promo video
 - Create a tutorial video with help text
 - Simply convert a video to a GIF
-- Resize video to any size or framerate and with automatic letterbox/crop (e.g. if you need to upload a video somewhere but the site complains `Video must be 1337x1000 30fps`)
+- Resize video to any size or framerate and with automatic letterboxing/cropping (e.g. if you need to upload a video somewhere but the site complains `Video must be 1337x1000 30fps`)
 
 See [examples](https://github.com/mifi/editly/tree/master/examples)
 
 ## Requirements
 
-- [Node.js installed](https://nodejs.org/en/) (Recommended to use newest stable version)
-- Should work on Windows, MacOS and Linux. Needs at least Node.js v12.16.2 on MacOS ([see issue](https://github.com/sindresorhus/meow/issues/144)). See also https://github.com/stackgl/headless-gl#system-dependencies
-- (Linux) may require some extra steps, see [headless-gl](https://github.com/stackgl/headless-gl#system-dependencies).
+- [Node.js installed](https://nodejs.org/en/) (Use of the latest stable version is recommended)
+- Should work on Windows, MacOS and Linux. Needs at least Node.js v12.16.2 on MacOS ([see issue](https://github.com/sindresorhus/meow/issues/144)).
+  See also: https://github.com/stackgl/headless-gl#system-dependencies
+- (Linux) may require some extra steps. See [headless-gl](https://github.com/stackgl/headless-gl#system-dependencies).
 
 Make sure you have `ffmpeg` and `ffprobe` installed and available in `PATH`
 
@@ -70,17 +71,17 @@ Or create an MP4 (or GIF) from a JSON or JSON5 edit spec *(JSON5 is just a more 
 editly my-editly.json5 --fast --out output.gif
 ```
 
-For examples of how to make an JSON edit spec, see below or https://github.com/mifi/editly/tree/master/examples
+For examples of how to make a JSON edit spec, see below or https://github.com/mifi/editly/tree/master/examples
 
-When you run with `--fast` or `fast: true` it will render a much quicker low resolution preview ⏩
+When you run with `--fast` or `fast: true`, it will render a much quicker low-resolution preview ⏩
 
-Without `--fast` it will default to using the **width**, **height** and **frame rate** from the **first** input video. **all other clips will be converted to these dimensions.** You can of course override any or all of these parameters.
+Without `--fast` it will default to using the **width**, **height** and **frame rate** from the **first** input video. **All other clips will be converted to these dimensions.** You can of course override any or all of these parameters.
 
 **TIP:** Use this tool in conjunction with [LosslessCut](https://github.com/mifi/lossless-cut)
 
 **TIP:** If you need catchy music for your video, have a look at [this YouTube](https://www.youtube.com/channel/UCht8qITGkBvXKsR1Byln-wA) or the [YouTube audio library](https://www.youtube.com/audiolibrary/music?nv=1). Then use [youtube-dl](https://github.com/ytdl-org/youtube-dl) to download the video, and then point `--audio-file-path` at the video file. *Be sure to respect their license!*
 
-## Javascript library
+## JavaScript library
 
 ```js
 const editly = require('editly');
@@ -92,7 +93,7 @@ await editly(editSpec)
 
 ## Edit spec
 
-Edit specs are Javascript / JSON objects describing the whole edit operation with the following structure:
+Edit specs are JavaScript / JSON objects describing the whole edit operation with the following structure:
 
 ```js
 {
@@ -119,7 +120,7 @@ Edit specs are Javascript / JSON objects describing the whole edit operation wit
       layers: [
         {
           type,
-          // ...more layer specific options
+          // ...more layer-specific options
         }
         // ...more layers
       ],
@@ -138,7 +139,7 @@ Edit specs are Javascript / JSON objects describing the whole edit operation wit
 
 | Parameter | CLI equivalent | Description | Default | |
 |-|-|-|-|-|
-| `outPath` | `--out` | Out path (mp4, mkv), can also be a `.gif` | | |
+| `outPath` | `--out` | Output path (mp4, mkv), can also be a `.gif` | | |
 | `width` | `--width` | Width which all media will be converted to | `640` | |
 | `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of **first video** | |
 | `fps` | `--fps` | FPS which all videos will be converted to | First video FPS or `25` | |
@@ -221,13 +222,13 @@ Title with background
 
 See [customCanvas.js](https://github.com/mifi/editly/blob/master/examples/customCanvas.js)
 
-- `func` - Custom Javascript function
+- `func` - Custom JavaScript function
 
 #### Layer type 'fabric'
 
 See [customFabric.js](https://github.com/mifi/editly/blob/master/examples/customFabric.js)
 
-- `func` - Custom Javascript function
+- `func` - Custom JavaScript function
 
 #### Layer type 'gl'
 
