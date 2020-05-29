@@ -1,5 +1,15 @@
 const execa = require('execa');
 
+function toArrayInteger(buffer) {
+  if (buffer.length > 0) {
+      const data = new Uint8ClampedArray(buffer.length);
+      for (let i = 0; i < buffer.length; i=i+1)
+          data[i] = buffer[i];
+      return data;
+  }
+  return [];
+}
+
 function parseFps(fps) {
   const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
   if (match) {
@@ -34,4 +44,5 @@ module.exports = {
   parseFps,
   readFileInfo,
   multipleOf2,
+  toArrayInteger
 };

@@ -1,6 +1,7 @@
 const { fabric } = require('fabric');
 const fileUrl = require('file-url');
 const nodeCanvas = require('canvas');
+const { toArrayInteger } = require("../util");
 
 const { createCanvas } = nodeCanvas;
 
@@ -35,7 +36,7 @@ async function mergeFrames({ width, height, framesRaw }) {
     const ctx2 = canvas2.getContext('2d');
     // https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
     // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData
-    ctx2.putImageData(new nodeCanvas.ImageData(Uint8ClampedArray.from(frameRaw), width, height), 0, 0);
+    ctx2.putImageData(new nodeCanvas.ImageData(toArrayInteger(frameRaw), width, height), 0, 0);
     // require('fs').writeFileSync(`${Math.floor(Math.random() * 1e12)}.png`, canvas2.toBuffer('image/png'));
 
     ctx.drawImage(canvas2, 0, 0);
