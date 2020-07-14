@@ -25,7 +25,8 @@
     "p-map": "^4.0.0"
   },
   "scripts": {
-    "test": "exit 0"
+    "test": "exit 0",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
