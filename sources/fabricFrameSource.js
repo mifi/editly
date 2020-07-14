@@ -278,6 +278,49 @@ async function titleFrameSource({ width, height, params }) {
   return { onRender };
 }
 
+async function newsTitleFrameSource({ width, height, params }) {
+  const { text, textColor = '#ffffff', backgroundColor = '#d02a42', fontFamily = 'sans-serif', delay = 0, speed = 1 } = params;
+
+  async function onRender(progress, canvas) {
+    const min = Math.min(width, height);
+
+    const fontSize = Math.round(min * 0.05);
+
+    const easedBgProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed * 3, 1)));
+    const easedTextProgress = easeOutExpo(Math.max(0, Math.min((progress - delay - 0.02) * speed * 4, 1)));
+    const easedTextOpacityProgress = easeOutExpo(Math.max(0, Math.min((progress - delay - 0.07) * speed * 4, 1)));
+
+    const top = height * 0.08;
+
+    const paddingV = 0.07 * min;
+    const paddingH = 0.03 * min;
+
+    const textBox = new fabric.Text(text, {
+      top,
+      left: paddingV + (easedTextProgress - 1) * width,
+      fill: textColor,
+      opacity: easedTextOpacityProgress,
+      fontFamily,
+      fontSize,
+      charSpacing: width * 0.1,
+    });
+
+    const bgWidth = textBox.width + (paddingV * 2);
+    const rect = new fabric.Rect({
+      top: top - paddingH,
+      left: (easedBgProgress - 1) * bgWidth,
+      width: bgWidth,
+      height: textBox.height + (paddingH * 2),
+      fill: backgroundColor,
+    });
+
+    canvas.add(rect);
+    canvas.add(textBox);
+  }
+
+  return { onRender };
+}
+
 async function createCustomCanvasFrameSource({ width, height, params }) {
   const canvas = createCanvas(width, height);
   const context = canvas.getContext('2d');
@@ -315,6 +358,7 @@ module.exports = {
   customFabricFrameSource,
   subtitleFrameSource,
   titleFrameSource,
+  newsTitleFrameSource,
   fillColorFrameSource,
   radialGradientFrameSource,
   linearGradientFrameSource,

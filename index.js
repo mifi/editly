@@ -108,7 +108,7 @@ module.exports = async (config = {}) => {
       return outLayers;
     }
 
-    if (type === 'title' || type === 'subtitle') {
+    if (['title', 'subtitle', 'news-title'].includes(type)) {
       assert(layer.text, 'Please specify a text');
 
       let { fontFamily } = layer;

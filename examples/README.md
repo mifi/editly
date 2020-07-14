@@ -10,6 +10,16 @@
 editly kenBurns.json5
 ```
 
+## News title
+
+![](https://github.com/mifi/gifs/raw/master/newsTitle.gif)
+
+[kenBurns.json5](https://github.com/mifi/editly/blob/master/examples/newsTitle.json5)
+
+```bash
+editly newsTitle.json5
+```
+
 ## Resize modes
 
 ![](https://github.com/mifi/gifs/raw/master/resizeHorizontal.gif)
