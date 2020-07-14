@@ -51,13 +51,14 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
 
   const readNextFrame = () => new Promise((resolve, reject) => {
     if (ended) {
+      console.log(path, 'Tried to read next video frame after ffmpeg stream ended');
       resolve();
       return;
     }
     // console.log('Reading new frame', path);
 
     function onEnd() {
-      if (verbose) console.log(path, 'ffmpeg stream ended');
+      if (verbose) console.log(path, 'ffmpeg video stream ended');
       ended = true;
       resolve();
     }

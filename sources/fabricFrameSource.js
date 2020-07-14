@@ -23,58 +23,40 @@ function fabricCanvasToRgba(canvas) {
   return canvasToRgba(ctx);
 }
 
-async function mergeFrames({ width, height, framesRaw }) {
-  if (framesRaw.length === 1) return framesRaw[0];
+function createFabricCanvas({ width, height }) {
+  return new fabric.StaticCanvas(null, { width, height });
+}
 
-  // Node canvas needs no cleanup https://github.com/Automattic/node-canvas/issues/1216#issuecomment-412390668
+async function renderFabricCanvas(canvas) {
+  canvas.renderAll();
+  const rgba = fabricCanvasToRgba(canvas);
+  canvas.clear();
+  // canvas.dispose();
+  return rgba;
+}
+
+async function rgbaToFabricImage({ width, height, rgba }) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
-
-  framesRaw.forEach((frameRaw) => {
-    const canvas2 = createCanvas(width, height);
-    const ctx2 = canvas2.getContext('2d');
-    // https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
-    // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData
-    ctx2.putImageData(new nodeCanvas.ImageData(Uint8ClampedArray.from(frameRaw), width, height), 0, 0);
-    // require('fs').writeFileSync(`${Math.floor(Math.random() * 1e12)}.png`, canvas2.toBuffer('image/png'));
-
-    ctx.drawImage(canvas2, 0, 0);
-  });
-
-  return canvasToRgba(ctx);
+  // https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
+  // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData
+  ctx.putImageData(new nodeCanvas.ImageData(Uint8ClampedArray.from(rgba), width, height), 0, 0);
+  // https://stackoverflow.com/questions/58209996/unable-to-render-tiff-images-and-add-it-as-a-fabric-object
+  return new fabric.Image(canvas);
 }
 
 async function createFabricFrameSource(func, { width, height, ...rest }) {
-  const onInit = async ({ canvas }) => func(({ width, height, fabric, canvas, ...rest }));
+  const onInit = async () => func(({ width, height, fabric, ...rest }));
 
-  let canvas = new fabric.StaticCanvas(null, { width, height });
-
-  const { onRender = () => {}, onClose = () => {} } = await onInit({ canvas }) || {};
-
-  async function readNextFrame(progress) {
-    await onRender(progress);
-
-    canvas.renderAll();
-
-    const rgba = fabricCanvasToRgba(canvas);
-
-    canvas.clear();
-    // canvas.dispose();
-    return rgba;
-  }
+  const { onRender = () => {}, onClose = () => {} } = await onInit() || {};
 
   return {
-    readNextFrame,
-    close: () => {
-      // https://stackoverflow.com/questions/19030174/how-to-manage-memory-in-case-of-multiple-fabric-js-canvas
-      canvas.dispose();
-      canvas = undefined;
-      onClose();
-    },
+    readNextFrame: onRender,
+    close: onClose,
   };
 }
 
-async function imageFrameSource({ verbose, params, width, height, canvas }) {
+async function imageFrameSource({ verbose, params, width, height }) {
   if (verbose) console.log('Loading', params.path);
 
   const imgData = await new Promise((resolve) => fabric.util.loadImage(fileUrl(params.path), resolve));
@@ -95,7 +77,7 @@ async function imageFrameSource({ verbose, params, width, height, canvas }) {
   else blurredImg.scaleToHeight(height);
 
 
-  async function onRender(progress) {
+  async function onRender(progress, canvas) {
     const { zoomDirection = 'in', zoomAmount = 0.1 } = params;
 
     const img = getImg();
@@ -119,14 +101,20 @@ async function imageFrameSource({ verbose, params, width, height, canvas }) {
   return { onRender, onClose };
 }
 
-async function fillColorFrameSource({ canvas, params }) {
+async function fillColorFrameSource({ params, width, height }) {
   const { color } = params;
 
   const randomColor = getRandomColors(1)[0];
 
-  async function onRender() {
-    // eslint-disable-next-line no-param-reassign
-    canvas.backgroundColor = color || randomColor;
+  async function onRender(progress, canvas) {
+    const rect = new fabric.Rect({
+      left: 0,
+      right: 0,
+      width,
+      height,
+      fill: color || randomColor,
+    });
+    canvas.add(rect);
   }
 
   return { onRender };
@@ -137,12 +125,12 @@ function getRekt(width, height) {
   return new fabric.Rect({ originX: 'center', originY: 'center', left: width / 2, top: height / 2, width: width * 2, height: height * 2 });
 }
 
-async function radialGradientFrameSource({ canvas, width, height, params }) {
+async function radialGradientFrameSource({ width, height, params }) {
   const { colors: inColors } = params;
 
   const randomColors = getRandomGradient();
 
-  async function onRender(progress) {
+  async function onRender(progress, canvas) {
     // console.log('progress', progress);
 
     const max = Math.max(width, height);
@@ -177,13 +165,13 @@ async function radialGradientFrameSource({ canvas, width, height, params }) {
   return { onRender };
 }
 
-async function linearGradientFrameSource({ canvas, width, height, params }) {
+async function linearGradientFrameSource({ width, height, params }) {
   const { colors: inColors } = params;
 
   const randomColors = getRandomGradient();
   const colors = inColors && inColors.length === 2 ? inColors : randomColors;
 
-  async function onRender(progress) {
+  async function onRender(progress, canvas) {
     const rect = getRekt(width, height);
 
     rect.setGradient('fill', {
@@ -204,11 +192,11 @@ async function linearGradientFrameSource({ canvas, width, height, params }) {
   return { onRender };
 }
 
-async function subtitleFrameSource({ canvas, width, height, params }) {
-  const { text, textColor = '#ffffff', fontFamily = 'sans-serif' } = params;
+async function subtitleFrameSource({ width, height, params }) {
+  const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = 'sans-serif', delay = 0, speed = 1 } = params;
 
-  async function onRender(progress) {
-    const easedProgress = easeOutExpo(Math.min(progress, 1));
+  async function onRender(progress, canvas) {
+    const easedProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed, 1)));
 
     const min = Math.min(width, height);
     const padding = 0.05 * min;
@@ -233,7 +221,7 @@ async function subtitleFrameSource({ canvas, width, height, params }) {
       height: textBox.height + padding * 2,
       top: height,
       originY: 'bottom',
-      fill: 'rgba(0,0,0,0.2)',
+      fill: backgroundColor,
       opacity: easedProgress,
     });
 
@@ -244,10 +232,10 @@ async function subtitleFrameSource({ canvas, width, height, params }) {
   return { onRender };
 }
 
-async function titleFrameSource({ canvas, width, height, params }) {
+async function titleFrameSource({ width, height, params }) {
   const { text, textColor = '#ffffff', fontFamily = 'sans-serif', position = 'center' } = params;
 
-  async function onRender(progress) {
+  async function onRender(progress, canvas) {
     // console.log('progress', progress);
 
     const min = Math.min(width, height);
@@ -300,6 +288,7 @@ async function createCustomCanvasFrameSource({ width, height, params }) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     await onRender(progress);
     // require('fs').writeFileSync(`${new Date().getTime()}.png`, canvas.toBuffer('image/png'));
+    // I don't know any way to draw a node-canvas as a layer on a fabric.js canvas, other than converting to rgba first:
     return canvasToRgba(context);
   }
 
@@ -319,7 +308,6 @@ function registerFont(...args) {
 }
 
 module.exports = {
-  mergeFrames,
   registerFont,
   createFabricFrameSource,
   createCustomCanvasFrameSource,
@@ -331,4 +319,8 @@ module.exports = {
   radialGradientFrameSource,
   linearGradientFrameSource,
   imageFrameSource,
+
+  createFabricCanvas,
+  renderFabricCanvas,
+  rgbaToFabricImage,
 };
