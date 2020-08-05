@@ -39,7 +39,14 @@ module.exports = async (config = {}) => {
 
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
+
+    onStart,
+    onProcessStart,
+    
   } = config;
+
+  assert(!onStart || typeof onStart === 'function', 'Callback onStart expected to be a function');
+  assert(!onProcessStart || typeof onProcessStart === 'function', 'Callback onProcessStart expected to be a function');
 
   const isGif = outPath.toLowerCase().endsWith('.gif');
 
@@ -314,6 +321,7 @@ module.exports = async (config = {}) => {
       ...outputArgs,
     ];
     if (verbose) console.log('ffmpeg', args.join(' '));
+    if (onStart) onStart(`ffmpeg ${args.join(' ')}`);
     return execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'pipe', stdout: process.stdout, stderr: process.stderr });
   }
 
@@ -323,6 +331,7 @@ module.exports = async (config = {}) => {
 
   try {
     outProcess = startFfmpegWriterProcess();
+    if (onProcessStart) onProcessStart(outProcess);
     let outProcessError;
 
     // If we don't catch it here, the whole process will crash and we cannot process the error
