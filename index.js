@@ -19,7 +19,7 @@ const loadedFonts = [];
 // See #16
 const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', 'Transition must be an object');
 
-const assertFileExists = async (path) => assert(await fs.exists(path), `File does not exist ${path}`);
+const assertFileExists = async (path, enableRemote) => assert((enableRemote && path.startsWith('http')) || await fs.exists(path), `File does not exist ${path}`);
 
 
 module.exports = async (config = {}) => {
@@ -52,7 +52,7 @@ module.exports = async (config = {}) => {
 
   const audioFilePath = isGif ? undefined : audioFilePathIn;
 
-  if (audioFilePath) await assertFileExists(audioFilePath);
+  if (audioFilePath) await assertFileExists(audioFilePath, true);
 
   checkTransition(defaultsIn.transition);
 
@@ -76,7 +76,7 @@ module.exports = async (config = {}) => {
 
     // https://github.com/mifi/editly/issues/39
     if (type === 'image') {
-      await assertFileExists(restLayer.path);
+      await assertFileExists(restLayer.path, true);
     } else if (type === 'gl') {
       await assertFileExists(restLayer.fragmentPath);
     }
