@@ -4,7 +4,7 @@
 
 This GIF / YouTube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)". See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples).
 
-**Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images and titles**, with smooth transitions and music overlaid.
+**Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images, audio and titles**, with smooth transitions and music overlaid.
 
 Editly has a simple CLI for quickly assembling a video from a set of clips or images, or you can use its more flexible JavaScript API.
 
@@ -143,7 +143,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `width` | `--width` | Width which all media will be converted to | `640` | |
 | `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of **first video** | |
 | `fps` | `--fps` | FPS which all videos will be converted to | First video FPS or `25` | |
-| `audioFilePath` | `--audio-file-path` | Set an audio track to the whole output video | | |
+| `audioFilePath` | `--audio-file-path` | Set an audio track for the whole video | | |
 | `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview) | `false` | |
 | `defaults.layer.fontPath` | `--font-path` | Set default font to a .ttf | System font | |
 | `defaults.layer.*` | | Set any layer parameter that all layers will inherit | | |
@@ -152,7 +152,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `defaults.transition.duration` | `--transition-duration` | Default transition duration | `0.5` | sec |
 | `defaults.transition.name` | `--transition-name` | Default transition type. See **Transition types** | `random` | |
 | `clips[]` | | List of clip objects that will be concatenated in sequence | | |
-| `clips[].duration` | | Clip duration. See `defaults.duration` | `defaults.duration` | |
+| `clips[].duration` | | Clip duration. See `defaults.duration`. If unset, the clip duration will be that of the first video layer. | `defaults.duration` | |
 | `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.transition` | |
 | `clips[].layers[]` | | List of layers within the current clip that will be overlaid in their natural order (last layer on top) | | |
 | `clips[].layers[].type` | | Layer type, see below | | |
@@ -167,15 +167,27 @@ See [examples](https://github.com/mifi/editly/tree/master/examples) and [commonF
 
 #### Layer type 'video'
 
-For video layers, if parent `clip.duration` is specified, the video will be slowed/sped-up to match `clip.duration`. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`.
+For video layers, if parent `clip.duration` is specified, the video will be slowed/sped-up to match `clip.duration`. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`. If the layer has audio, it will be kept (and mixed with other audio layers if present.)
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
 | `path` | Path to video file | | |
 | `resizeMode` | One of `cover`, `contain`, `stretch` | `contain` | |
 | `cutFrom` | Time value to cut from | `0` | sec |
-| `cutTo` | Time value to cut from | *end of video* | sec |
+| `cutTo` | Time value to cut to | *end of video* | sec |
 | `backgroundColor` | Background of letterboxing | `#000000` | |
+| `mixVolume` | Relative volume when mixing this video's audio track with others | `1` | |
+
+#### Layer type 'audio'
+
+Audio layers will be mixed together. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`. The slow down/speed-up operation is limited to `half speed` and `100x`.
+
+| Parameter  | Description | Default | |
+|-|-|-|-|
+| `path` | Path to audio file | | |
+| `cutFrom` | Time value to cut from | `0` | sec |
+| `cutTo` | Time value to cut to | `clip.duration` | sec |
+| `mixVolume` | Relative volume when mixing this audio track with others | `1` | |
 
 #### Layer type 'image'
 

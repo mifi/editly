@@ -1,17 +1,18 @@
 const execa = require('execa');
 const assert = require('assert');
 const pMap = require('p-map');
-const { basename, join } = require('path');
+const { basename, join, dirname } = require('path');
 const flatMap = require('lodash/flatMap');
 const JSON5 = require('json5');
 const fs = require('fs-extra');
 
-const { parseFps, readFileInfo, multipleOf2 } = require('./util');
+const { parseFps, readVideoFileInfo, readAudioFileInfo, multipleOf2 } = require('./util');
 const { registerFont } = require('./sources/fabricFrameSource');
 const { createFrameSource } = require('./sources/frameSource');
 const { calcTransition } = require('./transitions');
 
 const GlTransitions = require('./glTransitions');
+const Audio = require('./audio');
 
 // Cache
 const loadedFonts = [];
@@ -42,7 +43,8 @@ module.exports = async (config = {}) => {
 
   const isGif = outPath.toLowerCase().endsWith('.gif');
 
-  const audioFilePath = isGif ? undefined : audioFilePathIn;
+  let audioFilePath;
+  if (!isGif) audioFilePath = audioFilePathIn;
 
   if (audioFilePath) await assertFileExists(audioFilePath);
 
@@ -126,65 +128,121 @@ module.exports = async (config = {}) => {
   }
 
   const clips = await pMap(clipsIn, async (clip, clipIndex) => {
-    const { transition: userTransition, duration: userDuration, layers } = clip;
+    const { transition: userTransition, duration: userClipDuration, layers } = clip;
 
     checkTransition(userTransition);
 
     const videoLayers = layers.filter((layer) => layer.type === 'video');
-    assert(videoLayers.length <= 1, 'Max 1 video per layer');
 
-    const userOrDefaultDuration = userDuration || defaults.duration;
-    if (videoLayers.length === 0) assert(userOrDefaultDuration, `Duration is required for clip ${clipIndex}`);
+    const userClipDurationOrDefault = userClipDuration || defaults.duration;
+    if (videoLayers.length === 0) assert(userClipDurationOrDefault, `Duration parameter is required for videoless clip ${clipIndex}`);
 
-    let duration = userOrDefaultDuration;
+    const transition = calcTransition(defaults, userTransition, clipIndex === clipsIn.length - 1);
 
-    const layersOut = flatMap(await pMap(layers, async (layerIn) => {
+    let layersOut = flatMap(await pMap(layers, async (layerIn) => {
       const layer = { ...defaults.layer, ...layerIn };
-      const { type } = layer;
+      const { type, path } = layer;
 
       if (type === 'video') {
-        const { cutFrom: cutFromIn, cutTo: cutToIn, path } = layer;
-        const fileInfo = await readFileInfo(ffprobePath, path);
-        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = fileInfo;
-        let cutFrom;
-        let cutTo;
-        let trimmedSourceDuration = fileDuration;
-        if (cutFromIn != null || cutToIn != null) {
-          cutFrom = Math.min(Math.max(0, cutFromIn || 0), fileDuration);
-          cutTo = Math.min(Math.max(cutFrom, cutToIn || fileDuration), fileDuration);
-          assert(cutFrom < cutTo, 'cutFrom must be lower than cutTo');
+        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = await readVideoFileInfo(ffprobePath, path);
+        let { cutFrom, cutTo } = layer;
+        if (!cutFrom) cutFrom = 0;
+        cutFrom = Math.max(cutFrom, 0);
+        cutFrom = Math.min(cutFrom, fileDuration);
 
-          trimmedSourceDuration = cutTo - cutFrom;
-        }
+        if (!cutTo) cutTo = fileDuration;
+        cutTo = Math.max(cutTo, cutFrom);
+        cutTo = Math.min(cutTo, fileDuration);
+        assert(cutFrom < cutTo, 'cutFrom must be lower than cutTo');
 
-        // If user specified duration, means that should be the output duration
-        let framePtsFactor;
-        if (userDuration) {
-          duration = userDuration;
-          framePtsFactor = userDuration / trimmedSourceDuration;
-        } else {
-          duration = trimmedSourceDuration;
-          framePtsFactor = 1;
-        }
+        const inputDuration = cutTo - cutFrom;
 
         const isRotated = rotation === 90 || rotation === 270;
         const width = isRotated ? heightIn : widthIn;
         const height = isRotated ? widthIn : heightIn;
 
-        return { ...layer, cutFrom, cutTo, width, height, framerateStr, framePtsFactor };
+        // Compensate for transition duration
+        const audioCutTo = Math.max(cutFrom, cutTo - transition.duration);
+
+        return { ...layer, cutFrom, cutTo, audioCutTo, inputDuration, width, height, framerateStr };
       }
+
+      if (type === 'audio') return layer;
 
       return handleLayer(layer);
     }, { concurrency: 1 }));
 
-    const transition = calcTransition(defaults, userTransition);
+    let clipDuration = userClipDurationOrDefault;
+
+    const firstVideoLayer = layersOut.find((layer) => layer.type === 'video');
+    if (firstVideoLayer && !userClipDuration) clipDuration = firstVideoLayer.inputDuration;
+    assert(clipDuration);
+
+    layersOut = await pMap(layersOut, async (layer) => {
+      const { type, path } = layer;
+
+      if (type === 'audio') {
+        const { duration: fileDuration } = await readAudioFileInfo(ffprobePath, path);
+        let { cutFrom, cutTo } = layer;
+
+        console.log({ cutFrom, cutTo, fileDuration, clipDuration });
+
+        if (!cutFrom) cutFrom = 0;
+        cutFrom = Math.max(cutFrom, 0);
+        cutFrom = Math.min(cutFrom, fileDuration);
+
+        if (!cutTo) cutTo = cutFrom + clipDuration;
+        cutTo = Math.max(cutTo, cutFrom);
+        cutTo = Math.min(cutTo, fileDuration);
+        assert(cutFrom < cutTo, 'cutFrom must be lower than cutTo');
+
+        const inputDuration = cutTo - cutFrom;
+
+        const framePtsFactor = clipDuration / inputDuration;
+
+        // Compensate for transition duration
+        const audioCutTo = Math.max(cutFrom, cutTo - transition.duration);
+
+        return { ...layer, cutFrom, cutTo, audioCutTo, framePtsFactor };
+      }
+
+      if (layer.type === 'video') {
+        const { inputDuration } = layer;
+
+        let framePtsFactor;
+
+        // If user explicitly specified duration for clip, it means that should be the output duration of the video
+        if (userClipDuration) {
+          // Later we will speed up or slow down video using this factor
+          framePtsFactor = userClipDuration / inputDuration;
+        } else {
+          framePtsFactor = 1;
+        }
+
+        return { ...layer, framePtsFactor };
+      }
+
+      return layer;
+    });
 
     return {
       transition,
-      duration,
+      duration: clipDuration,
       layers: layersOut,
     };
   }, { concurrency: 1 });
+
+  const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose });
+
+  const outDir = dirname(outPath);
+  const tmpDir = join(outDir, 'editly-tmp');
+  if (verbose) console.log({ tmpDir });
+  await fs.remove(tmpDir);
+  await fs.mkdirp(tmpDir);
+
+  if (!audioFilePath) {
+    audioFilePath = await editAudio({ clips, tmpDir });
+  }
 
   if (verbose) console.log(JSON5.stringify(clips, null, 2));
 
@@ -340,7 +398,7 @@ module.exports = async (config = {}) => {
     const getTransitionFromClip = () => clips[transitionFromClipId];
     const getTransitionToClip = () => clips[getTransitionToClipId()];
 
-    const getSource = (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, enableFfmpegLog, framerateStr });
+    const getSource = (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
 
     const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
     frameSource1 = await getSource(getTransitionFromClip(), transitionFromClipId);
@@ -436,6 +494,7 @@ module.exports = async (config = {}) => {
   } finally {
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
+    await fs.remove(tmpDir);
   }
 
   try {

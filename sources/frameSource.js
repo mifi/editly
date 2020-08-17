@@ -5,11 +5,12 @@ const { rgbaToFabricImage, customFabricFrameSource, createCustomCanvasFrameSourc
 const createVideoFrameSource = require('./videoFrameSource');
 const { createGlFrameSource } = require('./glFrameSource');
 
-
-async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, enableFfmpegLog, framerateStr }) {
+async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
   const { layers, duration } = clip;
 
-  const layerFrameSources = await pMap(layers, async (layer, layerIndex) => {
+  const visualLayers = layers.filter((layer) => layer.type !== 'audio');
+
+  const layerFrameSources = await pMap(visualLayers, async (layer, layerIndex) => {
     const { type, ...params } = layer;
     console.log('createFrameSource', type, 'clip', clipIndex, 'layer', layerIndex);
 
@@ -29,15 +30,15 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
     const createFrameSourceFunc = frameSourceFuncs[type];
     assert(createFrameSourceFunc, `Invalid type ${type}`);
 
-    return createFrameSourceFunc({ ffmpegPath, width, height, duration, channels, verbose, enableFfmpegLog, framerateStr, params });
+    return createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration, channels, verbose, enableFfmpegLog, framerateStr, params });
   }, { concurrency: 1 });
 
   async function readNextFrame(progress) {
     const canvas = createFabricCanvas({ width, height });
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const frameSource of layerFrameSources) {
-      const rgba = await frameSource.readNextFrame(progress, canvas);
+    for (const layerFrameSource of layerFrameSources) {
+      const rgba = await layerFrameSource.readNextFrame(progress, canvas);
       // Frame sources can either render to the provided canvas and return nothing
       // OR return an raw RGBA blob which will be drawn onto the canvas
       if (rgba) {
