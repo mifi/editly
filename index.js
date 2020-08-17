@@ -21,7 +21,6 @@ const checkTransition = (transition) => assert(transition == null || typeof tran
 
 const assertFileExists = async (path) => assert(await fs.exists(path), `File does not exist ${path}`);
 
-
 module.exports = async (config = {}) => {
   const {
     // Testing options:
@@ -353,7 +352,7 @@ module.exports = async (config = {}) => {
       const toClipNumFrames = getTransitionToClip() && Math.round(getTransitionToClip().duration * fps);
       const fromClipProgress = fromClipFrameCount / fromClipNumFrames;
       const toClipProgress = getTransitionToClip() && toClipFrameCount / toClipNumFrames;
-      const frameData1 = await frameSource1.readNextFrame(fromClipProgress);
+      const frameSource1Data = await frameSource1.readNextFrame(fromClipProgress);
 
       const clipTransition = getTransitionFromClip().transition;
 
@@ -371,7 +370,7 @@ module.exports = async (config = {}) => {
         if (totalFrameCount % 10 === 0) process.stdout.write(`${String(percentDone).padStart(3, ' ')}% `);
       }
 
-      if (!frameData1 || transitionFrameAt >= transitionNumFramesSafe - 1) {
+      if (!frameSource1Data || transitionFrameAt >= transitionNumFramesSafe - 1) {
       // if (!frameData1 || transitionFrameAt >= transitionNumFramesSafe) {
         console.log('Done with transition, switching to next clip');
         transitionFromClipId += 1;
@@ -393,25 +392,25 @@ module.exports = async (config = {}) => {
         if (frameSource2 && transitionFrameAt >= 0) {
           if (verbose) console.log('Transition', 'frame', transitionFrameAt, '/', transitionNumFramesSafe, clipTransition.name, `${clipTransition.duration}s`);
 
-          const frameData2 = await frameSource2.readNextFrame(toClipProgress);
+          const frameSource2Data = await frameSource2.readNextFrame(toClipProgress);
           toClipFrameCount += 1;
 
-          if (frameData2) {
+          if (frameSource2Data) {
             const progress = transitionFrameAt / transitionNumFramesSafe;
             const easedProgress = clipTransition.easingFunction(progress);
 
             if (verbose) console.time('runTransitionOnFrame');
-            outFrameData = runTransitionOnFrame({ fromFrame: frameData1, toFrame: frameData2, progress: easedProgress, transitionName: clipTransition.name, transitionParams: clipTransition.params });
+            outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data, toFrame: frameSource2Data, progress: easedProgress, transitionName: clipTransition.name, transitionParams: clipTransition.params });
             if (verbose) console.timeEnd('runTransitionOnFrame');
           } else {
             console.warn('Got no frame data from clip 2!');
             // We have reached end of clip2 but transition is not complete
             // Pass thru
             // TODO improve, maybe cut it short
-            outFrameData = frameData1;
+            outFrameData = frameSource1Data;
           }
         } else {
-          outFrameData = frameData1;
+          outFrameData = frameSource1Data;
         }
 
         // If we don't await we get EINVAL when dealing with high resolution files (big writes)

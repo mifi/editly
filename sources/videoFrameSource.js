@@ -1,6 +1,8 @@
 const execa = require('execa');
 const assert = require('assert');
 
+const { getFfmpegCommonArgs } = require('../ffmpeg');
+
 module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpegPath, enableFfmpegLog, params }) => {
   const targetSize = width * height * channels;
 
@@ -29,7 +31,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
   const args = [
-    ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']),
+    ...getFfmpegCommonArgs({ enableFfmpegLog }),
     ...(cutFrom ? ['-ss', cutFrom] : []),
     '-i', path,
     ...(cutTo ? ['-t', (cutTo - cutFrom) * framePtsFactor] : []),
