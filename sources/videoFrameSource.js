@@ -2,8 +2,9 @@ const execa = require('execa');
 const assert = require('assert');
 
 const { getFfmpegCommonArgs } = require('../ffmpeg');
+const { readFileStreams } = require('../util');
 
-module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpegPath, enableFfmpegLog, params }) => {
+module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
   const targetSize = width * height * channels;
 
   // TODO assert that we have read the correct amount of frames
@@ -27,11 +28,18 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
   // Cover: https://unix.stackexchange.com/a/192123
   else scaleFilter = `scale=(iw*sar)*max(${width}/(iw*sar)\\,${height}/ih):ih*max(${width}/(iw*sar)\\,${height}/ih),crop=${width}:${height}`;
 
+  // https://forum.unity.com/threads/settings-for-importing-a-video-with-an-alpha-channel.457657/
+  const streams = await readFileStreams(ffprobePath, path);
+  const firstVideoStream = streams.find((s) => s.codec_type === 'video');
+  // https://superuser.com/a/1116905/658247
+  const inputCodecArgs = ['vp8', 'vp9'].includes(firstVideoStream.codec_name) ? ['-vcodec', 'libvpx'] : [];
+
   // http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
   const args = [
     ...getFfmpegCommonArgs({ enableFfmpegLog }),
+    ...inputCodecArgs,
     ...(cutFrom ? ['-ss', cutFrom] : []),
     '-i', path,
     ...(cutTo ? ['-t', (cutTo - cutFrom) * framePtsFactor] : []),
