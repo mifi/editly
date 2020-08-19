@@ -1,5 +1,5 @@
 const pMap = require('p-map');
-const { join, basename } = require('path');
+const { join, basename, resolve } = require('path');
 const execa = require('execa');
 const flatMap = require('lodash/flatMap');
 const fs = require('fs-extra');
@@ -106,12 +106,13 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
         await createSilence(clipAudioPath);
       }
 
-      return basename(clipAudioPath);
+      // https://superuser.com/a/853262/658247
+      return resolve(clipAudioPath);
     }, { concurrency: 4 });
 
     const concatFilePath = join(tmpDir, 'audio-segments.txt');
 
-    console.log('Combining audio', segments, concatFilePath);
+    console.log('Combining audio', segments.map((s) => basename(s)), concatFilePath);
 
     await createConcatFile(segments, concatFilePath);
 
