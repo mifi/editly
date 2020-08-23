@@ -59,17 +59,21 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
   let timeout;
   let ended = false;
 
+  stream.once('end', () => {
+    clearTimeout(timeout);
+    if (verbose) console.log(path, 'ffmpeg video stream ended');
+    ended = true;
+  });
+
   const readNextFrame = () => new Promise((resolve, reject) => {
     if (ended) {
-      console.log(path, 'Tried to read next video frame after ffmpeg stream ended');
+      console.log(path, 'Tried to read next video frame after ffmpeg video stream ended');
       resolve();
       return;
     }
     // console.log('Reading new frame', path);
 
     function onEnd() {
-      if (verbose) console.log(path, 'ffmpeg video stream ended');
-      ended = true;
       resolve();
     }
 
@@ -87,7 +91,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
       chunk.copy(buf, length, 0, nCopied);
       length += nCopied;
 
-      if (length > targetSize) console.error('OOPS! Overflow', length);
+      if (length > targetSize) console.error('Video data overflow', length);
 
       if (length >= targetSize) {
         // console.log('Finished reading frame', inFrameCount, path);
@@ -95,7 +99,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
 
         const restLength = chunk.length - nCopied;
         if (restLength > 0) {
-          if (verbose) console.log('Left over data', nCopied, chunk.length, restLength);
+          // if (verbose) console.log('Left over data', nCopied, chunk.length, restLength);
           chunk.slice(nCopied).copy(buf, 0);
           length = restLength;
         } else {
@@ -114,7 +118,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
       console.warn('Timeout on read video frame');
       cleanup();
       resolve();
-    }, 20000);
+    }, 60000);
 
     stream.on('data', handleChunk);
     stream.on('end', onEnd);

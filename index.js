@@ -178,6 +178,7 @@ module.exports = async (config = {}) => {
     if (firstVideoLayer && !userClipDuration) clipDuration = firstVideoLayer.inputDuration;
     assert(clipDuration);
 
+    // We need to map again, because for audio, we need to know the correct clipDuration
     layersOut = await pMap(layersOut, async (layer) => {
       const { type, path } = layer;
 
@@ -378,109 +379,124 @@ module.exports = async (config = {}) => {
   let frameSource1;
   let frameSource2;
 
+  let frameSource1Data;
+
+  let totalFramesWritten = 0;
+  let fromClipFrameAt = 0;
+  let toClipFrameAt = 0;
+
+  let transitionFromClipId = 0;
+
+  const getTransitionToClipId = () => transitionFromClipId + 1;
+  const getTransitionFromClip = () => clips[transitionFromClipId];
+  const getTransitionToClip = () => clips[getTransitionToClipId()];
+
+  const getSource = async (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
+  const getTransitionFromSource = async () => getSource(getTransitionFromClip(), transitionFromClipId);
+  const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
+
   try {
     outProcess = startFfmpegWriterProcess();
     let outProcessError;
 
-    // If we don't catch it here, the whole process will crash and we cannot process the error
+    // If we don't handle it here, the whole Node process will crash and we cannot process the error
     outProcess.stdin.on('error', (err) => {
       console.error('Output ffmpeg caught error', err);
       outProcessError = err;
     });
 
-    let totalFrameCount = 0;
-    let fromClipFrameCount = 0;
-    let toClipFrameCount = 0;
-
-    let transitionFromClipId = 0;
-
-    const getTransitionToClipId = () => transitionFromClipId + 1;
-    const getTransitionFromClip = () => clips[transitionFromClipId];
-    const getTransitionToClip = () => clips[getTransitionToClipId()];
-
-    const getSource = (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
-
-    const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
-    frameSource1 = await getSource(getTransitionFromClip(), transitionFromClipId);
+    frameSource1 = await getTransitionFromSource();
     frameSource2 = await getTransitionToSource();
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const fromClipNumFrames = Math.round(getTransitionFromClip().duration * fps);
       const toClipNumFrames = getTransitionToClip() && Math.round(getTransitionToClip().duration * fps);
-      const fromClipProgress = fromClipFrameCount / fromClipNumFrames;
-      const toClipProgress = getTransitionToClip() && toClipFrameCount / toClipNumFrames;
-      const frameSource1Data = await frameSource1.readNextFrame(fromClipProgress);
+      const fromClipProgress = fromClipFrameAt / fromClipNumFrames;
+      const toClipProgress = getTransitionToClip() && toClipFrameAt / toClipNumFrames;
 
-      const clipTransition = getTransitionFromClip().transition;
+      const currentTransition = getTransitionFromClip().transition;
 
-      const transitionNumFrames = Math.round(clipTransition.duration * fps);
+      const transitionNumFrames = Math.round(currentTransition.duration * fps);
 
       // Each clip has two transitions, make sure we leave enough room:
       const transitionNumFramesSafe = Math.floor(Math.min(Math.min(fromClipNumFrames, toClipNumFrames != null ? toClipNumFrames : Number.MAX_SAFE_INTEGER) / 2, transitionNumFrames));
       // How many frames into the transition are we? negative means not yet started
-      const transitionFrameAt = fromClipFrameCount - (fromClipNumFrames - transitionNumFramesSafe);
-
-      if (verbose) console.log('Frame', totalFrameCount, 'from', fromClipFrameCount, `(clip ${transitionFromClipId})`, 'to', toClipFrameCount, `(clip ${getTransitionToClipId()})`);
+      const transitionFrameAt = fromClipFrameAt - (fromClipNumFrames - transitionNumFramesSafe);
 
       if (!verbose) {
-        const percentDone = Math.floor(100 * (totalFrameCount / estimatedTotalFrames));
-        if (totalFrameCount % 10 === 0) process.stdout.write(`${String(percentDone).padStart(3, ' ')}% `);
+        const percentDone = Math.floor(100 * (totalFramesWritten / estimatedTotalFrames));
+        if (totalFramesWritten % 10 === 0) process.stdout.write(`${String(percentDone).padStart(3, ' ')}% `);
       }
 
-      if (!frameSource1Data || transitionFrameAt >= transitionNumFramesSafe - 1) {
-      // if (!frameData1 || transitionFrameAt >= transitionNumFramesSafe) {
-        console.log('Done with transition, switching to next clip');
+      // console.log({ transitionFrameAt, transitionNumFramesSafe })
+      // const transitionLastFrameIndex = transitionNumFramesSafe - 1;
+      const transitionLastFrameIndex = transitionNumFramesSafe;
+      // Done with transition?
+      if (transitionFrameAt >= transitionLastFrameIndex) {
         transitionFromClipId += 1;
+        console.log(`Done with transition, switching to next transitionFromClip (${transitionFromClipId})`);
 
         if (!getTransitionFromClip()) {
           console.log('No more transitionFromClip, done');
           break;
         }
 
-        // Cleanup old, swap and load next
+        // Cleanup completed frameSource1, swap and load next frameSource2
         await frameSource1.close();
         frameSource1 = frameSource2;
         frameSource2 = await getTransitionToSource();
 
-        fromClipFrameCount = transitionNumFramesSafe;
-        toClipFrameCount = 0;
-      } else {
-        let outFrameData;
-        if (frameSource2 && transitionFrameAt >= 0) {
-          if (verbose) console.log('Transition', 'frame', transitionFrameAt, '/', transitionNumFramesSafe, clipTransition.name, `${clipTransition.duration}s`);
+        fromClipFrameAt = transitionLastFrameIndex;
+        toClipFrameAt = 0;
 
-          const frameSource2Data = await frameSource2.readNextFrame(toClipProgress);
-          toClipFrameCount += 1;
-
-          if (frameSource2Data) {
-            const progress = transitionFrameAt / transitionNumFramesSafe;
-            const easedProgress = clipTransition.easingFunction(progress);
-
-            if (verbose) console.time('runTransitionOnFrame');
-            outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data, toFrame: frameSource2Data, progress: easedProgress, transitionName: clipTransition.name, transitionParams: clipTransition.params });
-            if (verbose) console.timeEnd('runTransitionOnFrame');
-          } else {
-            console.warn('Got no frame data from clip 2!');
-            // We have reached end of clip2 but transition is not complete
-            // Pass thru
-            // TODO improve, maybe cut it short
-            outFrameData = frameSource1Data;
-          }
-        } else {
-          outFrameData = frameSource1Data;
-        }
-
-        // If we don't await we get EINVAL when dealing with high resolution files (big writes)
-        await new Promise((r) => outProcess.stdin.write(outFrameData, () => r()));
-
-        if (outProcessError) throw outProcessError;
-
-        fromClipFrameCount += 1;
+        // eslint-disable-next-line no-continue
+        continue;
       }
 
-      totalFrameCount += 1;
-    }
+      const newFrameSource1Data = await frameSource1.readNextFrame(fromClipProgress);
+      // If we got no data, use the old data
+      // TODO maybe abort?
+      if (newFrameSource1Data) frameSource1Data = newFrameSource1Data;
+      else console.log('No frame data returned, using last frame');
+
+      const isInTransition = frameSource2 && transitionNumFramesSafe > 0 && transitionFrameAt >= 0;
+
+      let outFrameData;
+      if (isInTransition) {
+        const frameSource2Data = await frameSource2.readNextFrame(toClipProgress);
+
+        if (frameSource2Data) {
+          const progress = transitionFrameAt / transitionNumFramesSafe;
+          const easedProgress = currentTransition.easingFunction(progress);
+
+          // if (verbose) console.time('runTransitionOnFrame');
+          outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data, toFrame: frameSource2Data, progress: easedProgress, transitionName: currentTransition.name, transitionParams: currentTransition.params });
+          // if (verbose) console.timeEnd('runTransitionOnFrame');
+        } else {
+          console.warn('Got no frame data from transitionToClip!');
+          // We have probably reached end of clip2 but transition is not complete. Just pass thru clip1
+          outFrameData = frameSource1Data;
+        }
+      } else {
+        // Not in transition. Pass thru clip 1
+        outFrameData = frameSource1Data;
+      }
+
+      if (verbose) {
+        if (isInTransition) console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`, 'to clip', getTransitionToClipId(), `(frame ${toClipFrameAt} / ${transitionNumFramesSafe})`, currentTransition.name, `${currentTransition.duration}s`);
+        else console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`);
+      }
+
+      // If we don't wait for callback, then we get EINVAL when dealing with high resolution files (big writes)
+      await new Promise((r) => outProcess.stdin.write(outFrameData, () => r()));
+
+      if (outProcessError) throw outProcessError;
+
+      totalFramesWritten += 1;
+      fromClipFrameAt += 1;
+      if (isInTransition) toClipFrameAt += 1;
+    } // End while loop
 
     outProcess.stdin.end();
 
