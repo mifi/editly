@@ -151,11 +151,13 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `defaults.transition` | | An object `{ name, duration }` describing the default transition. Set to **null** to disable transitions | | |
 | `defaults.transition.duration` | `--transition-duration` | Default transition duration | `0.5` | sec |
 | `defaults.transition.name` | `--transition-name` | Default transition type. See **Transition types** | `random` | |
-| `clips[]` | | List of clip objects that will be concatenated in sequence | | |
-| `clips[].duration` | | Clip duration. See `defaults.duration`. If unset, the clip duration will be that of the first video layer. | `defaults.duration` | |
+| `clips[]` | | List of clip objects that will be played in sequence. Each clip can have one or more layers. | | |
+| `clips[].duration` | | Clip duration. See `defaults.duration`. If unset, the clip duration will be that of the **first video layer**. | `defaults.duration` | |
 | `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.transition` | |
-| `clips[].layers[]` | | List of layers within the current clip that will be overlaid in their natural order (last layer on top) | | |
+| `clips[].layers[]` | | List of layers within the current clip that will be overlaid in their natural order (final layer on top) | | |
 | `clips[].layers[].type` | | Layer type, see below | | |
+| `clips[].layers[].visibleFrom` | | What time into the clip should this layer start | | sec |
+| `clips[].layers[].visibleUntil` | | What time into the clip should this layer stop | | sec |
 
 ### Transition types
 
@@ -180,7 +182,7 @@ For video layers, if parent `clip.duration` is specified, the video will be slow
 
 #### Layer type 'audio'
 
-Audio layers will be mixed together. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`. The slow down/speed-up operation is limited to `half speed` and `100x`.
+Audio layers will be mixed together. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`. The slow down/speed-up operation is limited to values between `0.5x` and `100x`.
 
 | Parameter  | Description | Default | |
 |-|-|-|-|

@@ -167,6 +167,7 @@ module.exports = async (config = {}) => {
         return { ...layer, cutFrom, cutTo, audioCutTo, inputDuration, width, height, framerateStr };
       }
 
+      // Audio is handled later
       if (type === 'audio') return layer;
 
       return handleLayer(layer);
@@ -179,14 +180,22 @@ module.exports = async (config = {}) => {
     assert(clipDuration);
 
     // We need to map again, because for audio, we need to know the correct clipDuration
-    layersOut = await pMap(layersOut, async (layer) => {
-      const { type, path } = layer;
+    layersOut = await pMap(layersOut, async (layerIn) => {
+      const { type, path, visibleUntil, visibleFrom = 0 } = layerIn;
+
+      // This feature allows the user to show another layer overlayed (or replacing) parts of the lower layers (visibleFrom - visibleUntil)
+      const visibleDuration = ((visibleUntil || clipDuration) - visibleFrom);
+      assert(visibleDuration > 0 && visibleDuration <= clipDuration, `Invalid visibleFrom ${visibleFrom} or visibleUntil ${visibleUntil}`);
+      // TODO Also need to handle video layers (framePtsFactor etc)
+      // TODO handle audio in case of visibleFrom/visibleTo
+
+      const layer = { ...layerIn, visibleFrom, visibleDuration };
 
       if (type === 'audio') {
         const { duration: fileDuration } = await readAudioFileInfo(ffprobePath, path);
         let { cutFrom, cutTo } = layer;
 
-        console.log({ cutFrom, cutTo, fileDuration, clipDuration });
+        // console.log({ cutFrom, cutTo, fileDuration, clipDuration });
 
         if (!cutFrom) cutFrom = 0;
         cutFrom = Math.max(cutFrom, 0);
@@ -410,12 +419,16 @@ module.exports = async (config = {}) => {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const fromClipNumFrames = Math.round(getTransitionFromClip().duration * fps);
-      const toClipNumFrames = getTransitionToClip() && Math.round(getTransitionToClip().duration * fps);
+      const transitionToClip = getTransitionToClip();
+      const transitionFromClip = getTransitionFromClip();
+      const fromClipNumFrames = Math.round(transitionFromClip.duration * fps);
+      const toClipNumFrames = transitionToClip && Math.round(transitionToClip.duration * fps);
       const fromClipProgress = fromClipFrameAt / fromClipNumFrames;
-      const toClipProgress = getTransitionToClip() && toClipFrameAt / toClipNumFrames;
+      const toClipProgress = transitionToClip && toClipFrameAt / toClipNumFrames;
+      const fromClipTime = transitionFromClip.duration * fromClipProgress;
+      const toClipTime = transitionToClip && transitionToClip.duration * toClipProgress;
 
-      const currentTransition = getTransitionFromClip().transition;
+      const currentTransition = transitionFromClip.transition;
 
       const transitionNumFrames = Math.round(currentTransition.duration * fps);
 
@@ -432,6 +445,7 @@ module.exports = async (config = {}) => {
       // console.log({ transitionFrameAt, transitionNumFramesSafe })
       // const transitionLastFrameIndex = transitionNumFramesSafe - 1;
       const transitionLastFrameIndex = transitionNumFramesSafe;
+
       // Done with transition?
       if (transitionFrameAt >= transitionLastFrameIndex) {
         transitionFromClipId += 1;
@@ -454,17 +468,17 @@ module.exports = async (config = {}) => {
         continue;
       }
 
-      const newFrameSource1Data = await frameSource1.readNextFrame(fromClipProgress);
+      const newFrameSource1Data = await frameSource1.readNextFrame({ time: fromClipTime });
       // If we got no data, use the old data
       // TODO maybe abort?
       if (newFrameSource1Data) frameSource1Data = newFrameSource1Data;
-      else console.log('No frame data returned, using last frame');
+      else console.warn('No frame data returned, using last frame');
 
       const isInTransition = frameSource2 && transitionNumFramesSafe > 0 && transitionFrameAt >= 0;
 
       let outFrameData;
       if (isInTransition) {
-        const frameSource2Data = await frameSource2.readNextFrame(toClipProgress);
+        const frameSource2Data = await frameSource2.readNextFrame({ time: toClipTime });
 
         if (frameSource2Data) {
           const progress = transitionFrameAt / transitionNumFramesSafe;
@@ -504,9 +518,7 @@ module.exports = async (config = {}) => {
     console.log(outPath);
   } catch (err) {
     console.error('Loop failed', err);
-    if (outProcess) {
-      outProcess.kill();
-    }
+    if (outProcess) outProcess.kill();
   } finally {
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();

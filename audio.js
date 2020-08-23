@@ -18,7 +18,10 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
     const segments = await pMap(clips, async (clip, i) => {
       const clipAudioPath = join(tmpDir, `clip${i}-audio.flac`);
 
-      const audioLayers = clip.layers.filter((layer) => ['audio', 'video'].includes(layer.type));
+      const audioLayers = clip.layers.filter(({ type, visibleFrom, visibleUntil }) => (
+        ['audio', 'video'].includes(type)
+        // TODO We don't support audio for visibleFrom/visibleUntil layers
+        && !visibleFrom && visibleUntil == null));
 
       async function createSilence(outPath) {
         if (verbose) console.log('create silence', clip.duration);
