@@ -244,6 +244,38 @@ async function titleFrameSource({ width, height, params }) {
 
     const scale = (1 + progress * 0.2).toFixed(4);
 
+    // text outline for readability and to increase contrast
+    const textBoxOutline = new fabric.Textbox(text, {
+      fill: '#000000',
+      fontFamily,
+      fontSize + 0.05,
+      textAlign: 'center',
+      width: width * 0.8,
+    });
+
+    const textImageOutline = await new Promise((r) => textBoxOutline.cloneAsImage(r));
+
+    let originY = 'center';
+    let top = height / 2;
+    if (position === 'top') {
+      originY = 'top';
+      top = height * 0.05;
+    } else if (position === 'bottom') {
+      originY = 'bottom';
+      top = height;
+    }
+
+    textImageOutline.set({
+      originX: 'center',
+      originY,
+      left: width / 2,
+      top,
+      scaleX: scale,
+      scaleY: scale,
+    });
+    canvas.add(textImageOutline);
+    
+    // text
     const textBox = new fabric.Textbox(text, {
       fill: textColor,
       fontFamily,
