@@ -205,7 +205,9 @@ Audio layers will be mixed together. If `cutFrom`/`cutTo` is set, the resulting 
 - `fontPath` - See `defaults.layer.fontPath`
 - `text` - Title text to show, keep it short
 - `textColor` - default `#ffffff`
-- `position` - Vertical position: `top`, `bottom` or `center`
+- `position` - One of either:
+  - `top`, `bottom` or `center` - vertical position
+  - An object `{ x, y, originX = 'left', originY = 'top' }`, where `{ x: 0, y: 0 }` is the upper left corner of the screen, and `{ x: 1, y: 1 }` is the lower right corner. `originX` and `originY` are optional, and specify the position origin of the text object.
 
 #### Layer type 'subtitle'
 - `fontPath` - See `defaults.layer.fontPath`

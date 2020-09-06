@@ -232,6 +232,32 @@ async function subtitleFrameSource({ width, height, params }) {
   return { onRender };
 }
 
+function getPositionProps({ position, width, height, objHeight }) {
+  let originY = 'center';
+  let originX = 'center';
+  let top = height / 2;
+  let left = width / 2;
+
+  if (position === 'top') {
+    originY = 'top';
+    top = height * objHeight;
+  } else if (position === 'bottom') {
+    originY = 'bottom';
+    top = height;
+  }
+
+  if (position.x != null) {
+    originX = position.originX || 'left';
+    left = width * position.x;
+  }
+  if (position.y != null) {
+    originY = position.originY || 'top';
+    top = height * position.y;
+  }
+
+  return { originX, originY, top, left };
+}
+
 async function titleFrameSource({ width, height, params }) {
   const { text, textColor = '#ffffff', fontFamily = 'sans-serif', position = 'center' } = params;
 
@@ -252,22 +278,15 @@ async function titleFrameSource({ width, height, params }) {
       width: width * 0.8,
     });
 
+    // We need the text as an image in order to scale it
     const textImage = await new Promise((r) => textBox.cloneAsImage(r));
 
-    let originY = 'center';
-    let top = height / 2;
-    if (position === 'top') {
-      originY = 'top';
-      top = height * 0.05;
-    } else if (position === 'bottom') {
-      originY = 'bottom';
-      top = height;
-    }
+    const { left, top, originX, originY } = getPositionProps({ position, width, height, objHeight: 0.05 });
 
     textImage.set({
-      originX: 'center',
+      originX,
       originY,
-      left: width / 2,
+      left,
       top,
       scaleX: scale,
       scaleY: scale,
