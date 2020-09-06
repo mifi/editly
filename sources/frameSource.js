@@ -1,7 +1,7 @@
 const assert = require('assert');
 const pMap = require('p-map');
 
-const { rgbaToFabricImage, customFabricFrameSource, createCustomCanvasFrameSource, titleFrameSource, subtitleFrameSource, imageFrameSource, linearGradientFrameSource, radialGradientFrameSource, fillColorFrameSource, createFabricFrameSource, newsTitleFrameSource, createFabricCanvas, renderFabricCanvas } = require('./fabricFrameSource');
+const { rgbaToFabricImage, customFabricFrameSource, createCustomCanvasFrameSource, titleFrameSource, subtitleFrameSource, imageFrameSource, imageOverlayFrameSource, linearGradientFrameSource, radialGradientFrameSource, fillColorFrameSource, createFabricFrameSource, newsTitleFrameSource, createFabricCanvas, renderFabricCanvas } = require('./fabricFrameSource');
 const createVideoFrameSource = require('./videoFrameSource');
 const { createGlFrameSource } = require('./glFrameSource');
 
@@ -20,6 +20,7 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
       canvas: createCustomCanvasFrameSource,
       fabric: async (opts) => createFabricFrameSource(customFabricFrameSource, opts),
       image: async (opts) => createFabricFrameSource(imageFrameSource, opts),
+      'image-overlay': async (opts) => createFabricFrameSource(imageOverlayFrameSource, opts),
       title: async (opts) => createFabricFrameSource(titleFrameSource, opts),
       subtitle: async (opts) => createFabricFrameSource(subtitleFrameSource, opts),
       'linear-gradient': async (opts) => createFabricFrameSource(linearGradientFrameSource, opts),

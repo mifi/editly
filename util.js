@@ -62,6 +62,36 @@ function toArrayInteger(buffer) {
 
 const multipleOf2 = (x) => (x + (x % 2));
 
+function getPositionProps({ position, width, height }) {
+  let originY = 'center';
+  let originX = 'center';
+  let top = height / 2;
+  let left = width / 2;
+
+  const margin = 0.05;
+  if (position === 'top') {
+    originY = 'top';
+    top = height * margin;
+  } else if (position === 'bottom') {
+    originY = 'bottom';
+    top = height * (1 - margin);
+  } else if (position === 'center') {
+    originY = 'center';
+    top = height / 2;
+  }
+
+  if (position && position.x != null) {
+    originX = position.originX || 'left';
+    left = width * position.x;
+  }
+  if (position && position.y != null) {
+    originY = position.originY || 'top';
+    top = height * position.y;
+  }
+
+  return { originX, originY, top, left };
+}
+
 module.exports = {
   parseFps,
   readVideoFileInfo,
@@ -69,4 +99,5 @@ module.exports = {
   multipleOf2,
   toArrayInteger,
   readFileStreams,
+  getPositionProps,
 };

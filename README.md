@@ -114,7 +114,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
     layerType: {
       'fill-color': {
         color: '#ff6666',
-    }
+      }
       // ...more per-layer-type defaults
     },
   },
@@ -158,7 +158,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `defaults.duration` | `--clip-duration` | Set default clip duration for clips that don't have an own duration | `4` | sec |
 | `defaults.transition` | | An object `{ name, duration }` describing the default transition. Set to **null** to disable transitions | | |
 | `defaults.transition.duration` | `--transition-duration` | Default transition duration | `0.5` | sec |
-| `defaults.transition.name` | `--transition-name` | Default transition type. See **Transition types** | `random` | |
+| `defaults.transition.name` | `--transition-name` | Default transition type. See [Transition types](#transition-types) | `random` | |
 | `clips[]` | | List of clip objects that will be played in sequence. Each clip can have one or more layers. | | |
 | `clips[].duration` | | Clip duration. See `defaults.duration`. If unset, the clip duration will be that of the **first video layer**. | `defaults.duration` | |
 | `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.transition` | |
@@ -201,19 +201,32 @@ Audio layers will be mixed together. If `cutFrom`/`cutTo` is set, the resulting 
 
 #### Layer type 'image'
 
+Full screen image (auto letterboxed)
+
 | Parameter  | Description | Default | |
 |-|-|-|-|
 | `path` | Path to image file | | |
-| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out` or `null` to disable | `in` | |
-| `zoomAmount` | Zoom amount for Ken Burns effect | `0.1` | |
+
+See also See [Ken Burns parameters](#ken-burns-parameters).
+
+#### Layer type 'image-overlay'
+
+Image overlay with a custom position on the screen.
+
+| Parameter  | Description | Default | |
+|-|-|-|-|
+| `path` | Path to image file | | |
+| `position` | See [Position parameter](#position-parameter) | | |
+
+See also [Ken Burns parameters](#ken-burns-parameters).
 
 #### Layer type 'title'
 - `fontPath` - See `defaults.layer.fontPath`
 - `text` - Title text to show, keep it short
 - `textColor` - default `#ffffff`
-- `position` - One of either:
-  - `top`, `bottom` or `center` - vertical position
-  - An object `{ x, y, originX = 'left', originY = 'top' }`, where `{ x: 0, y: 0 }` is the upper left corner of the screen, and `{ x: 1, y: 1 }` is the lower right corner. `originX` and `originY` are optional, and specify the position origin of the text object.
+- `position` - See **Positions**
+
+See also [Ken Burns parameters](#ken-burns-parameters)
 
 #### Layer type 'subtitle'
 - `fontPath` - See `defaults.layer.fontPath`
@@ -260,6 +273,21 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 
 - `fragmentPath`
 - `vertexPath` (optional)
+
+### Position parameter
+
+Certain layers support the position parameter
+
+`position` can be one of either:
+  - `top`, `bottom` or `center` - vertical position (horizontally centered)
+  - An object `{ x, y, originX = 'left', originY = 'top' }`, where `{ x: 0, y: 0 }` is the upper left corner of the screen, and `{ x: 1, y: 1 }` is the lower right corner, `x` is relative to video width, `y` to height. `originX` and `originY` are optional, and specify the position's origin (anchor position) of the object.
+
+### Ken Burns parameters
+
+| Parameter  | Description | Default | |
+|-|-|-|-|
+| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out` or `null` to disable | | |
+| `zoomAmount` | Zoom amount for Ken Burns effect | `0.1` | |
 
 ## Troubleshooting
 

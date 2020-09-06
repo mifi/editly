@@ -70,7 +70,7 @@ module.exports = async (config = {}) => {
     const { type, ...restLayer } = layer;
 
     // https://github.com/mifi/editly/issues/39
-    if (type === 'image') {
+    if (['image', 'image-overlay'].includes(type)) {
       await assertFileExists(restLayer.path);
     } else if (type === 'gl') {
       await assertFileExists(restLayer.fragmentPath);
@@ -78,7 +78,7 @@ module.exports = async (config = {}) => {
 
     if (['fabric', 'canvas'].includes(type)) assert(typeof layer.func === 'function', '"func" must be a function');
 
-    if (['image', 'fabric', 'canvas', 'gl', 'radial-gradient', 'linear-gradient', 'fill-color'].includes(type)) return layer;
+    if (['image', 'image-overlay', 'fabric', 'canvas', 'gl', 'radial-gradient', 'linear-gradient', 'fill-color'].includes(type)) return layer;
 
     // TODO if random-background radial-gradient linear etc
     if (type === 'pause') return handleLayer({ ...restLayer, type: 'fill-color' });
