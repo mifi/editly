@@ -36,6 +36,8 @@
 
 ## Image overlays with alpha channel
 
+![](https://github.com/mifi/gifs/raw/master/imageOverlay.gif)
+
 [imageOverlay.json5](https://github.com/mifi/editly/blob/master/examples/imageOverlay.json5)
 
 ## Partial overlays (B-roll)
