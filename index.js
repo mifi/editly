@@ -1,17 +1,18 @@
 const execa = require('execa');
 const assert = require('assert');
 const pMap = require('p-map');
-const { basename, join } = require('path');
+const { basename, join, dirname } = require('path');
 const flatMap = require('lodash/flatMap');
 const JSON5 = require('json5');
 const fs = require('fs-extra');
 
-const { parseFps, readFileInfo, multipleOf2 } = require('./util');
+const { parseFps, readVideoFileInfo, readAudioFileInfo, multipleOf2 } = require('./util');
 const { registerFont } = require('./sources/fabricFrameSource');
 const { createFrameSource } = require('./sources/frameSource');
 const { calcTransition } = require('./transitions');
 
 const GlTransitions = require('./glTransitions');
+const Audio = require('./audio');
 
 // Cache
 const loadedFonts = [];
@@ -20,7 +21,6 @@ const loadedFonts = [];
 const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', 'Transition must be an object');
 
 const assertFileExists = async (path) => assert(await fs.exists(path), `File does not exist ${path}`);
-
 
 module.exports = async (config = {}) => {
   const {
@@ -36,6 +36,7 @@ module.exports = async (config = {}) => {
     fps: requestedFps,
     defaults: defaultsIn = {},
     audioFilePath: audioFilePathIn,
+    keepSourceAudio,
 
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
@@ -43,7 +44,8 @@ module.exports = async (config = {}) => {
 
   const isGif = outPath.toLowerCase().endsWith('.gif');
 
-  const audioFilePath = isGif ? undefined : audioFilePathIn;
+  let audioFilePath;
+  if (!isGif) audioFilePath = audioFilePathIn;
 
   if (audioFilePath) await assertFileExists(audioFilePath);
 
@@ -68,7 +70,7 @@ module.exports = async (config = {}) => {
     const { type, ...restLayer } = layer;
 
     // https://github.com/mifi/editly/issues/39
-    if (type === 'image') {
+    if (['image', 'image-overlay'].includes(type)) {
       await assertFileExists(restLayer.path);
     } else if (type === 'gl') {
       await assertFileExists(restLayer.fragmentPath);
@@ -76,7 +78,7 @@ module.exports = async (config = {}) => {
 
     if (['fabric', 'canvas'].includes(type)) assert(typeof layer.func === 'function', '"func" must be a function');
 
-    if (['image', 'fabric', 'canvas', 'gl', 'radial-gradient', 'linear-gradient', 'fill-color'].includes(type)) return layer;
+    if (['image', 'image-overlay', 'fabric', 'canvas', 'gl', 'radial-gradient', 'linear-gradient', 'fill-color'].includes(type)) return layer;
 
     // TODO if random-background radial-gradient linear etc
     if (type === 'pause') return handleLayer({ ...restLayer, type: 'fill-color' });
@@ -127,65 +129,133 @@ module.exports = async (config = {}) => {
   }
 
   const clips = await pMap(clipsIn, async (clip, clipIndex) => {
-    const { transition: userTransition, duration: userDuration, layers } = clip;
+    const { transition: userTransition, duration: userClipDuration, layers } = clip;
 
     checkTransition(userTransition);
 
     const videoLayers = layers.filter((layer) => layer.type === 'video');
-    assert(videoLayers.length <= 1, 'Max 1 video per layer');
 
-    const userOrDefaultDuration = userDuration || defaults.duration;
-    if (videoLayers.length === 0) assert(userOrDefaultDuration, `Duration is required for clip ${clipIndex}`);
+    const userClipDurationOrDefault = userClipDuration || defaults.duration;
+    if (videoLayers.length === 0) assert(userClipDurationOrDefault, `Duration parameter is required for videoless clip ${clipIndex}`);
 
-    let duration = userOrDefaultDuration;
+    const transition = calcTransition(defaults, userTransition, clipIndex === clipsIn.length - 1);
 
-    const layersOut = flatMap(await pMap(layers, async (layerIn) => {
-      const layer = { ...defaults.layer, ...layerIn };
-      const { type } = layer;
+    let layersOut = flatMap(await pMap(layers, async (layerIn) => {
+      const globalLayerDefaults = defaults.layer || {};
+      const thisLayerDefaults = (defaults.layerType || {})[layerIn.type];
+      const layer = { ...globalLayerDefaults, ...thisLayerDefaults, ...layerIn };
+      const { type, path } = layer;
 
       if (type === 'video') {
-        const { cutFrom: cutFromIn, cutTo: cutToIn, path } = layer;
-        const fileInfo = await readFileInfo(ffprobePath, path);
-        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = fileInfo;
-        let cutFrom;
-        let cutTo;
-        let trimmedSourceDuration = fileDuration;
-        if (cutFromIn != null || cutToIn != null) {
-          cutFrom = Math.min(Math.max(0, cutFromIn || 0), fileDuration);
-          cutTo = Math.min(Math.max(cutFrom, cutToIn || fileDuration), fileDuration);
-          assert(cutFrom < cutTo, 'cutFrom must be lower than cutTo');
+        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = await readVideoFileInfo(ffprobePath, path);
+        let { cutFrom, cutTo } = layer;
+        if (!cutFrom) cutFrom = 0;
+        cutFrom = Math.max(cutFrom, 0);
+        cutFrom = Math.min(cutFrom, fileDuration);
 
-          trimmedSourceDuration = cutTo - cutFrom;
-        }
+        if (!cutTo) cutTo = fileDuration;
+        cutTo = Math.max(cutTo, cutFrom);
+        cutTo = Math.min(cutTo, fileDuration);
+        assert(cutFrom < cutTo, 'cutFrom must be lower than cutTo');
 
-        // If user specified duration, means that should be the output duration
-        let framePtsFactor;
-        if (userDuration) {
-          duration = userDuration;
-          framePtsFactor = userDuration / trimmedSourceDuration;
-        } else {
-          duration = trimmedSourceDuration;
-          framePtsFactor = 1;
-        }
+        const inputDuration = cutTo - cutFrom;
 
         const isRotated = rotation === 90 || rotation === 270;
         const width = isRotated ? heightIn : widthIn;
         const height = isRotated ? widthIn : heightIn;
 
-        return { ...layer, cutFrom, cutTo, width, height, framerateStr, framePtsFactor };
+        // Compensate for transition duration
+        const audioCutTo = Math.max(cutFrom, cutTo - transition.duration);
+
+        return { ...layer, cutFrom, cutTo, audioCutTo, inputDuration, width, height, framerateStr };
       }
+
+      // Audio is handled later
+      if (type === 'audio') return layer;
 
       return handleLayer(layer);
     }, { concurrency: 1 }));
 
-    const transition = calcTransition(defaults, userTransition);
+    let clipDuration = userClipDurationOrDefault;
+
+    const firstVideoLayer = layersOut.find((layer) => layer.type === 'video');
+    if (firstVideoLayer && !userClipDuration) clipDuration = firstVideoLayer.inputDuration;
+    assert(clipDuration);
+
+    // We need to map again, because for audio, we need to know the correct clipDuration
+    layersOut = await pMap(layersOut, async (layerIn) => {
+      const { type, path, visibleUntil, visibleFrom = 0 } = layerIn;
+
+      // This feature allows the user to show another layer overlayed (or replacing) parts of the lower layers (visibleFrom - visibleUntil)
+      const visibleDuration = ((visibleUntil || clipDuration) - visibleFrom);
+      assert(visibleDuration > 0 && visibleDuration <= clipDuration, `Invalid visibleFrom ${visibleFrom} or visibleUntil ${visibleUntil}`);
+      // TODO Also need to handle video layers (framePtsFactor etc)
+      // TODO handle audio in case of visibleFrom/visibleTo
+
+      const layer = { ...layerIn, visibleFrom, visibleDuration };
+
+      if (type === 'audio') {
+        const { duration: fileDuration } = await readAudioFileInfo(ffprobePath, path);
+        let { cutFrom, cutTo } = layer;
+
+        // console.log({ cutFrom, cutTo, fileDuration, clipDuration });
+
+        if (!cutFrom) cutFrom = 0;
+        cutFrom = Math.max(cutFrom, 0);
+        cutFrom = Math.min(cutFrom, fileDuration);
+
+        if (!cutTo) cutTo = cutFrom + clipDuration;
+        cutTo = Math.max(cutTo, cutFrom);
+        cutTo = Math.min(cutTo, fileDuration);
+        assert(cutFrom < cutTo, 'cutFrom must be lower than cutTo');
+
+        const inputDuration = cutTo - cutFrom;
+
+        const framePtsFactor = clipDuration / inputDuration;
+
+        // Compensate for transition duration
+        const audioCutTo = Math.max(cutFrom, cutTo - transition.duration);
+
+        return { ...layer, cutFrom, cutTo, audioCutTo, framePtsFactor };
+      }
+
+      if (layer.type === 'video') {
+        const { inputDuration } = layer;
+
+        let framePtsFactor;
+
+        // If user explicitly specified duration for clip, it means that should be the output duration of the video
+        if (userClipDuration) {
+          // Later we will speed up or slow down video using this factor
+          framePtsFactor = userClipDuration / inputDuration;
+        } else {
+          framePtsFactor = 1;
+        }
+
+        return { ...layer, framePtsFactor };
+      }
+
+      return layer;
+    });
 
     return {
       transition,
-      duration,
+      duration: clipDuration,
       layers: layersOut,
     };
   }, { concurrency: 1 });
+
+  const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose });
+
+  const outDir = dirname(outPath);
+  const tmpDir = join(outDir, 'editly-tmp');
+  if (verbose) console.log({ tmpDir });
+  await fs.remove(tmpDir);
+  await fs.mkdirp(tmpDir);
+
+  if (!audioFilePath && keepSourceAudio) {
+    audioFilePath = await editAudio({ clips, tmpDir });
+  }
 
   if (verbose) console.log(JSON5.stringify(clips, null, 2));
 
@@ -321,109 +391,129 @@ module.exports = async (config = {}) => {
   let frameSource1;
   let frameSource2;
 
+  let frameSource1Data;
+
+  let totalFramesWritten = 0;
+  let fromClipFrameAt = 0;
+  let toClipFrameAt = 0;
+
+  let transitionFromClipId = 0;
+
+  const getTransitionToClipId = () => transitionFromClipId + 1;
+  const getTransitionFromClip = () => clips[transitionFromClipId];
+  const getTransitionToClip = () => clips[getTransitionToClipId()];
+
+  const getSource = async (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
+  const getTransitionFromSource = async () => getSource(getTransitionFromClip(), transitionFromClipId);
+  const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
+
   try {
     outProcess = startFfmpegWriterProcess();
     let outProcessError;
 
-    // If we don't catch it here, the whole process will crash and we cannot process the error
+    // If we don't handle it here, the whole Node process will crash and we cannot process the error
     outProcess.stdin.on('error', (err) => {
       console.error('Output ffmpeg caught error', err);
       outProcessError = err;
     });
 
-    let totalFrameCount = 0;
-    let fromClipFrameCount = 0;
-    let toClipFrameCount = 0;
-
-    let transitionFromClipId = 0;
-
-    const getTransitionToClipId = () => transitionFromClipId + 1;
-    const getTransitionFromClip = () => clips[transitionFromClipId];
-    const getTransitionToClip = () => clips[getTransitionToClipId()];
-
-    const getSource = (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, enableFfmpegLog, framerateStr });
-
-    const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
-    frameSource1 = await getSource(getTransitionFromClip(), transitionFromClipId);
+    frameSource1 = await getTransitionFromSource();
     frameSource2 = await getTransitionToSource();
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const fromClipNumFrames = Math.round(getTransitionFromClip().duration * fps);
-      const toClipNumFrames = getTransitionToClip() && Math.round(getTransitionToClip().duration * fps);
-      const fromClipProgress = fromClipFrameCount / fromClipNumFrames;
-      const toClipProgress = getTransitionToClip() && toClipFrameCount / toClipNumFrames;
-      const frameData1 = await frameSource1.readNextFrame(fromClipProgress);
+      const transitionToClip = getTransitionToClip();
+      const transitionFromClip = getTransitionFromClip();
+      const fromClipNumFrames = Math.round(transitionFromClip.duration * fps);
+      const toClipNumFrames = transitionToClip && Math.round(transitionToClip.duration * fps);
+      const fromClipProgress = fromClipFrameAt / fromClipNumFrames;
+      const toClipProgress = transitionToClip && toClipFrameAt / toClipNumFrames;
+      const fromClipTime = transitionFromClip.duration * fromClipProgress;
+      const toClipTime = transitionToClip && transitionToClip.duration * toClipProgress;
 
-      const clipTransition = getTransitionFromClip().transition;
+      const currentTransition = transitionFromClip.transition;
 
-      const transitionNumFrames = Math.round(clipTransition.duration * fps);
+      const transitionNumFrames = Math.round(currentTransition.duration * fps);
 
       // Each clip has two transitions, make sure we leave enough room:
       const transitionNumFramesSafe = Math.floor(Math.min(Math.min(fromClipNumFrames, toClipNumFrames != null ? toClipNumFrames : Number.MAX_SAFE_INTEGER) / 2, transitionNumFrames));
       // How many frames into the transition are we? negative means not yet started
-      const transitionFrameAt = fromClipFrameCount - (fromClipNumFrames - transitionNumFramesSafe);
-
-      if (verbose) console.log('Frame', totalFrameCount, 'from', fromClipFrameCount, `(clip ${transitionFromClipId})`, 'to', toClipFrameCount, `(clip ${getTransitionToClipId()})`);
+      const transitionFrameAt = fromClipFrameAt - (fromClipNumFrames - transitionNumFramesSafe);
 
       if (!verbose) {
-        const percentDone = Math.floor(100 * (totalFrameCount / estimatedTotalFrames));
-        if (totalFrameCount % 10 === 0) process.stdout.write(`${String(percentDone).padStart(3, ' ')}% `);
+        const percentDone = Math.floor(100 * (totalFramesWritten / estimatedTotalFrames));
+        if (totalFramesWritten % 10 === 0) process.stdout.write(`${String(percentDone).padStart(3, ' ')}% `);
       }
 
-      if (!frameData1 || transitionFrameAt >= transitionNumFramesSafe - 1) {
-      // if (!frameData1 || transitionFrameAt >= transitionNumFramesSafe) {
-        console.log('Done with transition, switching to next clip');
+      // console.log({ transitionFrameAt, transitionNumFramesSafe })
+      // const transitionLastFrameIndex = transitionNumFramesSafe - 1;
+      const transitionLastFrameIndex = transitionNumFramesSafe;
+
+      // Done with transition?
+      if (transitionFrameAt >= transitionLastFrameIndex) {
         transitionFromClipId += 1;
+        console.log(`Done with transition, switching to next transitionFromClip (${transitionFromClipId})`);
 
         if (!getTransitionFromClip()) {
           console.log('No more transitionFromClip, done');
           break;
         }
 
-        // Cleanup old, swap and load next
+        // Cleanup completed frameSource1, swap and load next frameSource2
         await frameSource1.close();
         frameSource1 = frameSource2;
         frameSource2 = await getTransitionToSource();
 
-        fromClipFrameCount = transitionNumFramesSafe;
-        toClipFrameCount = 0;
-      } else {
-        let outFrameData;
-        if (frameSource2 && transitionFrameAt >= 0) {
-          if (verbose) console.log('Transition', 'frame', transitionFrameAt, '/', transitionNumFramesSafe, clipTransition.name, `${clipTransition.duration}s`);
+        fromClipFrameAt = transitionLastFrameIndex;
+        toClipFrameAt = 0;
 
-          const frameData2 = await frameSource2.readNextFrame(toClipProgress);
-          toClipFrameCount += 1;
-
-          if (frameData2) {
-            const progress = transitionFrameAt / transitionNumFramesSafe;
-            const easedProgress = clipTransition.easingFunction(progress);
-
-            if (verbose) console.time('runTransitionOnFrame');
-            outFrameData = runTransitionOnFrame({ fromFrame: frameData1, toFrame: frameData2, progress: easedProgress, transitionName: clipTransition.name, transitionParams: clipTransition.params });
-            if (verbose) console.timeEnd('runTransitionOnFrame');
-          } else {
-            console.warn('Got no frame data from clip 2!');
-            // We have reached end of clip2 but transition is not complete
-            // Pass thru
-            // TODO improve, maybe cut it short
-            outFrameData = frameData1;
-          }
-        } else {
-          outFrameData = frameData1;
-        }
-
-        // If we don't await we get EINVAL when dealing with high resolution files (big writes)
-        await new Promise((r) => outProcess.stdin.write(outFrameData, () => r()));
-
-        if (outProcessError) throw outProcessError;
-
-        fromClipFrameCount += 1;
+        // eslint-disable-next-line no-continue
+        continue;
       }
 
-      totalFrameCount += 1;
-    }
+      const newFrameSource1Data = await frameSource1.readNextFrame({ time: fromClipTime });
+      // If we got no data, use the old data
+      // TODO maybe abort?
+      if (newFrameSource1Data) frameSource1Data = newFrameSource1Data;
+      else console.warn('No frame data returned, using last frame');
+
+      const isInTransition = frameSource2 && transitionNumFramesSafe > 0 && transitionFrameAt >= 0;
+
+      let outFrameData;
+      if (isInTransition) {
+        const frameSource2Data = await frameSource2.readNextFrame({ time: toClipTime });
+
+        if (frameSource2Data) {
+          const progress = transitionFrameAt / transitionNumFramesSafe;
+          const easedProgress = currentTransition.easingFunction(progress);
+
+          // if (verbose) console.time('runTransitionOnFrame');
+          outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data, toFrame: frameSource2Data, progress: easedProgress, transitionName: currentTransition.name, transitionParams: currentTransition.params });
+          // if (verbose) console.timeEnd('runTransitionOnFrame');
+        } else {
+          console.warn('Got no frame data from transitionToClip!');
+          // We have probably reached end of clip2 but transition is not complete. Just pass thru clip1
+          outFrameData = frameSource1Data;
+        }
+      } else {
+        // Not in transition. Pass thru clip 1
+        outFrameData = frameSource1Data;
+      }
+
+      if (verbose) {
+        if (isInTransition) console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`, 'to clip', getTransitionToClipId(), `(frame ${toClipFrameAt} / ${transitionNumFramesSafe})`, currentTransition.name, `${currentTransition.duration}s`);
+        else console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`);
+      }
+
+      // If we don't wait for callback, then we get EINVAL when dealing with high resolution files (big writes)
+      await new Promise((r) => outProcess.stdin.write(outFrameData, () => r()));
+
+      if (outProcessError) throw outProcessError;
+
+      totalFramesWritten += 1;
+      fromClipFrameAt += 1;
+      if (isInTransition) toClipFrameAt += 1;
+    } // End while loop
 
     outProcess.stdin.end();
 
@@ -431,12 +521,11 @@ module.exports = async (config = {}) => {
     console.log(outPath);
   } catch (err) {
     console.error('Loop failed', err);
-    if (outProcess) {
-      outProcess.kill();
-    }
+    if (outProcess) outProcess.kill();
   } finally {
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
+    await fs.remove(tmpDir);
   }
 
   try {

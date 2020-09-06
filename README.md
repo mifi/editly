@@ -4,7 +4,7 @@
 
 This GIF / YouTube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)". See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples).
 
-**Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images and titles**, with smooth transitions and music overlaid.
+**Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images, audio and titles**, with smooth transitions and music overlaid.
 
 Editly has a simple CLI for quickly assembling a video from a set of clips or images, or you can use its more flexible JavaScript API.
 
@@ -22,12 +22,16 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 - Accepts custom HTML5 Canvas / Fabric.js JavaScript code for custom screens or dynamic overlays
 - Render custom GL shaders (for example from [shadertoy](https://www.shadertoy.com/))
 - Can output GIF
+- Preserve audio sources or mix multiple
+- Overlay transparent images or videos
+- Show different sub-clips for parts of a clips duration (B-roll)
 
 ## Use cases
 
 - Create a slideshow from a set of pictures with text overlay
 - Create a fast-paced trailer or promo video
 - Create a tutorial video with help text
+- Create news stories
 - Simply convert a video to a GIF
 - Resize video to any size or framerate and with automatic letterboxing/cropping (e.g. if you need to upload a video somewhere but the site complains `Video must be 1337x1000 30fps`)
 
@@ -110,9 +114,16 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
     layer: {
       fontPath,
       // ...more layer defaults
-    }
+    },
+    layerType: {
+      'fill-color': {
+        color: '#ff6666',
+      }
+      // ...more per-layer-type defaults
+    },
   },
   audioFilePath,
+  keepSourceAudio: false,
   clips: [
     {
       transition,
@@ -143,19 +154,22 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `width` | `--width` | Width which all media will be converted to | `640` | |
 | `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of **first video** | |
 | `fps` | `--fps` | FPS which all videos will be converted to | First video FPS or `25` | |
-| `audioFilePath` | `--audio-file-path` | Set an audio track to the whole output video | | |
+| `audioFilePath` | `--audio-file-path` | Set an audio track for the whole video | | |
+| `keepSourceAudio` | `--keep-source-audio` | Keep audio from source files | | |
 | `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview) | `false` | |
 | `defaults.layer.fontPath` | `--font-path` | Set default font to a .ttf | System font | |
 | `defaults.layer.*` | | Set any layer parameter that all layers will inherit | | |
 | `defaults.duration` | `--clip-duration` | Set default clip duration for clips that don't have an own duration | `4` | sec |
 | `defaults.transition` | | An object `{ name, duration }` describing the default transition. Set to **null** to disable transitions | | |
 | `defaults.transition.duration` | `--transition-duration` | Default transition duration | `0.5` | sec |
-| `defaults.transition.name` | `--transition-name` | Default transition type. See **Transition types** | `random` | |
-| `clips[]` | | List of clip objects that will be concatenated in sequence | | |
-| `clips[].duration` | | Clip duration. See `defaults.duration` | `defaults.duration` | |
+| `defaults.transition.name` | `--transition-name` | Default transition type. See [Transition types](#transition-types) | `random` | |
+| `clips[]` | | List of clip objects that will be played in sequence. Each clip can have one or more layers. | | |
+| `clips[].duration` | | Clip duration. See `defaults.duration`. If unset, the clip duration will be that of the **first video layer**. | `defaults.duration` | |
 | `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.transition` | |
-| `clips[].layers[]` | | List of layers within the current clip that will be overlaid in their natural order (last layer on top) | | |
+| `clips[].layers[]` | | List of layers within the current clip that will be overlaid in their natural order (final layer on top) | | |
 | `clips[].layers[].type` | | Layer type, see below | | |
+| `clips[].layers[].visibleFrom` | | What time into the clip should this layer start | | sec |
+| `clips[].layers[].visibleUntil` | | What time into the clip should this layer stop | | sec |
 
 ### Transition types
 
@@ -167,29 +181,56 @@ See [examples](https://github.com/mifi/editly/tree/master/examples) and [commonF
 
 #### Layer type 'video'
 
-For video layers, if parent `clip.duration` is specified, the video will be slowed/sped-up to match `clip.duration`. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`.
+For video layers, if parent `clip.duration` is specified, the video will be slowed/sped-up to match `clip.duration`. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`. If the layer has audio, it will be kept (and mixed with other audio layers if present.)
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
 | `path` | Path to video file | | |
 | `resizeMode` | One of `cover`, `contain`, `stretch` | `contain` | |
 | `cutFrom` | Time value to cut from | `0` | sec |
-| `cutTo` | Time value to cut from | *end of video* | sec |
+| `cutTo` | Time value to cut to | *end of video* | sec |
 | `backgroundColor` | Background of letterboxing | `#000000` | |
+| `mixVolume` | Relative volume when mixing this video's audio track with others | `1` | |
+
+#### Layer type 'audio'
+
+Audio layers will be mixed together. If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`. The slow down/speed-up operation is limited to values between `0.5x` and `100x`.
+
+| Parameter  | Description | Default | |
+|-|-|-|-|
+| `path` | Path to audio file | | |
+| `cutFrom` | Time value to cut from | `0` | sec |
+| `cutTo` | Time value to cut to | `clip.duration` | sec |
+| `mixVolume` | Relative volume when mixing this audio track with others | `1` | |
 
 #### Layer type 'image'
+
+Full screen image (auto letterboxed)
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
 | `path` | Path to image file | | |
-| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out` or `null` to disable | `in` | |
-| `zoomAmount` | Zoom amount for Ken Burns effect | `0.1` | |
+
+See also See [Ken Burns parameters](#ken-burns-parameters).
+
+#### Layer type 'image-overlay'
+
+Image overlay with a custom position on the screen.
+
+| Parameter  | Description | Default | |
+|-|-|-|-|
+| `path` | Path to image file | | |
+| `position` | See [Position parameter](#position-parameter) | | |
+
+See also [Ken Burns parameters](#ken-burns-parameters).
 
 #### Layer type 'title'
 - `fontPath` - See `defaults.layer.fontPath`
 - `text` - Title text to show, keep it short
 - `textColor` - default `#ffffff`
-- `position` - Vertical position: `top`, `bottom` or `center`
+- `position` - See **Positions**
+
+See also [Ken Burns parameters](#ken-burns-parameters)
 
 #### Layer type 'subtitle'
 - `fontPath` - See `defaults.layer.fontPath`
@@ -236,6 +277,21 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 
 - `fragmentPath`
 - `vertexPath` (optional)
+
+### Position parameter
+
+Certain layers support the position parameter
+
+`position` can be one of either:
+  - `top`, `bottom` or `center` - vertical position (horizontally centered)
+  - An object `{ x, y, originX = 'left', originY = 'top' }`, where `{ x: 0, y: 0 }` is the upper left corner of the screen, and `{ x: 1, y: 1 }` is the lower right corner, `x` is relative to video width, `y` to height. `originX` and `originY` are optional, and specify the position's origin (anchor position) of the object.
+
+### Ken Burns parameters
+
+| Parameter  | Description | Default | |
+|-|-|-|-|
+| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out` or `null` to disable | | |
+| `zoomAmount` | Zoom amount for Ken Burns effect | `0.1` | |
 
 ## Troubleshooting
 

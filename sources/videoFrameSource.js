@@ -1,7 +1,10 @@
 const execa = require('execa');
 const assert = require('assert');
 
-module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpegPath, enableFfmpegLog, params }) => {
+const { getFfmpegCommonArgs } = require('../ffmpeg');
+const { readFileStreams } = require('../util');
+
+module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
   const targetSize = width * height * channels;
 
   // TODO assert that we have read the correct amount of frames
@@ -25,11 +28,18 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
   // Cover: https://unix.stackexchange.com/a/192123
   else scaleFilter = `scale=(iw*sar)*max(${width}/(iw*sar)\\,${height}/ih):ih*max(${width}/(iw*sar)\\,${height}/ih),crop=${width}:${height}`;
 
+  // https://forum.unity.com/threads/settings-for-importing-a-video-with-an-alpha-channel.457657/
+  const streams = await readFileStreams(ffprobePath, path);
+  const firstVideoStream = streams.find((s) => s.codec_type === 'video');
+  // https://superuser.com/a/1116905/658247
+  const inputCodecArgs = ['vp8', 'vp9'].includes(firstVideoStream.codec_name) ? ['-vcodec', 'libvpx'] : [];
+
   // http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
   const args = [
-    ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']),
+    ...getFfmpegCommonArgs({ enableFfmpegLog }),
+    ...inputCodecArgs,
     ...(cutFrom ? ['-ss', cutFrom] : []),
     '-i', path,
     ...(cutTo ? ['-t', (cutTo - cutFrom) * framePtsFactor] : []),
@@ -49,17 +59,21 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
   let timeout;
   let ended = false;
 
+  stream.once('end', () => {
+    clearTimeout(timeout);
+    if (verbose) console.log(path, 'ffmpeg video stream ended');
+    ended = true;
+  });
+
   const readNextFrame = () => new Promise((resolve, reject) => {
     if (ended) {
-      console.log(path, 'Tried to read next video frame after ffmpeg stream ended');
+      console.log(path, 'Tried to read next video frame after ffmpeg video stream ended');
       resolve();
       return;
     }
     // console.log('Reading new frame', path);
 
     function onEnd() {
-      if (verbose) console.log(path, 'ffmpeg video stream ended');
-      ended = true;
       resolve();
     }
 
@@ -77,7 +91,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
       chunk.copy(buf, length, 0, nCopied);
       length += nCopied;
 
-      if (length > targetSize) console.error('OOPS! Overflow', length);
+      if (length > targetSize) console.error('Video data overflow', length);
 
       if (length >= targetSize) {
         // console.log('Finished reading frame', inFrameCount, path);
@@ -85,7 +99,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
 
         const restLength = chunk.length - nCopied;
         if (restLength > 0) {
-          if (verbose) console.log('Left over data', nCopied, chunk.length, restLength);
+          // if (verbose) console.log('Left over data', nCopied, chunk.length, restLength);
           chunk.slice(nCopied).copy(buf, 0);
           length = restLength;
         } else {
@@ -104,7 +118,7 @@ module.exports = async ({ width, height, channels, framerateStr, verbose, ffmpeg
       console.warn('Timeout on read video frame');
       cleanup();
       resolve();
-    }, 20000);
+    }, 60000);
 
     stream.on('data', handleChunk);
     stream.on('end', onEnd);
