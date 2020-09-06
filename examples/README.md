@@ -1,14 +1,10 @@
 # Examples
 
-## Ken Burns zoom slideshow
+## Image slideshow with Ken Burns zoom
 
 ![](https://github.com/mifi/gifs/raw/master/kenburns.gif)
 
 [kenBurns.json5](https://github.com/mifi/editly/blob/master/examples/kenBurns.json5)
-
-```bash
-editly kenBurns.json5
-```
 
 ## News title
 
@@ -16,19 +12,11 @@ editly kenBurns.json5
 
 [newsTitle.json5](https://github.com/mifi/editly/blob/master/examples/newsTitle.json5)
 
-```bash
-editly newsTitle.json5
-```
-
 ## Resize modes
 
 ![](https://github.com/mifi/gifs/raw/master/resizeHorizontal.gif)
 
 [resizeHorizontal.json5](https://github.com/mifi/editly/blob/master/examples/resizeHorizontal.json5)
-
-```bash
-editly resizeHorizontal.json5
-```
 
 ## Speed up / slow down with cutting
 
@@ -36,26 +24,35 @@ editly resizeHorizontal.json5
 
 [speedTest.json5](https://github.com/mifi/editly/blob/master/examples/speedTest.json5)
 
-```bash
-editly speedTest.json5
-```
-
 ## Title and subtitle
 
 ![](https://github.com/mifi/gifs/raw/master/subtitle.gif)
 
 [subtitle.json5](https://github.com/mifi/editly/blob/master/examples/subtitle.json5)
 
-```bash
-editly subtitle.json5
-```
+## Video overlays with alpha channel
+
+[alpha.json5](https://github.com/mifi/editly/blob/master/examples/alpha.json5)
+
+## Image overlays with alpha channel
+
+[imageOverlay.json5](https://github.com/mifi/editly/blob/master/examples/imageOverlay.json5)
+
+## Partial overlays (B-roll)
+
+[visibleFromUntil.json5](https://github.com/mifi/editly/blob/master/examples/visibleFromUntil.json5)
+
+## Audio layers
+
+- [audio1.json5](https://github.com/mifi/editly/blob/master/examples/audio1.json5)
+- [audio2.json5](https://github.com/mifi/editly/blob/master/examples/audio2.json5)
+
 
 ## Custom HTML5 canvas Javascript
 
 ![](https://github.com/mifi/gifs/raw/master/customCanvas.gif)
 
 [customCanvas.js](https://github.com/mifi/editly/blob/master/examples/customCanvas.js)
-
 
 ```bash
 node customCanvas.js
@@ -67,10 +64,10 @@ node customCanvas.js
 
 [customFabric.js](https://github.com/mifi/editly/blob/master/examples/customFabric.js)
 
-
 ```bash
 node customFabric.js
 ```
+
 
 ## LosslessCut tutorial
 

@@ -22,12 +22,16 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 - Accepts custom HTML5 Canvas / Fabric.js JavaScript code for custom screens or dynamic overlays
 - Render custom GL shaders (for example from [shadertoy](https://www.shadertoy.com/))
 - Can output GIF
+- Preserve audio sources or mix multiple
+- Overlay transparent images or videos
+- Show different sub-clips for parts of a clips duration (B-roll)
 
 ## Use cases
 
 - Create a slideshow from a set of pictures with text overlay
 - Create a fast-paced trailer or promo video
 - Create a tutorial video with help text
+- Create news stories
 - Simply convert a video to a GIF
 - Resize video to any size or framerate and with automatic letterboxing/cropping (e.g. if you need to upload a video somewhere but the site complains `Video must be 1337x1000 30fps`)
 
@@ -119,7 +123,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
     },
   },
   audioFilePath,
-  keepSourceAudio,
+  keepSourceAudio: false,
   clips: [
     {
       transition,
