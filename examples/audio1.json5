@@ -8,6 +8,7 @@
     { duration: 0.5, layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 }] },
 
     { layers: [
+      { type: 'fill-color' },
       { type: 'title', text: 'test' },
       { type: 'audio', path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', cutFrom: 2, cutTo: 5 }] },
 
