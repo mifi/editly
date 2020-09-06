@@ -141,7 +141,9 @@ module.exports = async (config = {}) => {
     const transition = calcTransition(defaults, userTransition, clipIndex === clipsIn.length - 1);
 
     let layersOut = flatMap(await pMap(layers, async (layerIn) => {
-      const layer = { ...defaults.layer, ...layerIn };
+      const globalLayerDefaults = defaults.layer || {};
+      const thisLayerDefaults = (defaults.layerType || {})[layerIn.type];
+      const layer = { ...globalLayerDefaults, ...thisLayerDefaults, ...layerIn };
       const { type, path } = layer;
 
       if (type === 'video') {

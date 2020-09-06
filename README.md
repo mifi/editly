@@ -110,7 +110,13 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
     layer: {
       fontPath,
       // ...more layer defaults
+    },
+    layerType: {
+      'fill-color': {
+        color: '#ff6666',
     }
+      // ...more per-layer-type defaults
+    },
   },
   audioFilePath,
   keepSourceAudio,
