@@ -36,6 +36,7 @@ module.exports = async (config = {}) => {
     fps: requestedFps,
     defaults: defaultsIn = {},
     audioFilePath: audioFilePathIn,
+    keepSourceAudio,
 
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
@@ -250,7 +251,7 @@ module.exports = async (config = {}) => {
   await fs.remove(tmpDir);
   await fs.mkdirp(tmpDir);
 
-  if (!audioFilePath) {
+  if (!audioFilePath && keepSourceAudio) {
     audioFilePath = await editAudio({ clips, tmpDir });
   }
 
