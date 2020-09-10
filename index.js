@@ -7,7 +7,7 @@ const JSON5 = require('json5');
 const fs = require('fs-extra');
 
 const { parseFps, readVideoFileInfo, readAudioFileInfo, multipleOf2 } = require('./util');
-const { registerFont } = require('./sources/fabricFrameSource');
+const { registerFont } = require('./sources/fabric');
 const { createFrameSource } = require('./sources/frameSource');
 const { calcTransition } = require('./transitions');
 

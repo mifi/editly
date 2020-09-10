@@ -1,9 +1,24 @@
 const assert = require('assert');
 const pMap = require('p-map');
 
-const { rgbaToFabricImage, customFabricFrameSource, createCustomCanvasFrameSource, titleFrameSource, subtitleFrameSource, imageFrameSource, imageOverlayFrameSource, linearGradientFrameSource, radialGradientFrameSource, fillColorFrameSource, createFabricFrameSource, newsTitleFrameSource, createFabricCanvas, renderFabricCanvas } = require('./fabricFrameSource');
+const { rgbaToFabricImage, createCustomCanvasFrameSource, createFabricFrameSource, createFabricCanvas, renderFabricCanvas } = require('./fabric');
+
+const { customFabricFrameSource, subtitleFrameSource, titleFrameSource, newsTitleFrameSource, fillColorFrameSource, radialGradientFrameSource, linearGradientFrameSource, imageFrameSource, imageOverlayFrameSource } = require('./fabric/fabricFrameSources');
+
 const createVideoFrameSource = require('./videoFrameSource');
 const { createGlFrameSource } = require('./glFrameSource');
+
+const fabricFrameSources = {
+  fabric: customFabricFrameSource,
+  image: imageFrameSource,
+  'image-overlay': imageOverlayFrameSource,
+  title: titleFrameSource,
+  subtitle: subtitleFrameSource,
+  'linear-gradient': linearGradientFrameSource,
+  'radial-gradient': radialGradientFrameSource,
+  'fill-color': fillColorFrameSource,
+  'news-title': newsTitleFrameSource,
+};
 
 async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
   const { layers, duration } = clip;
@@ -14,21 +29,17 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
     const { type, ...params } = layer;
     console.log('createFrameSource', type, 'clip', clipIndex, 'layer', layerIndex);
 
-    const frameSourceFuncs = {
-      video: createVideoFrameSource,
-      gl: createGlFrameSource,
-      canvas: createCustomCanvasFrameSource,
-      fabric: async (opts) => createFabricFrameSource(customFabricFrameSource, opts),
-      image: async (opts) => createFabricFrameSource(imageFrameSource, opts),
-      'image-overlay': async (opts) => createFabricFrameSource(imageOverlayFrameSource, opts),
-      title: async (opts) => createFabricFrameSource(titleFrameSource, opts),
-      subtitle: async (opts) => createFabricFrameSource(subtitleFrameSource, opts),
-      'linear-gradient': async (opts) => createFabricFrameSource(linearGradientFrameSource, opts),
-      'radial-gradient': async (opts) => createFabricFrameSource(radialGradientFrameSource, opts),
-      'fill-color': async (opts) => createFabricFrameSource(fillColorFrameSource, opts),
-      'news-title': async (opts) => createFabricFrameSource(newsTitleFrameSource, opts),
-    };
-    const createFrameSourceFunc = frameSourceFuncs[type];
+    let createFrameSourceFunc;
+    if (fabricFrameSources[type]) {
+      createFrameSourceFunc = async (opts) => createFabricFrameSource(fabricFrameSources[type], opts);
+    } else {
+      createFrameSourceFunc = {
+        video: createVideoFrameSource,
+        gl: createGlFrameSource,
+        canvas: createCustomCanvasFrameSource,
+      }[type];
+    }
+
     assert(createFrameSourceFunc, `Invalid type ${type}`);
 
     const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration, channels, verbose, enableFfmpegLog, framerateStr, params });
