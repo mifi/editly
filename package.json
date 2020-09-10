@@ -8,7 +8,7 @@
   "dependencies": {
     "canvas": "^2.6.1",
     "execa": "^4.0.0",
-    "fabric": "^3.6.3",
+    "fabric": "^4.1.0",
     "file-type": "^14.1.4",
     "file-url": "^3.0.0",
     "fs-extra": "^9.0.0",

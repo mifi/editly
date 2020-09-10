@@ -152,19 +152,21 @@ async function radialGradientFrameSource({ width, height, params }) {
     const cx = 0.5 * rect.width;
     const cy = 0.5 * rect.height;
 
-    rect.setGradient('fill', {
+    rect.set('fill', new fabric.Gradient({
       type: 'radial',
-      r1,
-      r2,
-      x1: cx,
-      y1: cy,
-      x2: cx,
-      y2: cy,
-      colorStops: {
-        0: colors[0],
-        1: colors[1],
+      coords: {
+        r1,
+        r2,
+        x1: cx,
+        y1: cy,
+        x2: cx,
+        y2: cy,
       },
-    });
+      colorStops: [
+        { offset: 0, color: colors[0] },
+        { offset: 1, color: colors[1] },
+      ],
+    }));
 
     canvas.add(rect);
   }
@@ -181,16 +183,18 @@ async function linearGradientFrameSource({ width, height, params }) {
   async function onRender(progress, canvas) {
     const rect = getRekt(width, height);
 
-    rect.setGradient('fill', {
-      x1: 0,
-      y1: 0,
-      x2: width,
-      y2: height,
-      colorStops: {
-        0: colors[0],
-        1: colors[1],
+    rect.set('fill', new fabric.Gradient({
+      coords: {
+        x1: 0,
+        y1: 0,
+        x2: width,
+        y2: height,
       },
-    });
+      colorStops: [
+        { offset: 0, color: colors[0] },
+        { offset: 1, color: colors[1] },
+      ],
+    }));
 
     rect.rotate(progress * 30);
     canvas.add(rect);

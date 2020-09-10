@@ -1,0 +1,12 @@
+{
+  outPath: './gradients.mp4',
+  defaults: {
+    transition: { name: 'linearblur', duration: 0.1 },
+  },
+  clips: [
+    { duration: 1, layers: [{ type: 'linear-gradient', colors: ['#02aab0', '#00cdac'] }] },
+    { duration: 1, layers: [{ type: 'radial-gradient', colors: ['#b002aa', '#ac00cd'] }] },
+    { duration: 1, layers: [{ type: 'linear-gradient' }] },
+    { duration: 1, layers: [{ type: 'radial-gradient' }] },
+  ],
+}
