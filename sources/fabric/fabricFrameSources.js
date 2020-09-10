@@ -309,7 +309,7 @@ async function newsTitleFrameSource({ width, height, params }) {
 }
 
 async function customFabricFrameSource({ canvas, width, height, params }) {
-  return params.func(({ width, height, fabric, canvas }));
+  return params.func(({ width, height, fabric, canvas, params }));
 }
 
 module.exports = {
