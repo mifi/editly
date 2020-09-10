@@ -188,7 +188,7 @@ module.exports = async (config = {}) => {
 
       // This feature allows the user to show another layer overlayed (or replacing) parts of the lower layers (visibleFrom - visibleUntil)
       const visibleDuration = ((visibleUntil || clipDuration) - visibleFrom);
-      assert(visibleDuration > 0 && visibleDuration <= clipDuration, `Invalid visibleFrom ${visibleFrom} or visibleUntil ${visibleUntil}`);
+      assert(visibleDuration > 0 && visibleDuration <= clipDuration, `Invalid visibleFrom ${visibleFrom} or visibleUntil ${visibleUntil} (${clipDuration})`);
       // TODO Also need to handle video layers (framePtsFactor etc)
       // TODO handle audio in case of visibleFrom/visibleTo
 
