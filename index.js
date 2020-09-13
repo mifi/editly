@@ -20,7 +20,7 @@ const loadedFonts = [];
 // See #16
 const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', 'Transition must be an object');
 
-const assertFileExists = async (path) => assert(await fs.exists(path), `File does not exist ${path}`);
+const assertFileExists = async (path, enableRemote) => assert((enableRemote && path.startsWith('http')) || await fs.exists(path), `File does not exist ${path}`);
 
 module.exports = async (config = {}) => {
   const {
@@ -40,14 +40,21 @@ module.exports = async (config = {}) => {
 
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
+
+    onStart,
+    onProcessStart,
+    
   } = config;
+
+  assert(!onStart || typeof onStart === 'function', 'Callback onStart expected to be a function');
+  assert(!onProcessStart || typeof onProcessStart === 'function', 'Callback onProcessStart expected to be a function');
 
   const isGif = outPath.toLowerCase().endsWith('.gif');
 
   let audioFilePath;
   if (!isGif) audioFilePath = audioFilePathIn;
 
-  if (audioFilePath) await assertFileExists(audioFilePath);
+  if (audioFilePath) await assertFileExists(audioFilePath, true);
 
   checkTransition(defaultsIn.transition);
 
@@ -69,9 +76,8 @@ module.exports = async (config = {}) => {
   async function handleLayer(layer) {
     const { type, ...restLayer } = layer;
 
-    // https://github.com/mifi/editly/issues/39
     if (['image', 'image-overlay'].includes(type)) {
-      await assertFileExists(restLayer.path);
+      await assertFileExists(restLayer.path, true);
     } else if (type === 'gl') {
       await assertFileExists(restLayer.fragmentPath);
     }
@@ -384,6 +390,7 @@ module.exports = async (config = {}) => {
       ...outputArgs,
     ];
     if (verbose) console.log('ffmpeg', args.join(' '));
+    if (onStart) onStart(`ffmpeg ${args.join(' ')}`);
     return execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'pipe', stdout: process.stdout, stderr: process.stderr });
   }
 
@@ -409,6 +416,7 @@ module.exports = async (config = {}) => {
 
   try {
     outProcess = startFfmpegWriterProcess();
+    if (onProcessStart) onProcessStart(outProcess);
     let outProcessError;
 
     // If we don't handle it here, the whole Node process will crash and we cannot process the error

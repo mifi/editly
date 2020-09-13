@@ -143,6 +143,9 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
   enableFfmpegLog: false,
   verbose: false,
   fast: false,
+
+  onStart: (cmd) => console.log('Command:', cmd),
+  onProcessStart: (subprocess) => subprocess.stdout.pipe(process.stdout),
 }
 ```
 
@@ -168,6 +171,8 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.transition` | |
 | `clips[].layers[]` | | List of layers within the current clip that will be overlaid in their natural order (final layer on top) | | |
 | `clips[].layers[].type` | | Layer type, see below | | |
+| `onStart` | | Callback function, called before ffmpeg process start with command line as string argument | | |
+| `onProcessStart` | | Callback function, called after ffmpeg process start with subprocess argument | | |
 | `clips[].layers[].visibleFrom` | | What time into the clip should this layer start | | sec |
 | `clips[].layers[].visibleUntil` | | What time into the clip should this layer stop | | sec |
 
