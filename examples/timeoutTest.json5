@@ -1,0 +1,7 @@
+{
+  outPath: './timeoutTest.mp4',
+  clips: [
+    { duration: 1.5, transition: { name: 'crosszoom', duration: 0.3 }, layers: [{ type: 'video', path: './assets/DJI_0156.mov', cutTo: 58 }] },
+    { duration: 3, transition: { name: 'fade' }, layers: [{ type: 'video', path: './assets/DJI_0156.mov', cutFrom: 0 }] },
+  ],
+}

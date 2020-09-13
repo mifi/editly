@@ -7,6 +7,7 @@ const { createCanvas } = nodeCanvas;
 const { canvasToRgba } = require('./shared');
 const { getRandomGradient, getRandomColors } = require('../colors');
 const { easeOutExpo } = require('../transitions');
+const { getPositionProps } = require('../util');
 
 // http://fabricjs.com/kitchensink
 
@@ -56,10 +57,21 @@ async function createFabricFrameSource(func, { width, height, ...rest }) {
   };
 }
 
-async function imageFrameSource({ verbose, params, width, height }) {
-  if (verbose) console.log('Loading', params.path);
+const loadImage = async (path) => new Promise((resolve) => fabric.util.loadImage(fileUrl(path), resolve));
 
-  const imgData = await new Promise((resolve) => fabric.util.loadImage(fileUrl(params.path), resolve));
+function getZoomParams({ progress, zoomDirection, zoomAmount }) {
+  let scaleFactor = 1;
+  if (zoomDirection === 'in') scaleFactor = (1 + zoomAmount * progress);
+  else if (zoomDirection === 'out') scaleFactor = (1 + zoomAmount * (1 - progress));
+  return scaleFactor;
+}
+
+async function imageFrameSource({ verbose, params, width, height }) {
+  const { path, zoomDirection = 'in', zoomAmount = 0.1 } = params;
+
+  if (verbose) console.log('Loading', path);
+
+  const imgData = await loadImage(path);
 
   const getImg = () => new fabric.Image(imgData, {
     originX: 'center',
@@ -76,15 +88,10 @@ async function imageFrameSource({ verbose, params, width, height }) {
   if (blurredImg.height > blurredImg.width) blurredImg.scaleToWidth(width);
   else blurredImg.scaleToHeight(height);
 
-
   async function onRender(progress, canvas) {
-    const { zoomDirection = 'in', zoomAmount = 0.1 } = params;
-
     const img = getImg();
 
-    let scaleFactor = 1;
-    if (zoomDirection === 'in') scaleFactor = (1 + progress * zoomAmount);
-    else if (zoomDirection === 'out') scaleFactor = (1 + zoomAmount * (1 - progress));
+    const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
 
     if (img.height > img.width) img.scaleToHeight(height * scaleFactor);
     else img.scaleToWidth(width * scaleFactor);
@@ -232,8 +239,40 @@ async function subtitleFrameSource({ width, height, params }) {
   return { onRender };
 }
 
+async function imageOverlayFrameSource({ params, width, height }) {
+  const { path, position, width: relWidth, height: relHeight, zoomDirection, zoomAmount = 0.1 } = params;
+
+  const imgData = await loadImage(path);
+
+  const { left, top, originX, originY } = getPositionProps({ position, width, height });
+
+  const img = new fabric.Image(imgData, {
+    originX,
+    originY,
+    left,
+    top,
+  });
+
+  async function onRender(progress, canvas) {
+    const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
+
+    if (relWidth != null) {
+      img.scaleToWidth(relWidth * width * scaleFactor);
+    } else if (relHeight != null) {
+      img.scaleToHeight(relHeight * height * scaleFactor);
+    } else {
+      // Default to screen width
+      img.scaleToWidth(width * scaleFactor);
+    }
+
+    canvas.add(img);
+  }
+
+  return { onRender };
+}
+
 async function titleFrameSource({ width, height, params }) {
-  const { text, textColor = '#ffffff', fontFamily = 'sans-serif', position = 'center' } = params;
+  const { text, textColor = '#ffffff', fontFamily = 'sans-serif', position = 'center', zoomDirection = 'in', zoomAmount = 0.2 } = params;
 
   async function onRender(progress, canvas) {
     // console.log('progress', progress);
@@ -242,7 +281,7 @@ async function titleFrameSource({ width, height, params }) {
 
     const fontSize = Math.round(min * 0.1);
 
-    const scale = (1 + progress * 0.2).toFixed(4);
+    const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
 
     const textBox = new fabric.Textbox(text, {
       fill: textColor,
@@ -252,25 +291,18 @@ async function titleFrameSource({ width, height, params }) {
       width: width * 0.8,
     });
 
+    // We need the text as an image in order to scale it
     const textImage = await new Promise((r) => textBox.cloneAsImage(r));
 
-    let originY = 'center';
-    let top = height / 2;
-    if (position === 'top') {
-      originY = 'top';
-      top = height * 0.05;
-    } else if (position === 'bottom') {
-      originY = 'bottom';
-      top = height;
-    }
+    const { left, top, originX, originY } = getPositionProps({ position, width, height });
 
     textImage.set({
-      originX: 'center',
+      originX,
       originY,
-      left: width / 2,
+      left,
       top,
-      scaleX: scale,
-      scaleY: scale,
+      scaleX: scaleFactor,
+      scaleY: scaleFactor,
     });
     canvas.add(textImage);
   }
@@ -363,6 +395,7 @@ module.exports = {
   radialGradientFrameSource,
   linearGradientFrameSource,
   imageFrameSource,
+  imageOverlayFrameSource,
 
   createFabricCanvas,
   renderFabricCanvas,

@@ -6,7 +6,6 @@ function getRandomTransition() {
   return randomTransitionsSet[Math.floor(Math.random() * randomTransitionsSet.length)];
 }
 
-
 // https://easings.net/
 
 function easeOutExpo(x) {
@@ -17,7 +16,6 @@ function easeInOutCubic(x) {
   return x < 0.5 ? 4 * x * x * x : 1 - ((-2 * x + 2) ** 3) / 2;
 }
 
-
 function getTransitionEasingFunction(easing, transitionName) {
   if (easing !== null) {
     if (easing) return { easeOutExpo }[easing];
@@ -26,8 +24,8 @@ function getTransitionEasingFunction(easing, transitionName) {
   return (progress) => progress;
 }
 
-function calcTransition(defaults, transition) {
-  if (transition === null) return { duration: 0 };
+function calcTransition(defaults, transition, isLastClip) {
+  if (transition === null || isLastClip) return { duration: 0 };
 
   let transitionOrDefault = {
     name: (transition && transition.name) || (defaults.transition && defaults.transition.name),
@@ -62,7 +60,6 @@ function calcTransition(defaults, transition) {
     easingFunction: getTransitionEasingFunction(outTransition.easing, outTransition.name),
   };
 }
-
 
 module.exports = {
   calcTransition,

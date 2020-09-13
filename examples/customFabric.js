@@ -2,8 +2,8 @@ const editly = require('..');
 
 /* eslint-disable spaced-comment,no-param-reassign */
 
-async function func({ width, height, fabric, canvas }) {
-  async function onRender(progress) {
+async function func({ width, height, fabric }) {
+  async function onRender(progress, canvas) {
     canvas.backgroundColor = 'hsl(33, 100%, 50%)';
 
     const text = new fabric.Text(`PROGRESS\n${Math.floor(progress * 100)}%`, {
