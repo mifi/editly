@@ -248,6 +248,23 @@ Title with background
 - `background` - `{ type, ... }` - See type `radial-gradient`, `linear-gradient` or `fill-color`
 - `fontPath` - See type `title`
 
+#### Layer type 'news-title'
+- `fontPath` - See `defaults.layer.fontPath`
+- `text`
+- `textColor` - default `#ffffff`
+- `backgroundColor` - default `#d02a42`
+- `position` - See **Positions**
+
+#### Layer type 'slide-in-text'
+- `fontPath` - See `defaults.layer.fontPath`
+- `text`
+- `top`
+- `left`
+- `originX`
+- `originY`
+- `fontSize`
+- `color`
+
 #### Layer type 'fill-color', 'pause'
 - `color` - Color to fill background, default: randomize
 
