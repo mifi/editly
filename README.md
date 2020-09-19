@@ -221,6 +221,8 @@ Image overlay with a custom position on the screen.
 |-|-|-|-|
 | `path` | Path to image file | | |
 | `position` | See [Position parameter](#position-parameter) | | |
+| `width` | Width (from 0 to 1) where 1 is screen width | | |
+| `height` | Height (from 0 to 1) where 1 is screen height | | |
 
 See also [Ken Burns parameters](#ken-burns-parameters).
 
