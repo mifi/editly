@@ -2,11 +2,13 @@ const { fabric } = require('fabric');
 const fileUrl = require('file-url');
 
 const { getRandomGradient, getRandomColors } = require('../../colors');
-const { easeOutExpo } = require('../../transitions');
-const { getPositionProps } = require('../../util');
+const { easeOutExpo, easeInOutCubic } = require('../../transitions');
+const { getPositionProps, getFrameByKeyFrames } = require('../../util');
 
 // http://fabricjs.com/kitchensink
 
+
+const defaultFontFamily = 'sans-serif';
 
 const loadImage = async (path) => new Promise((resolve) => fabric.util.loadImage(fileUrl(path), resolve));
 
@@ -155,7 +157,7 @@ async function linearGradientFrameSource({ width, height, params }) {
 }
 
 async function subtitleFrameSource({ width, height, params }) {
-  const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = 'sans-serif', delay = 0, speed = 1 } = params;
+  const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
 
   async function onRender(progress, canvas) {
     const easedProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed, 1)));
@@ -227,7 +229,7 @@ async function imageOverlayFrameSource({ params, width, height }) {
 }
 
 async function titleFrameSource({ width, height, params }) {
-  const { text, textColor = '#ffffff', fontFamily = 'sans-serif', position = 'center', zoomDirection = 'in', zoomAmount = 0.2 } = params;
+  const { text, textColor = '#ffffff', fontFamily = defaultFontFamily, position = 'center', zoomDirection = 'in', zoomAmount = 0.2 } = params;
 
   async function onRender(progress, canvas) {
     // console.log('progress', progress);
@@ -266,7 +268,7 @@ async function titleFrameSource({ width, height, params }) {
 }
 
 async function newsTitleFrameSource({ width, height, params }) {
-  const { text, textColor = '#ffffff', backgroundColor = '#d02a42', fontFamily = 'sans-serif', delay = 0, speed = 1 } = params;
+  const { text, textColor = '#ffffff', backgroundColor = '#d02a42', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
 
   async function onRender(progress, canvas) {
     const min = Math.min(width, height);
@@ -308,6 +310,73 @@ async function newsTitleFrameSource({ width, height, params }) {
   return { onRender };
 }
 
+async function getFadedObject({ object, progress }) {
+  const rect = new fabric.Rect({
+    left: 0,
+    width: object.width,
+    height: object.height,
+    top: 0,
+  });
+
+  rect.set('fill', new fabric.Gradient({
+    coords: {
+      x1: 0,
+      y1: 0,
+      x2: object.width,
+      y2: 0,
+    },
+    colorStops: [
+      { offset: Math.max(0, (progress * (1 + 0.2)) - 0.2), color: 'rgba(255,255,255,1)' },
+      { offset: Math.min(1, (progress * (1 + 0.2))), color: 'rgba(255,255,255,0)' },
+    ],
+  }));
+
+  const gradientMaskImg = await new Promise((r) => rect.cloneAsImage(r));
+  const fadedImage = await new Promise((r) => object.cloneAsImage(r));
+
+  fadedImage.filters.push(new fabric.Image.filters.BlendImage({
+    image: gradientMaskImg,
+    mode: 'multiply',
+  }));
+
+  fadedImage.applyFilters();
+
+  return fadedImage;
+}
+
+async function slideInTextFrameSource({ width, height, params: { text, top = 0.05, left = 0.05, originX = 'left', originY = 'top', fontSize = 0.05, color = '#ffffff', fontFamily = defaultFontFamily } = {} }) {
+  async function onRender(progress, canvas) {
+    const fontSizeAbs = Math.round(width * fontSize);
+
+    const textBox = new fabric.Text(text, {
+      fill: color,
+      fontFamily,
+      fontSize: fontSizeAbs,
+      charSpacing: width * 0.1,
+    });
+
+    const { opacity, textSlide } = getFrameByKeyFrames([
+      { t: 0.1, props: { opacity: 1, textSlide: 0 } },
+      { t: 0.3, props: { opacity: 1, textSlide: 1 } },
+      { t: 0.8, props: { opacity: 1, textSlide: 1 } },
+      { t: 0.9, props: { opacity: 0, textSlide: 1 } },
+    ], progress);
+
+    const fadedObject = await getFadedObject({ object: textBox, progress: easeInOutCubic(textSlide) });
+    fadedObject.setOptions({
+      originX,
+      originY,
+      top: top * height,
+      left: left * width,
+      opacity,
+    });
+
+    canvas.add(fadedObject);
+  }
+
+  return { onRender };
+}
+
 async function customFabricFrameSource({ canvas, width, height, params }) {
   return params.func(({ width, height, fabric, canvas, params }));
 }
@@ -322,4 +391,5 @@ module.exports = {
   linearGradientFrameSource,
   imageFrameSource,
   imageOverlayFrameSource,
+  slideInTextFrameSource,
 };

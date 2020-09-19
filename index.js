@@ -110,7 +110,7 @@ module.exports = async (config = {}) => {
       return outLayers;
     }
 
-    if (['title', 'subtitle', 'news-title'].includes(type)) {
+    if (['title', 'subtitle', 'news-title', 'slide-in-text'].includes(type)) {
       assert(layer.text, 'Please specify a text');
 
       let { fontFamily } = layer;

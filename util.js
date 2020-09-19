@@ -1,5 +1,7 @@
 const execa = require('execa');
 const assert = require('assert');
+const sortBy = require('lodash/sortBy');
+
 
 function parseFps(fps) {
   const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
@@ -92,6 +94,34 @@ function getPositionProps({ position, width, height }) {
   return { originX, originY, top, left };
 }
 
+function getFrameByKeyFrames(keyframes, progress) {
+  if (keyframes.length < 2) throw new Error('Keyframes must be at least 2');
+  const sortedKeyframes = sortBy(keyframes, 't');
+
+  // TODO check that max is 1
+  // TODO check that all keyframes have all props
+  // TODO make smarter so user doesn't need to replicate non-changing props
+
+  const invalidKeyframe = sortedKeyframes.find((k, i) => {
+    if (i === 0) return false;
+    return k.t === sortedKeyframes[i - 1].t;
+  });
+  if (invalidKeyframe) throw new Error('Invalid keyframe');
+
+  let prevKeyframe = [...sortedKeyframes].reverse().find((k) => k.t < progress);
+  // eslint-disable-next-line prefer-destructuring
+  if (!prevKeyframe) prevKeyframe = sortedKeyframes[0];
+
+  let nextKeyframe = sortedKeyframes.find((k) => k.t >= progress);
+  if (!nextKeyframe) nextKeyframe = sortedKeyframes[sortedKeyframes.length - 1];
+
+  if (nextKeyframe.t === prevKeyframe.t) return prevKeyframe.props;
+
+  const interProgress = (progress - prevKeyframe.t) / (nextKeyframe.t - prevKeyframe.t);
+  return Object.fromEntries(Object.entries(prevKeyframe.props).map(([propName, prevVal]) => ([propName, prevVal + ((nextKeyframe.props[propName] - prevVal) * interProgress)])));
+}
+
+
 module.exports = {
   parseFps,
   readVideoFileInfo,
@@ -100,4 +130,5 @@ module.exports = {
   toArrayInteger,
   readFileStreams,
   getPositionProps,
+  getFrameByKeyFrames,
 };
