@@ -230,7 +230,7 @@ See also [Ken Burns parameters](#ken-burns-parameters).
 - `fontPath` - See `defaults.layer.fontPath`
 - `text` - Title text to show, keep it short
 - `textColor` - default `#ffffff`
-- `position` - See **Positions**
+- `position` - See [Position parameter](#position-parameter)
 
 See also [Ken Burns parameters](#ken-burns-parameters)
 
@@ -253,7 +253,7 @@ Title with background
 - `text`
 - `textColor` - default `#ffffff`
 - `backgroundColor` - default `#d02a42`
-- `position` - See **Positions**
+- `position` - See [Position parameter](#position-parameter)
 
 #### Layer type 'slide-in-text'
 - `fontPath` - See `defaults.layer.fontPath`
