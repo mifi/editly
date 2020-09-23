@@ -34,6 +34,7 @@ const cli = meow(`
     --audio-file-path  Add an audio track
     --loop-audio  Loop the audio track if it is shorter than video?
     --keep-source-audio  Keep audio from source files
+    --allow-remote-requests
 
     --fast, -f  Fast mode (low resolution and FPS, useful for getting a quick preview)
     --verbose, -v
@@ -48,6 +49,7 @@ const cli = meow(`
   flags: {
     verbose: { type: 'boolean', alias: 'v' },
     keepSourceAudio: { type: 'boolean' },
+    allowRemoteRequests: { type: 'boolean' },
     fast: { type: 'boolean', alias: 'f' },
     transitionDuration: { type: 'number' },
     clipDuration: { type: 'number' },
@@ -96,7 +98,7 @@ const cli = meow(`
     params.clips = clips.map((clip) => ({ layers: [clip] }));
   }
 
-  const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath, keepSourceAudio, loopAudio } = cli.flags;
+  const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath, keepSourceAudio, loopAudio, allowRemoteRequests } = cli.flags;
 
   if (transitionName || transitionDuration != null) {
     params.defaults.transition = {};
@@ -116,6 +118,7 @@ const cli = meow(`
   if (audioFilePath) params.audioFilePath = audioFilePath;
   if (loopAudio) params.loopAudio = loopAudio;
   if (keepSourceAudio) params.keepSourceAudio = true;
+  if (allowRemoteRequests) params.allowRemoteRequests = true;
   if (width) params.width = width;
   if (height) params.height = height;
   if (fps) params.fps = fps;

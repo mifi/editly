@@ -3,14 +3,14 @@ const fileUrl = require('file-url');
 
 const { getRandomGradient, getRandomColors } = require('../../colors');
 const { easeOutExpo, easeInOutCubic } = require('../../transitions');
-const { getPositionProps, getFrameByKeyFrames } = require('../../util');
+const { getPositionProps, getFrameByKeyFrames, isUrl } = require('../../util');
 
 // http://fabricjs.com/kitchensink
 
 
 const defaultFontFamily = 'sans-serif';
 
-const loadImage = async (path) => new Promise((resolve) => fabric.util.loadImage(fileUrl(path), resolve));
+const loadImage = async (pathOrUrl) => new Promise((resolve) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl), resolve));
 
 function getZoomParams({ progress, zoomDirection, zoomAmount }) {
   let scaleFactor = 1;

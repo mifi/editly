@@ -151,6 +151,8 @@ function getFrameByKeyFrames(keyframes, progress) {
   return Object.fromEntries(Object.entries(prevKeyframe.props).map(([propName, prevVal]) => ([propName, prevVal + ((nextKeyframe.props[propName] - prevVal) * interProgress)])));
 }
 
+const isUrl = (path) => /^https?:\/\//.test(path);
+
 
 module.exports = {
   parseFps,
@@ -161,4 +163,5 @@ module.exports = {
   readFileStreams,
   getPositionProps,
   getFrameByKeyFrames,
+  isUrl,
 };

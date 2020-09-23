@@ -125,6 +125,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
   audioFilePath,
   loopAudio: false,
   keepSourceAudio: false,
+  allowRemoteRequests: false,
   clips: [
     {
       transition,
@@ -156,8 +157,9 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of **first video** | |
 | `fps` | `--fps` | FPS which all videos will be converted to | First video FPS or `25` | |
 | `audioFilePath` | `--audio-file-path` | Set an audio track for the whole video | | |
-| `loopAudio` | `--loop-audio` | Loop the audio track if it is shorter than video? | | |
-| `keepSourceAudio` | `--keep-source-audio` | Keep audio from source files | | |
+| `loopAudio` | `--loop-audio` | Loop the audio track if it is shorter than video? | `false` | |
+| `keepSourceAudio` | `--keep-source-audio` | Keep audio from source files | `false` | |
+| `allowRemoteRequests` | `--allow-remote-requests` | Allow remote URLs as paths | `false` | |
 | `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview) | `false` | |
 | `defaults.layer.fontPath` | `--font-path` | Set default font to a .ttf | System font | |
 | `defaults.layer.*` | | Set any layer parameter that all layers will inherit | | |
