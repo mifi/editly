@@ -392,6 +392,8 @@ module.exports = async (config = {}) => {
   }
 
   let outProcess;
+  let outProcessExitCode;
+
   let frameSource1;
   let frameSource2;
 
@@ -413,11 +415,17 @@ module.exports = async (config = {}) => {
 
   try {
     outProcess = startFfmpegWriterProcess();
+
     let outProcessError;
 
-    // If we don't handle it here, the whole Node process will crash and we cannot process the error
-    outProcess.stdin.on('error', (err) => {
-      console.error('Output ffmpeg caught error', err);
+    outProcess.on('exit', (code) => {
+      if (verbose) console.log('Output ffmpeg exited', code);
+      outProcessExitCode = code;
+    });
+
+    // If we write and get an EPIPE (like when ffmpeg fails or is finished), we could get an unhandled rejection if we don't catch the promise
+    // (and meow causes the CLI to exit on unhandled rejections making it hard to see)
+    outProcess.catch((err) => {
       outProcessError = err;
     });
 
@@ -509,10 +517,10 @@ module.exports = async (config = {}) => {
         else console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`);
       }
 
-      // If we don't wait for callback, then we get EINVAL when dealing with high resolution files (big writes)
-      await new Promise((r) => outProcess.stdin.write(outFrameData, () => r()));
+      // If we don't wait, then we get EINVAL when dealing with high resolution files (big writes)
+      await new Promise((r) => outProcess.stdin.write(outFrameData, r));
 
-      if (outProcessError) throw outProcessError;
+      if (outProcessError) break;
 
       totalFramesWritten += 1;
       fromClipFrameAt += 1;
@@ -521,20 +529,22 @@ module.exports = async (config = {}) => {
 
     outProcess.stdin.end();
 
-    console.log('Done. Output file can be found at:');
-    console.log(outPath);
-  } catch (err) {
-    console.error('Loop failed', err);
-    if (outProcess) outProcess.kill();
+    outProcess.kill();
   } finally {
+    if (verbose) console.log('Cleanup');
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
     await fs.remove(tmpDir);
   }
 
   try {
+    if (verbose) console.log('Waiting for output ffmpeg process to finish');
     await outProcess;
   } catch (err) {
-    if (!err.killed) throw err;
+    if (outProcessExitCode !== 0 && !err.killed) throw err;
   }
+
+  console.log();
+  console.log('Done. Output file can be found at:');
+  console.log(outPath);
 };

@@ -129,6 +129,6 @@ const cli = meow(`
 
   await editly(params);
 })().catch((err) => {
-  console.error(err);
+  console.error('Caught error', err);
   process.exitCode = 1;
 });
