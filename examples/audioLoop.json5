@@ -1,0 +1,10 @@
+{
+  outPath: './audioLoop.mp4',
+  audioFilePath: './assets/winxp.mp3',
+  loopAudio: true,
+  // Should properly cut off and not crash with EPIPE if loopAudio=false and audio duration is shorter than total duration
+  // loopAudio: false,
+  clips: [
+    { duration: 10, layers: [{ type: 'title-background', text: 'Looping audio!' }] },
+  ],
+}

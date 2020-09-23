@@ -37,6 +37,7 @@ module.exports = async (config = {}) => {
     fps: requestedFps,
     defaults: defaultsIn = {},
     audioFilePath: audioFilePathIn,
+    loopAudio,
     keepSourceAudio,
 
     ffmpegPath = 'ffmpeg',
@@ -365,6 +366,8 @@ module.exports = async (config = {}) => {
       '-y', outPath,
     ];
 
+    const loopAudioArgs = loopAudio ? ['-stream_loop', '-1'] : [];
+
     const args = [
       ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']),
 
@@ -375,7 +378,7 @@ module.exports = async (config = {}) => {
       '-r', framerateStr,
       '-i', '-',
 
-      ...(audioFilePath ? ['-i', audioFilePath, '-shortest'] : []),
+      ...(audioFilePath ? [...loopAudioArgs, '-i', audioFilePath, '-shortest'] : []),
 
       '-map', '0:v:0',
       ...(audioFilePath ? ['-map', '1:a:0'] : []),

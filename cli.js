@@ -32,6 +32,7 @@ const cli = meow(`
     --fps  FPS which all videos will be converted to
     --font-path  Set default font to a .ttf
     --audio-file-path  Add an audio track
+    --loop-audio  Loop the audio track if it is shorter than video?
     --keep-source-audio  Keep audio from source files
 
     --fast, -f  Fast mode (low resolution and FPS, useful for getting a quick preview)
@@ -53,6 +54,7 @@ const cli = meow(`
     width: { type: 'number' },
     height: { type: 'number' },
     fps: { type: 'number' },
+    loopAudio: { type: 'boolean' },
   },
 });
 
@@ -94,7 +96,7 @@ const cli = meow(`
     params.clips = clips.map((clip) => ({ layers: [clip] }));
   }
 
-  const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath, keepSourceAudio } = cli.flags;
+  const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath, keepSourceAudio, loopAudio } = cli.flags;
 
   if (transitionName || transitionDuration != null) {
     params.defaults.transition = {};
@@ -112,6 +114,7 @@ const cli = meow(`
 
   if (outPath) params.outPath = outPath;
   if (audioFilePath) params.audioFilePath = audioFilePath;
+  if (loopAudio) params.loopAudio = loopAudio;
   if (keepSourceAudio) params.keepSourceAudio = true;
   if (width) params.width = width;
   if (height) params.height = height;
