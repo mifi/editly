@@ -30,7 +30,7 @@ async function createGlFrameSource({ width, height, channels, params }) {
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, 1, 1, -1, 1]), gl.STATIC_DRAW);
 
-  async function readNextFrame(progress) {
+  async function renderFrame(progress) {
     shader.bind();
 
     shader.attributes.position.pointer();
@@ -55,7 +55,7 @@ async function createGlFrameSource({ width, height, channels, params }) {
   }
 
   return {
-    readNextFrame,
+    renderFrame,
     close: () => {},
   };
 }

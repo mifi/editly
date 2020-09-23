@@ -43,11 +43,11 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
 
     assert(createFrameSourceFunc, `Invalid type ${type}`);
 
-    const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration, channels, verbose, enableFfmpegLog, framerateStr, params });
+    const frameSource = await createFrameSourceFunc({ statelessMode: true, ffmpegPath, ffprobePath, width, height, duration, channels, verbose, enableFfmpegLog, framerateStr, params });
     return { layer, frameSource };
   }, { concurrency: 1 });
 
-  async function readNextFrame({ time }) {
+  async function renderFrame({ time }) {
     const canvas = createFabricCanvas({ width, height });
 
     // eslint-disable-next-line no-restricted-syntax
@@ -58,7 +58,7 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
       const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
 
       if (shouldDrawLayer) {
-        const rgba = await frameSource.readNextFrame(offsetProgress, canvas);
+        const rgba = await frameSource.renderFrame(offsetProgress, canvas);
         // Frame sources can either render to the provided canvas and return nothing
         // OR return an raw RGBA blob which will be drawn onto the canvas
         if (rgba) {
@@ -82,7 +82,7 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
   }
 
   return {
-    readNextFrame,
+    renderFrame,
     close,
   };
 }

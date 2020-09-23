@@ -46,7 +46,7 @@ async function createFabricFrameSource(func, { width, height, ...rest }) {
   const { onRender = () => {}, onClose = () => {} } = await onInit() || {};
 
   return {
-    readNextFrame: onRender,
+    renderFrame: onRender,
     close: onClose,
   };
 }
@@ -57,7 +57,7 @@ async function createCustomCanvasFrameSource({ width, height, params }) {
 
   const { onClose, onRender } = await params.func(({ width, height, canvas }));
 
-  async function readNextFrame(progress) {
+  async function renderFrame(progress) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     await onRender(progress);
     // require('fs').writeFileSync(`${new Date().getTime()}.png`, canvas.toBuffer('image/png'));
@@ -66,7 +66,7 @@ async function createCustomCanvasFrameSource({ width, height, params }) {
   }
 
   return {
-    readNextFrame,
+    renderFrame,
     // Node canvas needs no cleanup https://github.com/Automattic/node-canvas/issues/1216#issuecomment-412390668
     close: onClose,
   };

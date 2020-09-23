@@ -483,7 +483,7 @@ module.exports = async (config = {}) => {
         continue;
       }
 
-      const newFrameSource1Data = await frameSource1.readNextFrame({ time: fromClipTime });
+      const newFrameSource1Data = await frameSource1.renderFrame({ time: fromClipTime });
       // If we got no data, use the old data
       // TODO maybe abort?
       if (newFrameSource1Data) frameSource1Data = newFrameSource1Data;
@@ -493,7 +493,7 @@ module.exports = async (config = {}) => {
 
       let outFrameData;
       if (isInTransition) {
-        const frameSource2Data = await frameSource2.readNextFrame({ time: toClipTime });
+        const frameSource2Data = await frameSource2.renderFrame({ time: toClipTime });
 
         if (frameSource2Data) {
           const progress = transitionFrameAt / transitionNumFramesSafe;
