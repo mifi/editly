@@ -325,9 +325,6 @@ See [position.json5](https://github.com/mifi/editly/blob/master/examples/positio
 - https://github.com/sjfricke/awesome-webgl
 - https://www.mltframework.org/docs/melt/
 
-## TODO
-
-- Keep source audio (See [#1](https://github.com/mifi/editly/issues/1))
 
 ---
 
