@@ -28,7 +28,7 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
 
   const layerFrameSources = await pMap(visualLayers, async (layer, layerIndex) => {
     const { type, ...params } = layer;
-    console.log('createFrameSource', type, 'clip', clipIndex, 'layer', layerIndex);
+    if (verbose) console.log('createFrameSource', type, 'clip', clipIndex, 'layer', layerIndex);
 
     let createFrameSourceFunc;
     if (fabricFrameSources[type]) {
