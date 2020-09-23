@@ -131,7 +131,14 @@ module.exports = async (config = {}) => {
   }
 
   const clips = await pMap(clipsIn, async (clip, clipIndex) => {
-    const { transition: userTransition, duration: userClipDuration, layers } = clip;
+    assert(typeof clip === 'object', '"clips" must contain objects with one or more layers');
+    const { transition: userTransition, duration: userClipDuration, layers: layersIn } = clip;
+
+    // Validation
+    let layers = layersIn;
+    if (!Array.isArray(layers)) layers = [layers]; // Allow single layer for convenience
+    assert(layers.every((layer) => layer != null && typeof layer === 'object'), '"clip.layers" must contain one or more objects');
+    assert(layers.every((layer) => layer.type != null), 'All "layers" must have a type');
 
     checkTransition(userTransition);
 
