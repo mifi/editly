@@ -188,7 +188,7 @@ For video layers, if parent `clip.duration` is specified, the video will be slow
 | Parameter  | Description | Default | |
 |-|-|-|-|
 | `path` | Path to video file | | |
-| `resizeMode` | One of `cover`, `contain`, `stretch` | `contain` | |
+| `resizeMode` | See [Resize modes](#resize-modes) | | |
 | `cutFrom` | Time value to cut from | `0` | sec |
 | `cutTo` | Time value to cut to | *end of video* | sec |
 | `backgroundColor` | Background of letterboxing | `#000000` | |
@@ -207,17 +207,18 @@ Audio layers will be mixed together. If `cutFrom`/`cutTo` is set, the resulting 
 
 #### Layer type 'image'
 
-Full screen image (auto letterboxed)
+Full screen image
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
 | `path` | Path to image file | | |
+| `resizeMode` | See [Resize modes](#resize-modes) | | |
 
 See also See [Ken Burns parameters](#ken-burns-parameters).
 
 #### Layer type 'image-overlay'
 
-Image overlay with a custom position on the screen.
+Image overlay with a custom position and size on the screen.
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
@@ -295,6 +296,12 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 
 - `fragmentPath`
 - `vertexPath` (optional)
+
+### Resize modes
+
+`resizeMode` - How to fit image to screen. Can be one of `contain`, `contain-blur`, `cover`, `stretch`. Default `contain-blur`.
+
+See [image.json5](https://github.com/mifi/editly/blob/master/examples/image.json5)
 
 ### Position parameter
 

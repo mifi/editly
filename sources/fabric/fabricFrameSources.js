@@ -20,7 +20,7 @@ function getZoomParams({ progress, zoomDirection, zoomAmount }) {
 }
 
 async function imageFrameSource({ verbose, params, width, height }) {
-  const { path, zoomDirection = 'in', zoomAmount = 0.1 } = params;
+  const { path, zoomDirection = 'in', zoomAmount = 0.1, resizeMode = 'contain-blur' } = params;
 
   if (verbose) console.log('Loading', path);
 
@@ -33,28 +33,52 @@ async function imageFrameSource({ verbose, params, width, height }) {
     top: height / 2,
   });
 
+  let blurredImg;
   // Blurred version
-  const blurredImg = getImg();
-  blurredImg.filters = [new fabric.Image.filters.Resize({ scaleX: 0.01, scaleY: 0.01 })];
-  blurredImg.applyFilters();
+  if (resizeMode === 'contain-blur') {
+    blurredImg = getImg();
+    if (verbose) console.log('Blurring background');
+    blurredImg.filters = [
+      // It is much faster on large images to first resize, but quality is almost the same
+      new fabric.Image.filters.Resize({ scaleX: 0.1, scaleY: 0.1 }),
+      new fabric.Image.filters.Blur({ blur: 0.1 }),
+    ];
+    blurredImg.applyFilters();
 
-  if (blurredImg.height > blurredImg.width) blurredImg.scaleToWidth(width);
-  else blurredImg.scaleToHeight(height);
+    // Resize it to fit
+    blurredImg.setOptions({ scaleX: width / blurredImg.width, scaleY: height / blurredImg.height });
+  }
 
   async function onRender(progress, canvas) {
     const img = getImg();
 
     const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
 
-    if (img.height > img.width) img.scaleToHeight(height * scaleFactor);
-    else img.scaleToWidth(width * scaleFactor);
+    const ratioW = width / img.width;
+    const ratioH = height / img.height;
 
-    canvas.add(blurredImg);
+    if (['contain', 'contain-blur'].includes(resizeMode)) {
+      if (ratioW > ratioH) {
+        img.scaleToHeight(height * scaleFactor);
+      } else {
+        img.scaleToWidth(width * scaleFactor);
+      }
+    } else if (resizeMode === 'cover') {
+      if (ratioW > ratioH) {
+        img.scaleToWidth(width * scaleFactor);
+      } else {
+        img.scaleToHeight(height * scaleFactor);
+      }
+    } else if (resizeMode === 'stretch') {
+      img.setOptions({ scaleX: width / img.width, scaleY: height / img.height });
+    }
+
+    if (blurredImg) canvas.add(blurredImg);
     canvas.add(img);
   }
 
   function onClose() {
-    blurredImg.dispose();
+    if (blurredImg) blurredImg.dispose();
     // imgData.dispose();
   }
 

@@ -1,0 +1,19 @@
+{
+  width: 600,
+  height: 300,
+  outPath: './image.mp4',
+  defaults: {
+    transition: null,
+    duration: 0.2,
+  },
+  clips: [
+    { layers: [{ type: 'image', path: './assets/pano.jpg' }] },
+    { layers: [{ type: 'image', path: './assets/vertical.jpg' }] },
+    { layers: [{ type: 'fill-color', color: 'white' }, { type: 'image', path: './assets/pano.jpg', resizeMode: 'contain' }] },
+    { layers: [{ type: 'fill-color', color: 'white' }, { type: 'image', path: './assets/vertical.jpg', resizeMode: 'contain' }] },
+    { layers: [{ type: 'image', path: './assets/pano.jpg', resizeMode: 'cover' }] },
+    { layers: [{ type: 'image', path: './assets/vertical.jpg', resizeMode: 'cover' }] },
+    { layers: [{ type: 'image', path: './assets/pano.jpg', resizeMode: 'stretch' }] },
+    { layers: [{ type: 'image', path: './assets/vertical.jpg', resizeMode: 'stretch' }] },
+  ],
+}
