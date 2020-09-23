@@ -326,6 +326,12 @@ See [position.json5](https://github.com/mifi/editly/blob/master/examples/positio
 - If you get an error about gl returning null, see Requirements.
 - If you get an error `/bin/sh: pkg-config: command not found`, try to use newest Node.js LTS version
 
+## Donate 🙏
+
+This project is maintained by me alone. The project will always remain free and open source, but if it's useful for you, consider supporting me. :) It will give me extra motivation to improve it.
+
+[Paypal](https://paypal.me/mifino)
+
 ## See also
 
 - https://github.com/transitive-bullshit/awesome-ffmpeg
