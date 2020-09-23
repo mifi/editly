@@ -5,6 +5,7 @@ const { basename, join, dirname } = require('path');
 const flatMap = require('lodash/flatMap');
 const JSON5 = require('json5');
 const fs = require('fs-extra');
+const { nanoid } = require('nanoid');
 
 const { parseFps, readVideoFileInfo, readAudioFileInfo, multipleOf2 } = require('./util');
 const { registerFont } = require('./sources/fabric');
@@ -248,7 +249,7 @@ module.exports = async (config = {}) => {
   const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose });
 
   const outDir = dirname(outPath);
-  const tmpDir = join(outDir, 'editly-tmp');
+  const tmpDir = join(outDir, `editly-tmp-${nanoid()}`);
   if (verbose) console.log({ tmpDir });
   await fs.remove(tmpDir);
   await fs.mkdirp(tmpDir);
