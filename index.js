@@ -542,9 +542,10 @@ module.exports = async (config = {}) => {
     } // End while loop
 
     outProcess.stdin.end();
-  } finally {
+  } catch (err) {
     outProcess.kill();
-
+    throw err;
+  } finally {
     if (verbose) console.log('Cleanup');
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
