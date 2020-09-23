@@ -3,7 +3,7 @@
   clips: [
     { duration: 3, layers: [
       { type: 'image', path: 'assets/img2.jpg' },
-      { type: 'slide-in-text', text: 'Text that slides in', top: 0.93, left: 0.04, color: '#fff', originY: 'bottom', fontSize: 0.05 },
+      { type: 'slide-in-text', text: 'Text that slides in', color: '#fff', position: { x: 0.04, y: 0.93, originY: 'bottom', originX: 'left' }, fontSize: 0.05 },
     ] },
   ],
 }

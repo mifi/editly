@@ -1,0 +1,23 @@
+{
+  outPath: './position.mp4',
+  defaults: {
+    layerType: {
+      'image-overlay': { width: 0.1 },
+    },
+  },
+  clips: [
+    { layers: [
+      { type: 'rainbow-colors' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'top' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'center' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'bottom' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'top-left' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'top-right' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'center-left' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'center-right' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'bottom-left' },
+      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'bottom-right' },
+      { type: 'image-overlay', path: './assets/emoji.png', width: 0.06, position: { originX: 'center', originY: 'center', x: 0.75, y: 0.75 } },
+    ] },
+  ],
+}

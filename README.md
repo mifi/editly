@@ -258,12 +258,9 @@ Title with background
 #### Layer type 'slide-in-text'
 - `fontPath` - See `defaults.layer.fontPath`
 - `text`
-- `top`
-- `left`
-- `originX`
-- `originY`
 - `fontSize`
 - `color`
+- `position` - See [Position parameter](#position-parameter)
 
 #### Layer type 'fill-color', 'pause'
 - `color` - Color to fill background, default: randomize
@@ -302,8 +299,10 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 Certain layers support the position parameter
 
 `position` can be one of either:
-  - `top`, `bottom` or `center` - vertical position (horizontally centered)
-  - An object `{ x, y, originX = 'left', originY = 'top' }`, where `{ x: 0, y: 0 }` is the upper left corner of the screen, and `{ x: 1, y: 1 }` is the lower right corner, `x` is relative to video width, `y` to height. `originX` and `originY` are optional, and specify the position's origin (anchor position) of the object.
+  - `top`, `bottom` `center`, `top-left`, `top-right`, `center-left`, `center-right`, `bottom-left`, `bottom-right`
+  - An object `{ x, y, originX = 'left', originY = 'top' }`, where `{ x: 0, y: 0 }` is the upper left corner of the screen, and `{ x: 1, y: 1 }` is the lower right corner, `x` is relative to video width, `y` to video height. `originX` and `originY` are optional, and specify the position's origin (anchor position) of the object.
+
+See [position.json5](https://github.com/mifi/editly/blob/master/examples/position.json5)
 
 ### Ken Burns parameters
 

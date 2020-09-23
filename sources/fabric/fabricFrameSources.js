@@ -344,9 +344,11 @@ async function getFadedObject({ object, progress }) {
   return fadedImage;
 }
 
-async function slideInTextFrameSource({ width, height, params: { text, top = 0.05, left = 0.05, originX = 'left', originY = 'top', fontSize = 0.05, color = '#ffffff', fontFamily = defaultFontFamily } = {} }) {
+async function slideInTextFrameSource({ width, height, params: { position, text, fontSize = 0.05, color = '#ffffff', fontFamily = defaultFontFamily } = {} }) {
   async function onRender(progress, canvas) {
     const fontSizeAbs = Math.round(width * fontSize);
+
+    const { left, top, originX, originY } = getPositionProps({ position, width, height });
 
     const textBox = new fabric.Text(text, {
       fill: color,
@@ -366,8 +368,8 @@ async function slideInTextFrameSource({ width, height, params: { text, top = 0.0
     fadedObject.setOptions({
       originX,
       originY,
-      top: top * height,
-      left: left * width,
+      top,
+      left,
       opacity,
     });
 

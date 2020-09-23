@@ -80,6 +80,36 @@ function getPositionProps({ position, width, height }) {
   } else if (position === 'center') {
     originY = 'center';
     top = height / 2;
+  } else if (position === 'top-left') {
+    originX = 'left';
+    originY = 'top';
+    left = width * margin;
+    top = height * margin;
+  } else if (position === 'top-right') {
+    originX = 'right';
+    originY = 'top';
+    left = width * (1 - margin);
+    top = height * margin;
+  } else if (position === 'center-left') {
+    originX = 'left';
+    originY = 'center';
+    left = width * margin;
+    top = height / 2;
+  } else if (position === 'center-right') {
+    originX = 'right';
+    originY = 'center';
+    left = width * (1 - margin);
+    top = height / 2;
+  } else if (position === 'bottom-left') {
+    originX = 'left';
+    originY = 'bottom';
+    left = width * margin;
+    top = height * (1 - margin);
+  } else if (position === 'bottom-right') {
+    originX = 'right';
+    originY = 'bottom';
+    left = width * (1 - margin);
+    top = height * (1 - margin);
   }
 
   if (position && position.x != null) {
