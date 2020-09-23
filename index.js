@@ -528,9 +528,9 @@ module.exports = async (config = {}) => {
     } // End while loop
 
     outProcess.stdin.end();
-
-    outProcess.kill();
   } finally {
+    outProcess.kill();
+
     if (verbose) console.log('Cleanup');
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
