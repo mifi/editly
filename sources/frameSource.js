@@ -21,7 +21,7 @@ const fabricFrameSources = {
   'slide-in-text': slideInTextFrameSource,
 };
 
-async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
+async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
   const { layers, duration } = clip;
 
   const visualLayers = layers.filter((layer) => layer.type !== 'audio');
@@ -58,14 +58,18 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
       const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
 
       if (shouldDrawLayer) {
+        if (logTimes) console.time('frameSource.readNextFrame');
         const rgba = await frameSource.readNextFrame(offsetProgress, canvas);
+        if (logTimes) console.timeEnd('frameSource.readNextFrame');
         // Frame sources can either render to the provided canvas and return nothing
         // OR return an raw RGBA blob which will be drawn onto the canvas
         if (rgba) {
           // Optimization: Don't need to draw to canvas if there's only one layer
           if (layerFrameSources.length === 1) return rgba;
 
+          if (logTimes) console.time('rgbaToFabricImage');
           const img = await rgbaToFabricImage({ width, height, rgba });
+          if (logTimes) console.timeEnd('rgbaToFabricImage');
           canvas.add(img);
         } else {
           // Assume this frame source has drawn its content to the canvas
@@ -74,7 +78,10 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
     }
     // if (verbose) console.time('Merge frames');
 
-    return renderFabricCanvas(canvas);
+    if (logTimes) console.time('renderFabricCanvas');
+    const rgba = await renderFabricCanvas(canvas);
+    if (logTimes) console.timeEnd('renderFabricCanvas');
+    return rgba;
   }
 
   async function close() {

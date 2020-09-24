@@ -26,6 +26,7 @@ module.exports = async (config = {}) => {
     // Testing options:
     enableFfmpegLog = false,
     verbose = false,
+    logTimes = false,
     fast,
 
     outPath,
@@ -423,7 +424,7 @@ module.exports = async (config = {}) => {
   const getTransitionFromClip = () => clips[transitionFromClipId];
   const getTransitionToClip = () => clips[getTransitionToClipId()];
 
-  const getSource = async (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
+  const getSource = async (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
   const getTransitionFromSource = async () => getSource(getTransitionFromClip(), transitionFromClipId);
   const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
 
@@ -497,7 +498,9 @@ module.exports = async (config = {}) => {
         continue;
       }
 
+      if (logTimes) console.time('Read frameSource1');
       const newFrameSource1Data = await frameSource1.readNextFrame({ time: fromClipTime });
+      if (logTimes) console.timeEnd('Read frameSource1');
       // If we got no data, use the old data
       // TODO maybe abort?
       if (newFrameSource1Data) frameSource1Data = newFrameSource1Data;
@@ -506,16 +509,19 @@ module.exports = async (config = {}) => {
       const isInTransition = frameSource2 && transitionNumFramesSafe > 0 && transitionFrameAt >= 0;
 
       let outFrameData;
+
       if (isInTransition) {
+        if (logTimes) console.time('Read frameSource2');
         const frameSource2Data = await frameSource2.readNextFrame({ time: toClipTime });
+        if (logTimes) console.timeEnd('Read frameSource2');
 
         if (frameSource2Data) {
           const progress = transitionFrameAt / transitionNumFramesSafe;
           const easedProgress = currentTransition.easingFunction(progress);
 
-          // if (verbose) console.time('runTransitionOnFrame');
+          if (logTimes) console.time('runTransitionOnFrame');
           outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data, toFrame: frameSource2Data, progress: easedProgress, transitionName: currentTransition.name, transitionParams: currentTransition.params });
-          // if (verbose) console.timeEnd('runTransitionOnFrame');
+          if (logTimes) console.timeEnd('runTransitionOnFrame');
         } else {
           console.warn('Got no frame data from transitionToClip!');
           // We have probably reached end of clip2 but transition is not complete. Just pass thru clip1
@@ -529,10 +535,17 @@ module.exports = async (config = {}) => {
       if (verbose) {
         if (isInTransition) console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`, 'to clip', getTransitionToClipId(), `(frame ${toClipFrameAt} / ${transitionNumFramesSafe})`, currentTransition.name, `${currentTransition.duration}s`);
         else console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`);
+        // console.log(outFrameData.length / 1e6, 'MB');
       }
 
+      const nullOutput = false;
+
+      if (logTimes) console.time('outProcess.write');
+
       // If we don't wait, then we get EINVAL when dealing with high resolution files (big writes)
-      await new Promise((r) => outProcess.stdin.write(outFrameData, r));
+      if (!nullOutput) await new Promise((r) => outProcess.stdin.write(outFrameData, r));
+
+      if (logTimes) console.timeEnd('outProcess.write');
 
       if (outProcessError) break;
 
