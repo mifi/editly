@@ -1,7 +1,7 @@
 const execa = require('execa');
 const assert = require('assert');
 const sortBy = require('lodash/sortBy');
-
+const fs = require('fs-extra');
 
 function parseFps(fps) {
   const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
@@ -153,6 +153,17 @@ function getFrameByKeyFrames(keyframes, progress) {
 
 const isUrl = (path) => /^https?:\/\//.test(path);
 
+const assertFileValid = async (path, allowRemoteRequests) => {
+  if (isUrl(path)) {
+    assert(allowRemoteRequests, 'Remote requests are not allowed');
+    return;
+  }
+  assert(await fs.exists(path), `File does not exist ${path}`);
+};
+
+// See #16
+const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', 'Transition must be an object');
+
 
 module.exports = {
   parseFps,
@@ -164,4 +175,6 @@ module.exports = {
   getPositionProps,
   getFrameByKeyFrames,
   isUrl,
+  assertFileValid,
+  checkTransition,
 };

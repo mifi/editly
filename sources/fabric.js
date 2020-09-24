@@ -121,4 +121,5 @@ module.exports = {
   renderFabricCanvas,
   rgbaToFabricImage,
   fabricCanvasToFabricImage,
+  getNodeCanvasFromFabricCanvas,
 };
