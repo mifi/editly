@@ -30,12 +30,23 @@ async function renderFabricCanvas(canvas) {
   return rgba;
 }
 
+function toUint8ClampedArray(buffer) {
+  // return Uint8ClampedArray.from(buffer);
+  // Some people are finding that manual copying is orders of magnitude faster than Uint8ClampedArray.from
+  // Since I'm getting similar times for both methods, then why not:
+  const data = new Uint8ClampedArray(buffer.length);
+  for (let i = 0; i < buffer.length; i += 1) {
+    data[i] = buffer[i];
+  }
+  return data;
+}
+
 async function rgbaToFabricImage({ width, height, rgba }) {
   const canvas = nodeCanvas.createCanvas(width, height);
   const ctx = canvas.getContext('2d');
   // https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData
-  ctx.putImageData(new nodeCanvas.ImageData(Uint8ClampedArray.from(rgba), width, height), 0, 0);
+  ctx.putImageData(new nodeCanvas.ImageData(toUint8ClampedArray(rgba), width, height), 0, 0);
   // https://stackoverflow.com/questions/58209996/unable-to-render-tiff-images-and-add-it-as-a-fabric-object
   return new fabric.Image(canvas);
 }
