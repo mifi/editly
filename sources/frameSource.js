@@ -43,7 +43,7 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
 
     assert(createFrameSourceFunc, `Invalid type ${type}`);
 
-    const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration, channels, verbose, enableFfmpegLog, framerateStr, params });
+    const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration, channels, verbose, logTimes, enableFfmpegLog, framerateStr, params });
     return { layer, frameSource };
   }, { concurrency: 1 });
 
