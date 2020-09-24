@@ -112,6 +112,20 @@ function registerFont(...args) {
   fabric.nodeCanvas.registerFont(...args);
 }
 
+function blurImage({ mutableImg, width, height }) {
+  // eslint-disable-next-line no-param-reassign
+  mutableImg.filters = [
+    // It is much faster on large images to first resize, but quality is almost the same
+    new fabric.Image.filters.Resize({ scaleX: 0.1, scaleY: 0.1 }),
+    new fabric.Image.filters.Blur({ blur: 0.1 }),
+  ];
+  mutableImg.applyFilters();
+
+  // Resize it to fit
+  mutableImg.setOptions({ scaleX: width / mutableImg.width, scaleY: height / mutableImg.height });
+}
+
+
 module.exports = {
   registerFont,
   createFabricFrameSource,
@@ -122,4 +136,5 @@ module.exports = {
   rgbaToFabricImage,
   fabricCanvasToFabricImage,
   getNodeCanvasFromFabricCanvas,
+  blurImage,
 };

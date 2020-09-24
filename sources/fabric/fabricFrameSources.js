@@ -4,6 +4,7 @@ const fileUrl = require('file-url');
 const { getRandomGradient, getRandomColors } = require('../../colors');
 const { easeOutExpo, easeInOutCubic } = require('../../transitions');
 const { getPositionProps, getFrameByKeyFrames, isUrl } = require('../../util');
+const { blurImage } = require('../fabric');
 
 // http://fabricjs.com/kitchensink
 
@@ -38,15 +39,7 @@ async function imageFrameSource({ verbose, params, width, height }) {
   if (resizeMode === 'contain-blur') {
     blurredImg = getImg();
     if (verbose) console.log('Blurring background');
-    blurredImg.filters = [
-      // It is much faster on large images to first resize, but quality is almost the same
-      new fabric.Image.filters.Resize({ scaleX: 0.1, scaleY: 0.1 }),
-      new fabric.Image.filters.Blur({ blur: 0.1 }),
-    ];
-    blurredImg.applyFilters();
-
-    // Resize it to fit
-    blurredImg.setOptions({ scaleX: width / blurredImg.width, scaleY: height / blurredImg.height });
+    blurImage({ mutableImg: blurredImg, width, height });
   }
 
   async function onRender(progress, canvas) {
