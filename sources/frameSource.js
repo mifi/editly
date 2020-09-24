@@ -1,7 +1,7 @@
 const assert = require('assert');
 const pMap = require('p-map');
 
-const { rgbaToFabricImage, createCustomCanvasFrameSource, createFabricFrameSource, createFabricCanvas, renderFabricCanvas } = require('./fabric');
+const { rgbaToFabricImage, createCustomCanvasFrameSource, createFabricFrameSource, createFabricCanvas, renderFabricCanvas, fabricCanvasToFabricImage } = require('./fabric');
 
 const { customFabricFrameSource, subtitleFrameSource, titleFrameSource, newsTitleFrameSource, fillColorFrameSource, radialGradientFrameSource, linearGradientFrameSource, imageFrameSource, imageOverlayFrameSource, slideInTextFrameSource } = require('./fabric/fabricFrameSources');
 
@@ -48,7 +48,9 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
   }, { concurrency: 1 });
 
   async function readNextFrame({ time }) {
-    const canvas = createFabricCanvas({ width, height });
+    const clipCanvas = createFabricCanvas({ width, height });
+
+    const layerCanvases = [];
 
     // eslint-disable-next-line no-restricted-syntax
     for (const { frameSource, layer } of layerFrameSources) {
@@ -57,10 +59,14 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
       // console.log({ offsetProgress });
       const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
 
+      const layerCanvas = createFabricCanvas({ width, height });
+      layerCanvases.push(layerCanvas);
+
       if (shouldDrawLayer) {
         if (logTimes) console.time('frameSource.readNextFrame');
-        const rgba = await frameSource.readNextFrame(offsetProgress, canvas);
+        const rgba = await frameSource.readNextFrame(offsetProgress, layerCanvas);
         if (logTimes) console.timeEnd('frameSource.readNextFrame');
+
         // Frame sources can either render to the provided canvas and return nothing
         // OR return an raw RGBA blob which will be drawn onto the canvas
         if (rgba) {
@@ -70,17 +76,27 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
           if (logTimes) console.time('rgbaToFabricImage');
           const img = await rgbaToFabricImage({ width, height, rgba });
           if (logTimes) console.timeEnd('rgbaToFabricImage');
-          canvas.add(img);
+
+          layerCanvas.add(img);
         } else {
           // Assume this frame source has drawn its content to the canvas
         }
       }
+
+      layerCanvas.renderAll();
+      const layerImage = fabricCanvasToFabricImage(layerCanvas);
+      clipCanvas.add(layerImage);
     }
-    // if (verbose) console.time('Merge frames');
 
     if (logTimes) console.time('renderFabricCanvas');
-    const rgba = await renderFabricCanvas(canvas);
+    const rgba = await renderFabricCanvas(clipCanvas);
     if (logTimes) console.timeEnd('renderFabricCanvas');
+
+    layerCanvases.forEach((layerCanvas) => {
+      layerCanvas.clear();
+      layerCanvas.dispose();
+    });
+
     return rgba;
   }
 
