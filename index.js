@@ -385,16 +385,16 @@ async function renderSingleFrame({
   outPath = `${Math.floor(Math.random() * 1e12)}.png`,
 }) {
   const clips = await parseConfig({ defaults, clips: clipsIn, allowRemoteRequests, ffprobePath });
-  let totalDuration = 0;
+  let clipStartTime = 0;
   const clip = clips.find((c) => {
-    if (totalDuration >= time) return true;
-    totalDuration += c.duration;
+    if (clipStartTime <= time && clipStartTime + c.duration > time) return true;
+    clipStartTime += c.duration;
     return false;
   });
   assert(clip, 'No clip found at requested time');
   const clipIndex = clips.indexOf(clip);
   const frameSource = await createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr: '1' });
-  const rgba = await frameSource.readNextFrame({ time });
+  const rgba = await frameSource.readNextFrame({ time: time - clipStartTime });
 
   // TODO converting rgba to png can be done more easily?
   const canvas = createFabricCanvas({ width, height });
