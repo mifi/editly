@@ -264,6 +264,7 @@ Title with background
 - `fontPath` - See `defaults.layer.fontPath`
 - `text`
 - `fontSize`
+- `charSpacing`
 - `color`
 - `position` - See [Position parameter](#position-parameter)
 

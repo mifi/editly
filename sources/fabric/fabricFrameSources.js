@@ -368,7 +368,7 @@ async function getFadedObject({ object, progress }) {
   return fadedImage;
 }
 
-async function slideInTextFrameSource({ width, height, params: { position, text, fontSize = 0.05, color = '#ffffff', fontFamily = defaultFontFamily } = {} }) {
+async function slideInTextFrameSource({ width, height, params: { position, text, fontSize = 0.05, charSpacing = 0.1, color = '#ffffff', fontFamily = defaultFontFamily } = {} }) {
   async function onRender(progress, canvas) {
     const fontSizeAbs = Math.round(width * fontSize);
 
@@ -378,7 +378,7 @@ async function slideInTextFrameSource({ width, height, params: { position, text,
       fill: color,
       fontFamily,
       fontSize: fontSizeAbs,
-      charSpacing: width * 0.1,
+      charSpacing: width * charSpacing,
     });
 
     const { opacity, textSlide } = getFrameByKeyFrames([
