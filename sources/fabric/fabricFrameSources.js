@@ -70,7 +70,7 @@ async function imageFrameSource({ verbose, params, width, height }) {
         img.scaleToHeight(height * scaleFactor);
       }
     } else if (resizeMode === 'stretch') {
-      img.setOptions({ scaleX: width / img.width, scaleY: height / img.height });
+      img.setOptions({ scaleX: (width / img.width) * scaleFactor, scaleY: (height / img.height) * scaleFactor });
     }
 
     if (blurredImg) canvas.add(blurredImg);
