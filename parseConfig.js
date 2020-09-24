@@ -126,13 +126,13 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, allowRemoteReques
         const inputDuration = cutTo - cutFrom;
 
         const isRotated = rotation === 90 || rotation === 270;
-        const width = isRotated ? heightIn : widthIn;
-        const height = isRotated ? widthIn : heightIn;
+        const inputWidth = isRotated ? heightIn : widthIn;
+        const inputHeight = isRotated ? widthIn : heightIn;
 
         // Compensate for transition duration
         const audioCutTo = Math.max(cutFrom, cutTo - transition.duration);
 
-        return { ...layer, cutFrom, cutTo, audioCutTo, inputDuration, width, height, framerateStr };
+        return { ...layer, cutFrom, cutTo, audioCutTo, inputDuration, framerateStr, inputWidth, inputHeight };
       }
 
       // Audio is handled later

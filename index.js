@@ -76,8 +76,8 @@ const Editly = async (config = {}) => {
 
   clips.find((clip) => clip && clip.layers.find((layer) => {
     if (layer.type === 'video') {
-      detectedWidth = layer.width;
-      detectedHeight = layer.height;
+      detectedWidth = layer.inputWidth;
+      detectedHeight = layer.inputHeight;
       firstVideoFramerateStr = layer.framerateStr;
 
       return true;
