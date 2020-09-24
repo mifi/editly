@@ -193,8 +193,14 @@ For video layers, if parent `clip.duration` is specified, the video will be slow
 | `resizeMode` | See [Resize modes](#resize-modes) | | |
 | `cutFrom` | Time value to cut from | `0` | sec |
 | `cutTo` | Time value to cut to | *end of video* | sec |
-| `backgroundColor` | Background of letterboxing | `#000000` | |
+| `width` | Width relative to screen width | `1` | `0` to `1` |
+| `height` | Height relative to screen height | `1` | `0` to `1` |
+| `left` | X-position relative to screen width | `0` | `0` to `1` |
+| `top` | Y-position relative to screen height | `0` | `0` to `1` |
+| `originX` | X anchor | `left` | `left` or `right` |
+| `originY` | Y anchor | `top` | `top` or `bottom` |
 | `mixVolume` | Relative volume when mixing this video's audio track with others | `1` | |
+
 
 #### Layer type 'audio'
 
@@ -302,9 +308,17 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 
 ### Resize modes
 
-`resizeMode` - How to fit image to screen. Can be one of `contain`, `contain-blur`, `cover`, `stretch`. Default `contain-blur`.
+`resizeMode` - How to fit image to screen. Can be one of:
+- `contain` - All the video will be contained within the frame and letterboxed
+- `contain-blur` - Like `contain`, but with a blurred copy as the letterbox
+- `cover` - Video be cropped to cover the whole screen (aspect ratio preserved)
+- `stretch` - Video will be stretched to cover the whole screen (aspect ratio ignored).
 
-See [image.json5](https://github.com/mifi/editly/blob/master/examples/image.json5)
+Default `contain-blur`.
+
+See:
+- [image.json5](https://github.com/mifi/editly/blob/master/examples/image.json5)
+- [videos.json5](https://github.com/mifi/editly/blob/master/examples/videos.json5)
 
 ### Position parameter
 

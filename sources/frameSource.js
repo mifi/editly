@@ -61,6 +61,7 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
         if (logTimes) console.time('frameSource.readNextFrame');
         const rgba = await frameSource.readNextFrame(offsetProgress, canvas);
         if (logTimes) console.timeEnd('frameSource.readNextFrame');
+
         // Frame sources can either render to the provided canvas and return nothing
         // OR return an raw RGBA blob which will be drawn onto the canvas
         if (rgba) {

@@ -1,0 +1,14 @@
+{
+  // verbose: true,
+  // enableFfmpegLog: true,
+  outPath: './video2.mp4',
+  defaults: {
+    transition: {
+      name: 'linearblur',
+    },
+  },
+  clips: [
+    { layers: [{ type: 'video', path: './assets/IMG_4605.MOV', cutFrom: 0, cutTo: 2 }, { type: 'title', text: 'Video 1' }] },
+    { layers: [{ type: 'video', path: './assets/IMG_1884.MOV', cutFrom: 0, cutTo: 2 }] },
+  ],
+}
