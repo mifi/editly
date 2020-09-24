@@ -1,15 +1,35 @@
 const { fabric } = require('fabric');
 const nodeCanvas = require('canvas');
 
-const { canvasToRgba } = require('./shared');
-
-
 // Fabric is used as a fundament for compositing layers in editly
 
-function fabricCanvasToRgba(canvas) {
+
+function canvasToRgba(ctx) {
+  // const bgra = canvas.toBuffer('raw');
+
+  /* const rgba = Buffer.allocUnsafe(bgra.length);
+  for (let i = 0; i < bgra.length; i += 4) {
+    rgba[i + 0] = bgra[i + 2];
+    rgba[i + 1] = bgra[i + 1];
+    rgba[i + 2] = bgra[i + 0];
+    rgba[i + 3] = bgra[i + 3];
+  } */
+
+  // We cannot use toBuffer('raw') because it returns pre-multiplied alpha data (a different format)
+  // https://gamedev.stackexchange.com/questions/138813/whats-the-difference-between-alpha-and-premulalpha
+  // https://github.com/Automattic/node-canvas#image-pixel-formats-experimental
+  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  return Buffer.from(imageData.data);
+}
+
+function getNodeCanvasFromFabricCanvas(fabricCanvas) {
   // https://github.com/fabricjs/fabric.js/blob/26e1a5b55cbeeffb59845337ced3f3f91d533d7d/src/static_canvas.class.js
   // https://github.com/fabricjs/fabric.js/issues/3885
-  const internalCanvas = fabric.util.getNodeCanvas(canvas.lowerCanvasEl);
+  return fabric.util.getNodeCanvas(fabricCanvas.lowerCanvasEl);
+}
+
+function fabricCanvasToRgba(fabricCanvas) {
+  const internalCanvas = getNodeCanvasFromFabricCanvas(fabricCanvas);
   const ctx = internalCanvas.getContext('2d');
 
   // require('fs').writeFileSync(`${Math.floor(Math.random() * 1e12)}.png`, internalCanvas.toBuffer('image/png'));
@@ -39,6 +59,11 @@ function toUint8ClampedArray(buffer) {
     data[i] = buffer[i];
   }
   return data;
+}
+
+function fabricCanvasToFabricImage(fabricCanvas) {
+  const canvas = getNodeCanvasFromFabricCanvas(fabricCanvas);
+  return new fabric.Image(canvas);
 }
 
 async function rgbaToFabricImage({ width, height, rgba }) {
@@ -95,4 +120,5 @@ module.exports = {
   createFabricCanvas,
   renderFabricCanvas,
   rgbaToFabricImage,
+  fabricCanvasToFabricImage,
 };
