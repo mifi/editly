@@ -54,14 +54,17 @@ module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, fr
   const streams = await readFileStreams(ffprobePath, path);
   const firstVideoStream = streams.find((s) => s.codec_type === 'video');
   // https://superuser.com/a/1116905/658247
-  const inputCodecArgs = ['vp8', 'vp9'].includes(firstVideoStream.codec_name) ? ['-vcodec', 'libvpx'] : [];
+
+  let inputCodec;
+  if (firstVideoStream.codec_name === 'vp8') inputCodec = 'libvpx';
+  else if (firstVideoStream.codec_name === 'vp9') inputCodec = 'libvpx-vp9';
 
   // http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
   const args = [
     ...getFfmpegCommonArgs({ enableFfmpegLog }),
-    ...inputCodecArgs,
+    ...(inputCodec ? ['-vcodec', inputCodec] : []),
     ...(cutFrom ? ['-ss', cutFrom] : []),
     '-i', path,
     ...(cutTo ? ['-t', (cutTo - cutFrom) * framePtsFactor] : []),
