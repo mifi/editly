@@ -4,11 +4,11 @@
   clips: [
     { duration: 2, layers: [
       { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 },
-      { type: 'video', path: './assets/dancer1.webm', cutFrom: 0, cutTo: 6 },
+      { type: 'video', path: './assets/dancer1.webm', resizeMode: 'contain', cutFrom: 0, cutTo: 6 },
     ] },
     { layers: [
       { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 },
-      { type: 'video', path: './assets/dancer1.webm' },
+      { type: 'video', path: './assets/dancer1.webm', resizeMode: 'contain' },
     ] },
   ],
 }
