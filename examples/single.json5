@@ -1,0 +1,8 @@
+{
+  // This is a test of a single clip to make sure that it works
+  outPath: './single.mp4',
+  keepSourceAudio: true,
+  clips: [
+    { layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 0, cutTo: 2 }] },
+  ],
+}

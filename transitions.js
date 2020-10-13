@@ -27,37 +27,37 @@ function getTransitionEasingFunction(easing, transitionName) {
 function calcTransition(defaults, transition, isLastClip) {
   if (transition === null || isLastClip) return { duration: 0 };
 
+  const getTransitionDefault = (key) => (defaults.transition && defaults.transition[key]);
+
   let transitionOrDefault = {
-    name: (transition && transition.name) || (defaults.transition && defaults.transition.name),
-    duration: (transition && transition.duration != null) ? transition.duration : (defaults.transition && defaults.transition.duration),
-    params: (transition && transition.params) || (defaults.transition && defaults.transition.params),
-    easing: (transition && transition.easing !== undefined) ? transition.easing : (defaults.transition && defaults.transition.easing),
+    name: (transition && transition.name) || getTransitionDefault('name'),
+    duration: (transition && transition.duration != null) ? transition.duration : getTransitionDefault('duration'),
+    params: (transition && transition.params) || getTransitionDefault('params'),
+    easing: (transition && transition.easing !== undefined) ? transition.easing : getTransitionDefault('easing'),
+    audioOutCurve: (transition && transition.audioOutCurve) || getTransitionDefault('audioOutCurve'),
+    audioInCurve: (transition && transition.audioInCurve) || getTransitionDefault('audioInCurve'),
   };
 
   assert(!transitionOrDefault.duration || transitionOrDefault.name, 'Please specify transition name or set duration to 0');
 
   if (transitionOrDefault.name === 'random' && transitionOrDefault.duration) {
-    transitionOrDefault = { easing: transitionOrDefault.easing, name: getRandomTransition(), duration: transitionOrDefault.duration };
+    transitionOrDefault = { ...transitionOrDefault, name: getRandomTransition() };
   }
 
-  const getTransitionByAlias = () => {
-    const aliasedTransition = {
-      'directional-left': { name: 'directional', params: { direction: [1, 0] } },
-      'directional-right': { name: 'directional', params: { direction: [-1, 0] } },
-      'directional-down': { name: 'directional', params: { direction: [0, 1] } },
-      'directional-up': { name: 'directional', params: { direction: [0, -1] } },
-    }[transitionOrDefault.name];
-    if (aliasedTransition) return { ...transitionOrDefault, ...aliasedTransition };
-    return transitionOrDefault;
-  };
-
-  const outTransition = getTransitionByAlias();
+  const aliasedTransition = {
+    'directional-left': { name: 'directional', params: { direction: [1, 0] } },
+    'directional-right': { name: 'directional', params: { direction: [-1, 0] } },
+    'directional-down': { name: 'directional', params: { direction: [0, 1] } },
+    'directional-up': { name: 'directional', params: { direction: [0, -1] } },
+  }[transitionOrDefault.name];
+  if (aliasedTransition) {
+    transitionOrDefault = { ...transitionOrDefault, ...aliasedTransition };
+  }
 
   return {
-    name: outTransition.name,
-    duration: outTransition.duration || 0,
-    params: outTransition.params,
-    easingFunction: getTransitionEasingFunction(outTransition.easing, outTransition.name),
+    ...transitionOrDefault,
+    duration: transitionOrDefault.duration || 0,
+    easingFunction: getTransitionEasingFunction(transitionOrDefault.easing, transitionOrDefault.name),
   };
 }
 

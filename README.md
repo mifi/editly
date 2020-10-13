@@ -110,6 +110,8 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
     transition: {
       duration: 0.5,
       name: 'random',
+      audioOutCurve: 'tri',
+      audioInCurve: 'tri',
     },
     layer: {
       fontPath,
@@ -167,6 +169,8 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `defaults.transition` | | An object `{ name, duration }` describing the default transition. Set to **null** to disable transitions | | |
 | `defaults.transition.duration` | `--transition-duration` | Default transition duration | `0.5` | sec |
 | `defaults.transition.name` | `--transition-name` | Default transition type. See [Transition types](#transition-types) | `random` | |
+| `defaults.transition.audioOutCurve` | | Default [fade out curve](https://trac.ffmpeg.org/wiki/AfadeCurves) in audio cross fades | `tri` | |
+| `defaults.transition.audioInCurve` | | Default [fade in curve](https://trac.ffmpeg.org/wiki/AfadeCurves) in audio cross fades | `tri` | |
 | `clips[]` | | List of clip objects that will be played in sequence. Each clip can have one or more layers. | | |
 | `clips[].duration` | | Clip duration. See `defaults.duration`. If unset, the clip duration will be that of the **first video layer**. | `defaults.duration` | |
 | `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.transition` | |

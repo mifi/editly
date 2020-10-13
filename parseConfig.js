@@ -20,6 +20,8 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, allowRemoteReques
     transition: defaultsIn.transition === null ? null : {
       duration: 0.5,
       name: 'random',
+      audioOutCurve: 'tri',
+      audioInCurve: 'tri',
       ...defaultsIn.transition,
     },
   };
@@ -108,6 +110,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, allowRemoteReques
     let layersOut = flatMap(await pMap(layers, async (layerIn) => {
       const globalLayerDefaults = defaults.layer || {};
       const thisLayerDefaults = (defaults.layerType || {})[layerIn.type];
+
       const layer = { ...globalLayerDefaults, ...thisLayerDefaults, ...layerIn };
       const { type, path } = layer;
 
@@ -129,10 +132,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, allowRemoteReques
         const inputWidth = isRotated ? heightIn : widthIn;
         const inputHeight = isRotated ? widthIn : heightIn;
 
-        // Compensate for transition duration
-        const audioCutTo = Math.max(cutFrom, cutTo - transition.duration);
-
-        return { ...layer, cutFrom, cutTo, audioCutTo, inputDuration, framerateStr, inputWidth, inputHeight };
+        return { ...layer, cutFrom, cutTo, inputDuration, framerateStr, inputWidth, inputHeight };
       }
 
       // Audio is handled later
@@ -178,10 +178,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, allowRemoteReques
 
         const speedFactor = clipDuration / inputDuration;
 
-        // Compensate for transition duration
-        const audioCutTo = Math.max(cutFrom, cutTo - transition.duration);
-
-        return { ...layer, cutFrom, cutTo, audioCutTo, speedFactor };
+        return { ...layer, cutFrom, cutTo, speedFactor };
       }
 
       if (layer.type === 'video') {

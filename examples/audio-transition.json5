@@ -1,0 +1,31 @@
+{
+  // enableFfmpegLog: true,
+  outPath: './audio-transition.mp4',
+  keepSourceAudio: true,
+  defaults: {
+    duration: 3,
+    transition: { duration: 1, name: 'directional' },
+  },
+  clips: [
+    { layers: [
+      { type: 'title-background', text: 'Clip 1' },
+      { type: 'audio', path: './assets/sample1.m4a' }
+    ] },
+    { transition: { duration: 0.2 }, layers: [
+      { type: 'title-background', text: 'Clip 2' },
+      { type: 'audio', path: './assets/sample2.m4a' }
+    ] },
+    { transition: { duration: 0 }, layers: [
+      { type: 'title-background', text: 'Clip 3' },
+      { type: 'audio', path: './assets/sample1.m4a' }
+    ] },
+    { transition: { audioInCurve: 'exp', audioOutCurve: 'exp' }, layers: [
+      { type: 'title-background', text: 'Clip 4' },
+      { type: 'audio', path: './assets/sample2.m4a' }
+    ] },
+    { layers: [
+      { type: 'title-background', text: 'Clip 5' },
+      { type: 'audio', path: './assets/sample1.m4a' }
+    ] },
+  ],
+}

@@ -4,7 +4,7 @@ const execa = require('execa');
 const flatMap = require('lodash/flatMap');
 const fs = require('fs-extra');
 
-const { getFfmpegCommonArgs, getCutFromArgs, createConcatFile } = require('./ffmpeg');
+const { getFfmpegCommonArgs, getCutFromArgs } = require('./ffmpeg');
 const { readFileStreams } = require('./util');
 
 module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
@@ -15,21 +15,23 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
 
     const mergedAudioPath = join(tmpDir, 'audio-merged.flac');
 
-    const segments = await pMap(clips, async (clip, i) => {
+    const clipsOut = await pMap(clips, async (clip, i) => {
       const clipAudioPath = join(tmpDir, `clip${i}-audio.flac`);
 
-      const audioLayers = clip.layers.filter(({ type, visibleFrom, visibleUntil }) => (
+      const { duration, layers, transition } = clip;
+
+      const audioLayers = layers.filter(({ type, visibleFrom, visibleUntil }) => (
         ['audio', 'video'].includes(type)
         // TODO We don't support audio for visibleFrom/visibleUntil layers
         && !visibleFrom && visibleUntil == null));
 
       async function createSilence(outPath) {
-        if (verbose) console.log('create silence', clip.duration);
+        if (verbose) console.log('create silence', duration);
         const args = [
           '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
           '-sample_fmt', 's32',
           '-ar', '48000',
-          '-t', clip.duration,
+          '-t', duration,
           '-c:a', 'flac',
           '-y',
           outPath,
@@ -39,7 +41,7 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
 
       if (audioLayers.length > 0) {
         const processedAudioLayersRaw = await pMap(audioLayers, async (audioLayer, j) => {
-          const { path, cutFrom, audioCutTo, speedFactor } = audioLayer;
+          const { path, cutFrom, cutTo, speedFactor } = audioLayer;
 
           const streams = await readFileStreams(ffprobePath, path);
           if (!streams.some((s) => s.codec_type === 'audio')) return undefined;
@@ -58,7 +60,7 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
               atempoFilter = `atempo=${atempo}`;
             }
 
-            const cutToArg = (audioCutTo - cutFrom) * speedFactor;
+            const cutToArg = (cutTo - cutFrom) * speedFactor;
 
             const args = [
               ...getFfmpegCommonArgs({ enableFfmpegLog }),
@@ -109,25 +111,41 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
         await createSilence(clipAudioPath);
       }
 
-      // https://superuser.com/a/853262/658247
-      return resolve(clipAudioPath);
+      return {
+        path: resolve(clipAudioPath), // https://superuser.com/a/853262/658247
+        transition,
+      };
     }, { concurrency: 4 });
 
-    const concatFilePath = join(tmpDir, 'audio-segments.txt');
+    if (clipsOut.length < 2) {
+      await fs.rename(clipsOut[0].path, mergedAudioPath);
+    } else {
+      console.log('Combining audio', clipsOut.map(({ path }) => basename(path)));
 
-    console.log('Combining audio', segments.map((s) => basename(s)), concatFilePath);
+      let inStream = '[0:a]';
+      const filterGraph = clipsOut.slice(0, -1).map(({ transition }, i) => {
+        const outStream = `[concat${i}]`;
 
-    await createConcatFile(segments, concatFilePath);
+        const epsilon = 0.0001; // If duration is 0, ffmpeg seems to default to 1 sec instead, hence epsilon.
+        let ret = `${inStream}[${i + 1}:a]acrossfade=d=${Math.max(epsilon, transition.duration)}:c1=${transition.audioOutCurve || 'tri'}:c2=${transition.audioInCurve || 'tri'}`;
 
-    const args = [
-      ...getFfmpegCommonArgs({ enableFfmpegLog }),
-      '-f', 'concat', '-safe', '0',
-      '-i', concatFilePath,
-      '-c', 'flac',
-      '-y',
-      mergedAudioPath,
-    ];
-    await execa(ffmpegPath, args);
+        inStream = outStream;
+
+        if (i < clipsOut.length - 2) ret += outStream;
+        return ret;
+      }).join(',');
+
+      const args = [
+        ...getFfmpegCommonArgs({ enableFfmpegLog }),
+        ...(flatMap(clipsOut, ({ path }) => ['-i', path])),
+        '-filter_complex',
+        filterGraph,
+        '-c', 'flac',
+        '-y',
+        mergedAudioPath,
+      ];
+      await execa(ffmpegPath, args);
+    }
 
     // TODO don't return audio if only silence?
     return mergedAudioPath;
