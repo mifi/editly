@@ -154,7 +154,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, allowRemoteReques
       // This feature allows the user to show another layer overlayed (or replacing) parts of the lower layers (visibleFrom - visibleUntil)
       const visibleDuration = ((visibleUntil || clipDuration) - visibleFrom);
       assert(visibleDuration > 0 && visibleDuration <= clipDuration, `Invalid visibleFrom ${visibleFrom} or visibleUntil ${visibleUntil} (${clipDuration})`);
-      // TODO Also need to handle video layers (framePtsFactor etc)
+      // TODO Also need to handle video layers (speedFactor etc)
       // TODO handle audio in case of visibleFrom/visibleTo
 
       const layer = { ...layerIn, visibleFrom, visibleDuration };
@@ -176,28 +176,28 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, allowRemoteReques
 
         const inputDuration = cutTo - cutFrom;
 
-        const framePtsFactor = clipDuration / inputDuration;
+        const speedFactor = clipDuration / inputDuration;
 
         // Compensate for transition duration
         const audioCutTo = Math.max(cutFrom, cutTo - transition.duration);
 
-        return { ...layer, cutFrom, cutTo, audioCutTo, framePtsFactor };
+        return { ...layer, cutFrom, cutTo, audioCutTo, speedFactor };
       }
 
       if (layer.type === 'video') {
         const { inputDuration } = layer;
 
-        let framePtsFactor;
+        let speedFactor;
 
         // If user explicitly specified duration for clip, it means that should be the output duration of the video
         if (userClipDuration) {
           // Later we will speed up or slow down video using this factor
-          framePtsFactor = userClipDuration / inputDuration;
+          speedFactor = userClipDuration / inputDuration;
         } else {
-          framePtsFactor = 1;
+          speedFactor = 1;
         }
 
-        return { ...layer, framePtsFactor };
+        return { ...layer, speedFactor };
       }
 
       return layer;

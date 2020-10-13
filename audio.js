@@ -39,7 +39,7 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
 
       if (audioLayers.length > 0) {
         const processedAudioLayersRaw = await pMap(audioLayers, async (audioLayer, j) => {
-          const { path, cutFrom, audioCutTo, framePtsFactor } = audioLayer;
+          const { path, cutFrom, audioCutTo, speedFactor } = audioLayer;
 
           const streams = await readFileStreams(ffprobePath, path);
           if (!streams.some((s) => s.codec_type === 'audio')) return undefined;
@@ -48,9 +48,9 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
 
           try {
             let atempoFilter;
-            if (Math.abs(framePtsFactor - 1) > 0.01) {
-              if (verbose) console.log('audio framePtsFactor', framePtsFactor);
-              const atempo = (1 / framePtsFactor);
+            if (Math.abs(speedFactor - 1) > 0.01) {
+              if (verbose) console.log('audio speedFactor', speedFactor);
+              const atempo = (1 / speedFactor);
               if (!(atempo >= 0.5 && atempo <= 100)) { // Required range by ffmpeg
                 console.warn(`Audio speed ${atempo} is outside accepted range, using silence (clip ${i})`);
                 return undefined;
@@ -58,7 +58,7 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose }) => {
               atempoFilter = `atempo=${atempo}`;
             }
 
-            const cutToArg = (audioCutTo - cutFrom) * framePtsFactor;
+            const cutToArg = (audioCutTo - cutFrom) * speedFactor;
 
             const args = [
               ...getFfmpegCommonArgs({ enableFfmpegLog }),

@@ -6,7 +6,7 @@ const { readFileStreams } = require('../util');
 const { rgbaToFabricImage, blurImage } = require('./fabric');
 
 module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
-  const { path, cutFrom, cutTo, resizeMode = 'contain-blur', framePtsFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top' } = params;
+  const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top' } = params;
 
   const requestedWidth = requestedWidthRel ? requestedWidthRel * canvasWidth : canvasWidth;
   const requestedHeight = requestedHeightRel ? requestedHeightRel * canvasHeight : canvasHeight;
@@ -40,9 +40,9 @@ module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, fr
   // let inFrameCount = 0;
 
   let ptsFilter = '';
-  if (framePtsFactor !== 1) {
-    if (verbose) console.log('framePtsFactor', framePtsFactor);
-    ptsFilter = `setpts=${framePtsFactor}*PTS,`;
+  if (speedFactor !== 1) {
+    if (verbose) console.log('speedFactor', speedFactor);
+    ptsFilter = `setpts=${speedFactor}*PTS,`;
   }
 
   let scaleFilter;
@@ -67,7 +67,7 @@ module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, fr
     ...(inputCodec ? ['-vcodec', inputCodec] : []),
     ...(cutFrom ? ['-ss', cutFrom] : []),
     '-i', path,
-    ...(cutTo ? ['-t', (cutTo - cutFrom) * framePtsFactor] : []),
+    ...(cutTo ? ['-t', (cutTo - cutFrom) * speedFactor] : []),
     '-vf', `${ptsFilter}fps=${framerateStr},${scaleFilter}`,
     '-map', 'v:0',
     '-vcodec', 'rawvideo',

@@ -4,7 +4,7 @@ const getFfmpegCommonArgs = ({ enableFfmpegLog }) => (enableFfmpegLog ? [] : ['-
 
 const getCutFromArgs = ({ cutFrom }) => (cutFrom ? ['-ss', cutFrom] : []);
 
-const getCutToArgs = ({ cutTo, cutFrom, framePtsFactor }) => (cutTo ? ['-t', (cutTo - cutFrom) * framePtsFactor] : []);
+const getCutToArgs = ({ cutTo, cutFrom, speedFactor }) => (cutTo ? ['-t', (cutTo - cutFrom) * speedFactor] : []);
 
 async function createConcatFile(segments, concatFilePath) {
   // https://superuser.com/questions/787064/filename-quoting-in-ffmpeg-concat
