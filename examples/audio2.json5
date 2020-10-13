@@ -1,6 +1,7 @@
 {
   // enableFfmpegLog: true,
   outPath: './audio2.mp4',
+  keepSourceAudio: true,
   clips: [
     { duration: 0.5, layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 }] },
 
