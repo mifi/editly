@@ -7,11 +7,11 @@
       { type: 'video', path: './assets/dancer1.webm', resizeMode: 'contain', cutFrom: 0, cutTo: 6, visibleFrom: 0.5, visibleUntil: 1 },
     ] },
     { duration: 2, layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 7.5, cutTo: 10.5 },
+      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.5, cutTo: 3.5 },
       { type: 'news-title', text: 'Hei', visibleFrom: 0.5, visibleUntil: 1  },
     ] },
     { layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 14, cutTo: 18 },
+      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0, cutTo: 4 },
       { type: 'video', path: './assets/IMG_4605.MOV', cutFrom: 0, cutTo: 1, visibleFrom: 1, visibleUntil: 2 },
     ] },
   ],

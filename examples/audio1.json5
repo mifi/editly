@@ -9,18 +9,17 @@
     { duration: 0.5, layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 }] },
 
     { layers: [
-      { type: 'fill-color' },
-      { type: 'title', text: 'test' },
+      { type: 'title-background', text: 'test' },
       { type: 'audio', path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', cutFrom: 2, cutTo: 5 }] },
 
     { layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 12, cutTo: 14, mixVolume: 0 },
+      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0, cutTo: 2, mixVolume: 0 },
       { type: 'audio', path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', mixVolume: 0.1 }] },
 
     { duration: 2, layers: [
       { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 },
       { type: 'audio', path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', cutFrom: 2, cutTo: 3, mixVolume: 0.5 }] },
 
-    { duration: 1.8, layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 10, cutTo: 11 }] },
+    { duration: 1.8, layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 1, cutTo: 2 }] },
   ],
 }
