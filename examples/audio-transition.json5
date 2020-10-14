@@ -23,9 +23,13 @@
       { type: 'title-background', text: 'Clip 4' },
       { type: 'audio', path: './assets/sample2.m4a' }
     ] },
-    { layers: [
+    { transition: { name: 'dummy' }, layers: [
       { type: 'title-background', text: 'Clip 5' },
       { type: 'audio', path: './assets/sample1.m4a' }
+    ] },
+    { layers: [
+      { type: 'title-background', text: 'Clip 6' },
+      { type: 'audio', path: './assets/sample2.m4a' }
     ] },
   ],
 }

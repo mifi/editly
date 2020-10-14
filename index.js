@@ -152,7 +152,14 @@ const Editly = async (config = {}) => {
     return newAcc;
   }, 0);
 
-  const { runTransitionOnFrame } = GlTransitions({ width, height, channels });
+  const { runTransitionOnFrame: runGlTransitionOnFrame } = GlTransitions({ width, height, channels });
+
+  function runTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams }) {
+    // A dummy transition can be used to have an audio transition without a video transition
+    // (Note: You will lose a portion from both clips due to overlap)
+    if (transitionName === 'dummy') return progress > 0.5 ? toFrame : fromFrame;
+    return runGlTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams });
+  }
 
   function startFfmpegWriterProcess() {
     // https://superuser.com/questions/556029/how-do-i-convert-a-video-to-gif-using-ffmpeg-with-reasonable-quality

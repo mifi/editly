@@ -181,7 +181,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 
 ### Transition types
 
-`transition.name` can be any of [gl-transitions](https://gl-transitions.com/gallery), or any of the following: `directional-left`, `directional-right`, `directional-up`, `directional-down` and `random`.
+`transition.name` can be any of [gl-transitions](https://gl-transitions.com/gallery), or any of the following: `directional-left`, `directional-right`, `directional-up`, `directional-down`, `random` or `dummy`.
 
 ### Layer types
 
