@@ -6,8 +6,8 @@
     layer: { backgroundColor: 'white' },
   },
   clips: [
-    { layers: [{ type: 'video', path: './assets/IMG_4605.MOV', cutFrom: 0.4, cutTo: 2 }] },
-    { layers: [{ type: 'video', path: './assets/IMG_4605.MOV', cutFrom: 0.4, cutTo: 2, resizeMode: 'contain' }] },
-    { layers: [{ type: 'video', path: './assets/IMG_4605.MOV', cutFrom: 0.4, cutTo: 2, resizeMode: 'stretch' }] },
+    { layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0.4, cutTo: 2 }] },
+    { layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0.4, cutTo: 2, resizeMode: 'contain' }] },
+    { layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0.4, cutTo: 2, resizeMode: 'stretch' }] },
   ],
 }

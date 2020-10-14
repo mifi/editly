@@ -12,7 +12,7 @@
     ] },
     { layers: [
       { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0, cutTo: 4 },
-      { type: 'video', path: './assets/IMG_4605.MOV', cutFrom: 0, cutTo: 1, visibleFrom: 1, visibleUntil: 2 },
+      { type: 'video', path: './assets/changi.mp4', cutFrom: 0, cutTo: 1, visibleFrom: 1, visibleUntil: 2 },
     ] },
   ],
 }

@@ -20,10 +20,10 @@
     { duration: 3, transition: { name: 'colorphase' }, layers: [{ type: 'image', path: './assets/img2.jpg', zoomDirection: 'out' }, { type: 'subtitle', text: 'Komodo national park is the only home of the endangered Komodo dragons' }] },
     { duration: 2.5, transition: { name: 'simplezoom' }, layers: [{ type: 'image', path: './assets/img3.jpg', zoomDirection: 'in' }] },
 
-    { duration: 1.5, transition: { name: 'crosszoom', duration: 0.3 }, layers: [{ type: 'video', path: '/Users/mifi/Desktop/photos/drone koh lipe/DJI_0402.MOV', cutTo: 58 }, { type: 'title', text: 'Videos' }] },
-    { duration: 3, transition: { name: 'fade' }, layers: [{ type: 'video', path: '/Users/mifi/Desktop/photos/drone koh lipe/DJI_0402.MOV', cutFrom: 58 }] },
-    { transition: { name: 'fade' }, layers: [{ type: 'video', path: '/Users/mifi/Desktop/photos/drone koh lipe/DJI_0403.MOV', cutTo: 2.5 }] },
-    { duration: 1.5, layers: [{ type: 'video', path: '/Users/mifi/Desktop/photos/drone koh lipe/DJI_0401.MOV', cutFrom: 3, cutTo: 30 }] },
+    { duration: 1.5, transition: { name: 'crosszoom', duration: 0.3 }, layers: [{ type: 'video', path: 'assets/kohlipe1.mp4', cutTo: 58 }, { type: 'title', text: 'Videos' }] },
+    { duration: 3, transition: { name: 'fade' }, layers: [{ type: 'video', path: 'assets/kohlipe1.mp4', cutFrom: 58 }] },
+    { transition: { name: 'fade' }, layers: [{ type: 'video', path: 'assets/kohlipe2.mp4', cutTo: 2.5 }] },
+    { duration: 1.5, layers: [{ type: 'video', path: 'assets/kohlipe3.mp4', cutFrom: 3, cutTo: 30 }] },
 
     { duration: 3, transition: { name: 'crosszoom' }, layers: [{ type: 'gl', fragmentPath: './assets/shaders/3l23Rh.frag' }, { type: 'title', text: 'OpenGL\nshaders' }] },
     { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/MdXyzX.frag' }] },
