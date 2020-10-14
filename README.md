@@ -12,7 +12,8 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 
 ## Features
 
-- Edit videos with code! Declarative API with fun defaults
+- Edit videos with code! 🤓
+- Declarative API with fun defaults
 - Create colorful videos with random colors generated from aesthetically pleasing palettes and random effects
 - Supports any input size, e.g. 4K video and DSLR photos
 - Can output to any dimensions and aspect ratio, e.g. *Instagram post* (1:1), *Instagram story* (9:16), *YouTube* (16:9), or any other dimensions you like.
@@ -23,8 +24,9 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 - Render custom GL shaders (for example from [shadertoy](https://www.shadertoy.com/))
 - Can output GIF
 - Preserve audio sources or mix multiple
-- Overlay transparent images or videos
+- Overlay transparent images or even videos with alpha channel
 - Show different sub-clips for parts of a clips duration (B-roll)
+- Automatic audio crossfading
 
 ## Use cases
 
