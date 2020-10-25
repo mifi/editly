@@ -29,6 +29,13 @@
     { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/MdXyzX.frag' }] },
     { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/30daysofshade_010.frag' }] },
     { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/wd2yDm.frag', speed: 5 }] },
+
+    { duration: 3, layers: [
+      { type: 'image', path: './assets/91083241_573589476840991_4224678072281051330_n.jpg' },
+      { type: 'news-title', text: 'BREAKING NEWS' },
+      { type: 'subtitle', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.', backgroundColor: 'rgba(0,0,0,0.5)' }
+    ] },
+
     { duration: 3, layers: [{ type: 'editly-banner' }] },
   ],
 }
