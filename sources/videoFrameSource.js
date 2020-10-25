@@ -8,8 +8,8 @@ const { rgbaToFabricImage, blurImage } = require('./fabric');
 module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
   const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top' } = params;
 
-  const requestedWidth = requestedWidthRel ? requestedWidthRel * canvasWidth : canvasWidth;
-  const requestedHeight = requestedHeightRel ? requestedHeightRel * canvasHeight : canvasHeight;
+  const requestedWidth = requestedWidthRel ? Math.round(requestedWidthRel * canvasWidth) : canvasWidth;
+  const requestedHeight = requestedHeightRel ? Math.round(requestedHeightRel * canvasHeight) : canvasHeight;
 
   const left = leftRel * canvasWidth;
   const top = topRel * canvasHeight;
