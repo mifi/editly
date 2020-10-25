@@ -1,0 +1,18 @@
+{
+  width: 240, height: 240, fps: 14,
+  outPath: './ph.gif',
+  defaults: {
+    transition: { duration: 0.4 },
+    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+  },
+  clips: [
+    { duration: 1, transition: { name: 'directionalWarp' }, layers: [{ type: 'image', path: './assets/vertical.jpg', zoomDirection: 'out' }, { type: 'title', text: 'EDITLY' }] },
+    { duration: 1.5, transition: { name: 'dreamyzoom' }, layers: [{ type: 'image', path: './assets/img1.jpg', duration: 2.5, zoomDirection: 'in' }, { type: 'title', position: 'bottom', text: 'Video editing API' }] },
+
+    { duration: 2, layers: [
+      { type: 'image', path: './assets/91083241_573589476840991_4224678072281051330_n.jpg' },
+      { type: 'news-title', text: 'EDITLY' },
+      { type: 'subtitle', text: 'Get it from npm', backgroundColor: 'rgba(0,0,0,0.5)' }
+    ] },
+  ],
+}
