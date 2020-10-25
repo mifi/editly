@@ -1,4 +1,4 @@
-# editly 🏄‍♀️
+# EDITLY 🏄‍♀️
 
 [![demo](https://github.com/mifi/gifs/raw/master/commonFeatures.gif)](https://youtu.be/LNeclLkxUEY)
 
@@ -27,6 +27,7 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 - Overlay transparent images or even videos with alpha channel
 - Show different sub-clips for parts of a clips duration (B-roll)
 - Automatic audio crossfading
+- Picture-in-picture
 
 ## Use cases
 

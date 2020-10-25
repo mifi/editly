@@ -165,7 +165,7 @@ const Editly = async (config = {}) => {
     // https://superuser.com/questions/556029/how-do-i-convert-a-video-to-gif-using-ffmpeg-with-reasonable-quality
     const outputArgs = isGif ? [
       '-vf',
-      `fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
+      `format=rgb24,fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
       '-loop', 0,
       '-y', outPath,
     ] : [
@@ -193,7 +193,7 @@ const Editly = async (config = {}) => {
 
       ...(audioFilePath ? [...loopAudioArgs, '-i', audioFilePath, '-shortest'] : []),
 
-      '-map', '0:v:0',
+      ...(!isGif ? ['-map', '0:v:0'] : []),
       ...(audioFilePath ? ['-map', '1:a:0'] : []),
 
       ...(audioFilePath ? ['-acodec', 'aac', '-b:a', '128k'] : []),

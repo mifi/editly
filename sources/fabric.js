@@ -43,7 +43,9 @@ function createFabricCanvas({ width, height }) {
 }
 
 async function renderFabricCanvas(canvas) {
+  // console.time('canvas.renderAll');
   canvas.renderAll();
+  // console.timeEnd('canvas.renderAll');
   const rgba = fabricCanvasToRgba(canvas);
   canvas.clear();
   canvas.dispose();
