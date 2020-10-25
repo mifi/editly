@@ -36,6 +36,12 @@
       { type: 'subtitle', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.', backgroundColor: 'rgba(0,0,0,0.5)' }
     ] },
 
+    { duration: 3, layers: [
+      { type: 'rainbow-colors' },
+      { type: 'video', path: './assets/tungestolen.mp4', resizeMode: 'contain', width: 0.4, height: 0.4, top: 0.05, left: 0.95, originY: 'top', originX: 'right' },
+      { type: 'title', position: 'bottom', text: 'Picture-in-Picture' }
+    ] },
+
     { duration: 3, layers: [{ type: 'editly-banner' }] },
   ],
 }
