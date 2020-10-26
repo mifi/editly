@@ -14,14 +14,15 @@ module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, fr
   const left = leftRel * canvasWidth;
   const top = topRel * canvasHeight;
 
+  const ratioW = requestedWidth / inputWidth;
+  const ratioH = requestedHeight / inputHeight;
+  const inputAspectRatio = inputWidth / inputHeight;
+
   let targetWidth = requestedWidth;
   let targetHeight = requestedHeight;
 
+  let scaleFilter;
   if (['contain', 'contain-blur'].includes(resizeMode)) {
-    const ratioW = requestedWidth / inputWidth;
-    const ratioH = requestedHeight / inputHeight;
-    const inputAspectRatio = inputWidth / inputHeight;
-
     if (ratioW > ratioH) {
       targetHeight = requestedHeight;
       targetWidth = Math.round(requestedHeight * inputAspectRatio);
@@ -29,6 +30,32 @@ module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, fr
       targetWidth = requestedWidth;
       targetHeight = Math.round(requestedWidth / inputAspectRatio);
     }
+
+    scaleFilter = `scale=${targetWidth}:${targetHeight}`;
+  } else if (resizeMode === 'cover') {
+    let scaledWidth;
+    let scaledHeight;
+
+    if (ratioW > ratioH) {
+      scaledWidth = requestedWidth;
+      scaledHeight = Math.round(requestedWidth / inputAspectRatio);
+    } else {
+      scaledHeight = requestedHeight;
+      scaledWidth = Math.round(requestedHeight * inputAspectRatio);
+    }
+
+    // TODO improve performance by crop first, then scale?
+    scaleFilter = `scale=${scaledWidth}:${scaledHeight},crop=${targetWidth}:${targetHeight}`;
+  } else { // 'stretch'
+    scaleFilter = `scale=${targetWidth}:${targetHeight}`;
+  }
+
+  if (verbose) console.log(scaleFilter);
+
+  let ptsFilter = '';
+  if (speedFactor !== 1) {
+    if (verbose) console.log('speedFactor', speedFactor);
+    ptsFilter = `setpts=${speedFactor}*PTS,`;
   }
 
   const frameByteSize = targetWidth * targetHeight * channels;
@@ -38,17 +65,6 @@ module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, fr
   const buf = Buffer.allocUnsafe(frameByteSize);
   let length = 0;
   // let inFrameCount = 0;
-
-  let ptsFilter = '';
-  if (speedFactor !== 1) {
-    if (verbose) console.log('speedFactor', speedFactor);
-    ptsFilter = `setpts=${speedFactor}*PTS,`;
-  }
-
-  let scaleFilter;
-  if (['stretch', 'contain', 'contain-blur'].includes(resizeMode)) scaleFilter = `scale=${targetWidth}:${targetHeight}`;
-  // Cover: https://unix.stackexchange.com/a/192123
-  else scaleFilter = `scale=(iw*sar)*max(${targetWidth}/(iw*sar)\\,${targetHeight}/ih):ih*max(${targetWidth}/(iw*sar)\\,${targetHeight}/ih),crop=${targetWidth}:${targetHeight}`;
 
   // https://forum.unity.com/threads/settings-for-importing-a-video-with-an-alpha-channel.457657/
   const streams = await readFileStreams(ffprobePath, path);
