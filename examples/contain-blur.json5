@@ -1,0 +1,11 @@
+{
+  width: 3000, height: 2000, fps: 15,
+  outPath: './contain-blur.mp4',
+  defaults: {
+    transition: null,
+  },
+  clips: [
+    { duration: 0.3, layers: [{ type: 'image', path: './assets/vertical.jpg', zoomDirection: null }] },
+    { duration: 0.5, layers: [{ type: 'video', path: './assets/IMG_1884.MOV', cutFrom: 0, cutTo: 2 }] },
+  ],
+}

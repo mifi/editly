@@ -27,7 +27,7 @@ async function imageFrameSource({ verbose, params, width, height }) {
 
   const imgData = await loadImage(path);
 
-  const getImg = () => new fabric.Image(imgData, {
+  const createImg = () => new fabric.Image(imgData, {
     originX: 'center',
     originY: 'center',
     left: width / 2,
@@ -37,13 +37,14 @@ async function imageFrameSource({ verbose, params, width, height }) {
   let blurredImg;
   // Blurred version
   if (resizeMode === 'contain-blur') {
-    blurredImg = getImg();
+    // If we dispose mutableImg, seems to cause issues with the rendering of blurredImg
+    const mutableImg = createImg();
     if (verbose) console.log('Blurring background');
-    blurImage({ mutableImg: blurredImg, width, height });
+    blurredImg = await blurImage({ mutableImg, width, height });
   }
 
   async function onRender(progress, canvas) {
-    const img = getImg();
+    const img = createImg();
 
     const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
 

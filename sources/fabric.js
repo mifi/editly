@@ -1,6 +1,8 @@
 const { fabric } = require('fabric');
 const nodeCanvas = require('canvas');
 
+const { boxBlurImage } = require('../BoxBlur');
+
 // Fabric is used as a fundament for compositing layers in editly
 
 
@@ -114,19 +116,22 @@ function registerFont(...args) {
   fabric.nodeCanvas.registerFont(...args);
 }
 
-function blurImage({ mutableImg, width, height }) {
-  // eslint-disable-next-line no-param-reassign
-  mutableImg.filters = [
-    // It is much faster on large images to first resize, but quality is almost the same
-    new fabric.Image.filters.Resize({ scaleX: 0.1, scaleY: 0.1 }),
-    new fabric.Image.filters.Blur({ blur: 0.1 }),
-  ];
-  mutableImg.applyFilters();
-
-  // Resize it to fit
+async function blurImage({ mutableImg, width, height }) {
   mutableImg.setOptions({ scaleX: width / mutableImg.width, scaleY: height / mutableImg.height });
-}
 
+  const fabricCanvas = createFabricCanvas({ width, height });
+  fabricCanvas.add(mutableImg);
+  fabricCanvas.renderAll();
+
+  const internalCanvas = getNodeCanvasFromFabricCanvas(fabricCanvas);
+  const ctx = internalCanvas.getContext('2d');
+
+  const blurAmount = Math.min(100, Math.max(width, height) / 10); // More than 100 seems to cause issues
+  const passes = 1;
+  boxBlurImage(ctx, width, height, blurAmount, false, passes);
+
+  return new fabric.Image(internalCanvas);
+}
 
 module.exports = {
   registerFont,

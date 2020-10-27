@@ -196,8 +196,8 @@ module.exports = async ({ width: canvasWidth, height: canvasHeight, channels, fr
     });
 
     if (resizeMode === 'contain-blur') {
-      const blurredImg = await new Promise((r) => img.cloneAsImage(r));
-      blurImage({ mutableImg: blurredImg, width: requestedWidth, height: requestedHeight });
+      const mutableImg = await new Promise((r) => img.cloneAsImage(r));
+      const blurredImg = await blurImage({ mutableImg, width: requestedWidth, height: requestedHeight });
       blurredImg.setOptions({
         left,
         top,

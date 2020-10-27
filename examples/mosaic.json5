@@ -1,4 +1,5 @@
 {
+  // width: 200, height: 500,
   width: 500, height: 500,
   outPath: './mosaic.mp4',
   defaults: {
