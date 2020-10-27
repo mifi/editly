@@ -365,6 +365,9 @@ This project is maintained by me alone. The project will always remain free and 
 - https://github.com/sjfricke/awesome-webgl
 - https://www.mltframework.org/docs/melt/
 
+## Videos made by you
+
+Submit a PR if you want to share your videos or project created with editly here.
 
 ---
 

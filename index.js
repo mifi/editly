@@ -70,14 +70,14 @@ const Editly = async (config = {}) => {
   if (verbose) console.log(JSON5.stringify(clips, null, 2));
 
   // Try to detect parameters from first video
-  let detectedWidth;
-  let detectedHeight;
+  let firstVideoWidth;
+  let firstVideoHeight;
   let firstVideoFramerateStr;
 
   clips.find((clip) => clip && clip.layers.find((layer) => {
     if (layer.type === 'video') {
-      detectedWidth = layer.inputWidth;
-      detectedHeight = layer.inputHeight;
+      firstVideoWidth = layer.inputWidth;
+      firstVideoHeight = layer.inputHeight;
       firstVideoFramerateStr = layer.framerateStr;
 
       return true;
@@ -90,18 +90,19 @@ const Editly = async (config = {}) => {
 
   let desiredWidth;
 
-  if (fast) desiredWidth = 320;
-  else if (requestedWidth) desiredWidth = requestedWidth;
+  if (requestedWidth) desiredWidth = requestedWidth;
   else if (isGif) desiredWidth = 320;
 
-  if (detectedWidth && detectedHeight) {
+  const roundDimension = (val) => (isGif ? Math.round(val) : multipleOf2(val));
+
+  if (firstVideoWidth && firstVideoHeight) {
     if (desiredWidth) {
-      const calculatedHeight = Math.round((detectedHeight / detectedWidth) * desiredWidth);
-      height = isGif ? calculatedHeight : multipleOf2(calculatedHeight); // x264 requires multiple of 2
+      const calculatedHeight = (firstVideoHeight / firstVideoWidth) * desiredWidth;
+      height = roundDimension(calculatedHeight);
       width = desiredWidth;
     } else {
-      width = detectedWidth;
-      height = detectedHeight;
+      width = firstVideoWidth;
+      height = firstVideoHeight;
     }
   } else if (desiredWidth) {
     width = desiredWidth;
@@ -114,13 +115,26 @@ const Editly = async (config = {}) => {
   }
 
   // User override?
-  if (!fast && requestedWidth && requestedHeight) {
+  if (requestedWidth && requestedHeight) {
     width = requestedWidth;
     height = requestedHeight;
   }
 
+  if (fast) {
+    const numPixelsEachDirection = 250;
+    const aspectRatio = width / height;
+    width = roundDimension(numPixelsEachDirection * Math.sqrt(aspectRatio));
+    height = roundDimension(numPixelsEachDirection * Math.sqrt(1 / aspectRatio));
+  }
+
   assert(width, 'Width not specified or detected');
   assert(height, 'Height not specified or detected');
+
+  if (!isGif) {
+    // x264 requires multiple of 2, eg minimum 2
+    width = Math.max(2, width);
+    height = Math.max(2, height);
+  }
 
   let fps;
   let framerateStr;

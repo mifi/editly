@@ -62,7 +62,8 @@ function toArrayInteger(buffer) {
   return [];
 }
 
-const multipleOf2 = (x) => (x + (x % 2));
+// x264 requires multiple of 2
+const multipleOf2 = (x) => Math.round(x / 2) * 2;
 
 function getPositionProps({ position, width, height }) {
   let originY = 'center';
