@@ -27,7 +27,7 @@ function getTransitionEasingFunction(easing, transitionName) {
 function calcTransition(defaults, transition, isLastClip) {
   if (transition === null || isLastClip) return { duration: 0 };
 
-  const getTransitionDefault = (key) => (defaults.transition && defaults.transition[key]);
+  const getTransitionDefault = (key) => (defaults.transition ? defaults.transition[key] : undefined);
 
   let transitionOrDefault = {
     name: (transition && transition.name) || getTransitionDefault('name'),
