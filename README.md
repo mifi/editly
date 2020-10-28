@@ -339,7 +339,7 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 - `fragmentPath`
 - `vertexPath` (optional)
 
-#### Arbitrary audio tracks
+### Arbitrary audio tracks
 
 `audioTracks` property can optionally contain a list of objects which specify audio tracks that can be started at arbitrary times in the final video. These tracks will be mixed (`mixVolume` specifying a relative number for how loud each track is compared to the other tracks). `clipsAudioVolume` specifies the volume of **all** the audio from `clips` relative to the volume of **all** the `audioTracks`.
 
@@ -357,7 +357,7 @@ See `audioTracks` [example](https://github.com/mifi/editly/blob/master/examples/
 
 See also **Layer type 'detached-audio'**.
 
-#### Audio normalization
+### Audio normalization
 
 You can enable audio normalization of the final output audio. This is useful if you want to achieve Audio Ducking (e.g. automatically lower volume of all other tracks when voice-over speaks).
 
