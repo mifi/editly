@@ -23,11 +23,12 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 - Accepts custom HTML5 Canvas / Fabric.js JavaScript code for custom screens or dynamic overlays
 - Render custom GL shaders (for example from [shadertoy](https://www.shadertoy.com/))
 - Can output GIF
-- Preserve audio sources or mix multiple
 - Overlay transparent images or even videos with alpha channel
 - Show different sub-clips for parts of a clips duration (B-roll)
-- Automatic audio crossfading
 - Picture-in-picture
+- Preserve/mix multiple audio sources
+- Automatic audio crossfading
+- Automatic audio ducking and normalization
 
 ## Use cases
 
@@ -35,19 +36,18 @@ Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat
 - Create a fast-paced trailer or promo video
 - Create a tutorial video with help text
 - Create news stories
-- Simply convert a video to a GIF
+- Create an animated GIF
 - Resize video to any size or framerate and with automatic letterboxing/cropping (e.g. if you need to upload a video somewhere but the site complains `Video must be 1337x1000 30fps`)
+- Create a podcast with multiple mixed tracks
 
 See [examples](https://github.com/mifi/editly/tree/master/examples)
 
 ## Requirements
 
-- [Node.js installed](https://nodejs.org/en/) (Use of the latest stable version is recommended)
-- Should work on Windows, MacOS and Linux. Needs at least Node.js v12.16.2 on MacOS ([see issue](https://github.com/sindresorhus/meow/issues/144)).
-  See also: https://github.com/stackgl/headless-gl#system-dependencies
+- Windows, MacOS or Linux
+- [Node.js installed](https://nodejs.org/en/) (Use of the latest LTS version is recommended, [v12.16.2 or newer on MacOS](https://github.com/sindresorhus/meow/issues/144).)
+- `ffmpeg` (and `ffprobe`) [installed](http://ffmpeg.org/) and available in `PATH`
 - (Linux) may require some extra steps. See [headless-gl](https://github.com/stackgl/headless-gl#system-dependencies).
-
-Make sure you have `ffmpeg` and `ffprobe` installed and available in `PATH`
 
 ## Installing
 
@@ -72,21 +72,18 @@ editly \
   --audio-file-path /path/to/music.mp3
 ```
 
-Or create an MP4 (or GIF) from a JSON or JSON5 edit spec *(JSON5 is just a more friendly JSON format)*:
+Or create an MP4 (or GIF) from a JSON or JSON5 edit spec *(JSON5 is just a more user friendly JSON format)*:
 
 ```sh
-editly my-editly.json5 --fast --out output.gif
+editly my-spec.json5 --fast --keep-source-audio --out output.gif
 ```
 
-For examples of how to make a JSON edit spec, see below or https://github.com/mifi/editly/tree/master/examples
+For examples of how to make a JSON edit spec, see below or [examples](https://github.com/mifi/editly/tree/master/examples).
 
-When you run with `--fast` or `fast: true`, it will render a much quicker low-resolution preview ⏩
+Without `--fast`, it will default to using the **width**, **height** and **frame rate** from the **first** input video. **All other clips will be converted to these dimensions.** You can of course override any or all of these parameters.
 
-Without `--fast` it will default to using the **width**, **height** and **frame rate** from the **first** input video. **All other clips will be converted to these dimensions.** You can of course override any or all of these parameters.
-
-**TIP:** Use this tool in conjunction with [LosslessCut](https://github.com/mifi/lossless-cut)
-
-**TIP:** If you need catchy music for your video, have a look at [this YouTube](https://www.youtube.com/channel/UCht8qITGkBvXKsR1Byln-wA) or the [YouTube audio library](https://www.youtube.com/audiolibrary/music?nv=1). Then use [youtube-dl](https://github.com/ytdl-org/youtube-dl) to download the video, and then point `--audio-file-path` at the video file. *Be sure to respect their license!*
+- **TIP:** Use this tool in conjunction with [LosslessCut](https://github.com/mifi/lossless-cut)
+- **TIP:** If you need catchy music for your video, have a look at [this YouTube](https://www.youtube.com/channel/UCht8qITGkBvXKsR1Byln-wA) or the [YouTube audio library](https://www.youtube.com/audiolibrary/music?nv=1). Then use [youtube-dl](https://github.com/ytdl-org/youtube-dl) to download the video, and then point `--audio-file-path` at the video file. *Be sure to respect their license!*
 
 ## JavaScript library
 
@@ -108,6 +105,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
   width,
   height,
   fps,
+  allowRemoteRequests: false,
   defaults: {
     duration: 4,
     transition: {
@@ -127,10 +125,6 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
       // ...more per-layer-type defaults
     },
   },
-  audioFilePath,
-  loopAudio: false,
-  keepSourceAudio: false,
-  allowRemoteRequests: false,
   clips: [
     {
       transition,
@@ -145,6 +139,25 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
     }
     // ...more clips
   ],
+  audioFilePath,
+  loopAudio: false,
+  keepSourceAudio: false,
+  clipsAudioVolume: 1,
+  audio: [
+    {
+      path,
+      mixVolume: 1,
+      cutFrom: 0,
+      cutTo,
+      start: 0,
+    },
+    // ...more audio tracks
+  ],
+  audioNorm: {
+    enable: false,
+    gaussSize: 5,
+    maxGain: 30,
+  }
 
   // Testing options:
   enableFfmpegLog: false,
@@ -161,11 +174,8 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `width` | `--width` | Width which all media will be converted to | `640` | |
 | `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of **first video** | |
 | `fps` | `--fps` | FPS which all videos will be converted to | First video FPS or `25` | |
-| `audioFilePath` | `--audio-file-path` | Set an audio track for the whole video | | |
-| `loopAudio` | `--loop-audio` | Loop the audio track if it is shorter than video? | `false` | |
-| `keepSourceAudio` | `--keep-source-audio` | Keep audio from source files | `false` | |
 | `allowRemoteRequests` | `--allow-remote-requests` | Allow remote URLs as paths | `false` | |
-| `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview) | `false` | |
+| `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview ⏩) | `false` | |
 | `defaults.layer.fontPath` | `--font-path` | Set default font to a .ttf | System font | |
 | `defaults.layer.*` | | Set any layer parameter that all layers will inherit | | |
 | `defaults.duration` | `--clip-duration` | Set default clip duration for clips that don't have an own duration | `4` | sec |
@@ -181,6 +191,14 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `clips[].layers[].type` | | Layer type, see below | | |
 | `clips[].layers[].visibleFrom` | | What time into the clip should this layer start | | sec |
 | `clips[].layers[].visibleUntil` | | What time into the clip should this layer stop | | sec |
+| `audioTracks[]` | | List of arbitrary audio tracks. See [audio tracks](#arbitrary-audio-tracks). | `[]` | |
+| `audioFilePath` | `--audio-file-path` | Set an audio track for the whole video. See also [audio tracks](#arbitrary-audio-tracks) | | |
+| `loopAudio` | `--loop-audio` | Loop the audio track if it is shorter than video? | `false` | |
+| `keepSourceAudio` | `--keep-source-audio` | Keep source audio from `clips`? | `false` | |
+| `clipsAudioVolume` | | Volume of audio from `clips` relative to `audioTracks`. See [audio tracks](#arbitrary-audio-tracks). | `1` | |
+| `audioNorm.enable` | | Enable audio normalization? See [audio normalization](#audio-normalization). | `false` | |
+| `audioNorm.gaussSize` | | Audio normalization gauss size. See [audio normalization](#audio-normalization). | `5` | |
+| `audioNorm.maxGain` | | Audio normalization max gain. See [audio normalization](#audio-normalization). | `30` | |
 
 ### Transition types
 
@@ -219,6 +237,14 @@ Audio layers will be mixed together. If `cutFrom`/`cutTo` is set, the resulting 
 | `cutFrom` | Time value to cut from | `0` | sec |
 | `cutTo` | Time value to cut to | `clip.duration` | sec |
 | `mixVolume` | Relative volume when mixing this audio track with others | `1` | |
+
+#### Layer type 'detached-audio'
+
+This is a special case of `audioTracks` that makes it easier to start the audio relative to `clips` start times without having to calculate global start times.
+
+`detached-audio` has the exact same properties as [audioTracks](#arbitrary-audio-tracks), except `start` time is relative to the clip's start.
+
+[Example of detached audio tracks](https://github.com/mifi/editly/blob/master/examples/audio3.json5)
 
 #### Layer type 'image'
 
@@ -312,6 +338,32 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 
 - `fragmentPath`
 - `vertexPath` (optional)
+
+#### Arbitrary audio tracks
+
+`audioTracks` property can optionally contain a list of objects which specify audio tracks that can be started at arbitrary times in the final video. These tracks will be mixed (`mixVolume` specifying a relative number for how loud each track is compared to the other tracks). `clipsAudioVolume` specifies the volume of **all** the audio from `clips` relative to the volume of **all** the `audioTracks`.
+
+| Parameter | Description | Default | |
+|-|-|-|-|
+| `audioTracks[].path` | File path for this track | | |
+| `audioTracks[].mixVolume` | Relative volume for this track | `1` | |
+| `audioTracks[].cutFrom` | Time value to cut source file **from** | `0` | sec |
+| `audioTracks[].cutTo` | Time value to cut source file **to** | | sec |
+| `audioTracks[].start` | How many seconds into video to start this audio track | `0` | sec |
+
+The difference between `audioTracks` and **Layer type 'audio'** is that `audioTracks` will continue to play across multiple `clips` and can start and stop whenever needed.
+
+See `audioTracks` [example](https://github.com/mifi/editly/blob/master/examples/audio2.json5)
+
+See also **Layer type 'detached-audio'**.
+
+#### Audio normalization
+
+You can enable audio normalization of the final output audio. This is useful if you want to achieve Audio Ducking (e.g. automatically lower volume of all other tracks when voice-over speaks).
+
+`audioNorm` parameters are [documented here.](https://ffmpeg.org/ffmpeg-filters.html#dynaudnorm)
+
+[Example of audio ducking](https://github.com/mifi/editly/blob/master/examples/audio2.json5)
 
 ### Resize modes
 

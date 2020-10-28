@@ -8,27 +8,39 @@
   },
   clips: [
     { layers: [
-      { type: 'title-background', text: 'Clip 1' },
+      { type: 'title-background', text: 'Default transition' },
       { type: 'audio', path: './assets/sample1.m4a' }
     ] },
     { transition: { duration: 0.2 }, layers: [
-      { type: 'title-background', text: 'Clip 2' },
+      { type: 'title-background', text: 'Fast transition' },
       { type: 'audio', path: './assets/sample2.m4a' }
     ] },
     { transition: { duration: 0 }, layers: [
-      { type: 'title-background', text: 'Clip 3' },
+      { type: 'title-background', text: 'No transition' },
       { type: 'audio', path: './assets/sample1.m4a' }
     ] },
     { transition: { audioInCurve: 'exp', audioOutCurve: 'exp' }, layers: [
-      { type: 'title-background', text: 'Clip 4' },
+      { type: 'title-background', text: 'Exp curve' },
       { type: 'audio', path: './assets/sample2.m4a' }
     ] },
     { transition: { name: 'dummy' }, layers: [
-      { type: 'title-background', text: 'Clip 5' },
+      { type: 'title-background', text: 'Dummy' },
       { type: 'audio', path: './assets/sample1.m4a' }
     ] },
+    { transition: { duration: 2 }, layers: [
+      { type: 'title-background', text: 'Too short' },
+      { type: 'audio', path: './assets/sample2.m4a' }
+    ] },
+    { duration: 1, transition: { duration: 2 }, layers: [
+      { type: 'title-background', text: 'Too short' },
+      { type: 'audio', path: './assets/sample2.m4a' }
+    ] },
+    { duration: 1, transition: { duration: 2 }, layers: [
+      { type: 'title-background', text: 'Too short' },
+      { type: 'audio', path: './assets/sample2.m4a' }
+    ] },
     { layers: [
-      { type: 'title-background', text: 'Clip 6' },
+      { type: 'title-background', text: 'THE END' },
       { type: 'audio', path: './assets/sample2.m4a' }
     ] },
   ],

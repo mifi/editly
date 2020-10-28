@@ -1,22 +1,16 @@
 {
   // enableFfmpegLog: true,
   outPath: './audio2.mp4',
-  keepSourceAudio: true,
+  width: 200, height: 200,
   clips: [
-    { duration: 0.5, layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 }] },
-
-    { layers: [
-      { type: 'title-background', text: 'Audio track' },
-      { type: 'audio', path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a' }] },
-
-    { layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0, cutTo: 2, mixVolume: 0.7 },
-      { type: 'audio', path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', mixVolume: 0.3 }] },
-
-    { layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 },
-      { type: 'audio', path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a' }] },
-
     { layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 1, cutTo: 2 }] },
+    { duration: 15, layers: { type: 'title-background', text: 'Audio track' } },
+  ],
+  audioNorm: { enable: true, gaussSize: 3, maxGain: 100 },
+  clipsAudioVolume: 50,
+  audioTracks: [
+    { path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', cutFrom: 18 },
+    { path: './assets/winxp.mp3', mixVolume: 10, cutFrom: 1, cutTo: 2, start: 2 },
+    { path: './assets/Julen_ribas.m4a', mixVolume: 50, cutTo: 7, start: 5 },
   ],
 }

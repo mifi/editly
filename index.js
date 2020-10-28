@@ -8,7 +8,7 @@ const { nanoid } = require('nanoid');
 const { parseFps, multipleOf2 } = require('./util');
 const { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } = require('./sources/fabric');
 const { createFrameSource } = require('./sources/frameSource');
-const parseConfig = require('./parseConfig');
+const { parseConfig } = require('./parseConfig');
 const GlTransitions = require('./glTransitions');
 const Audio = require('./audio');
 const { assertFileValid, checkTransition } = require('./util');
@@ -22,18 +22,22 @@ const Editly = async (config = {}) => {
     enableFfmpegLog = false,
     verbose = false,
     logTimes = false,
+    keepTmp = false,
     fast,
 
     outPath,
     clips: clipsIn,
+    clipsAudioVolume = 1,
+    audioTracks: arbitraryAudioIn = [],
     width: requestedWidth,
     height: requestedHeight,
     fps: requestedFps,
     defaults = {},
-    audioFilePath: audioFilePathIn,
+    audioFilePath: backgroundAudioPath,
     loopAudio,
     keepSourceAudio,
     allowRemoteRequests,
+    audioNorm,
 
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
@@ -41,10 +45,7 @@ const Editly = async (config = {}) => {
 
   const isGif = outPath.toLowerCase().endsWith('.gif');
 
-  let audioFilePath;
-  if (!isGif) audioFilePath = audioFilePathIn;
-
-  if (audioFilePath) await assertFileValid(audioFilePath, allowRemoteRequests);
+  if (backgroundAudioPath) await assertFileValid(backgroundAudioPath, allowRemoteRequests);
 
   checkTransition(defaults.transition);
 
@@ -53,21 +54,17 @@ const Editly = async (config = {}) => {
   assert(outPath, 'Please provide an output path');
   assert(clipsIn.length > 0, 'Please provide at least 1 clip');
 
-  const clips = await parseConfig({ defaults, clips: clipsIn, allowRemoteRequests, ffprobePath });
-
-  const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose });
+  const { clips, arbitraryAudio } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath });
+  if (verbose) console.log('Calculated', JSON5.stringify({ clips, arbitraryAudio }, null, 2));
 
   const outDir = dirname(outPath);
   const tmpDir = join(outDir, `editly-tmp-${nanoid()}`);
   if (verbose) console.log({ tmpDir });
-  await fs.remove(tmpDir);
   await fs.mkdirp(tmpDir);
 
-  if (!audioFilePath && keepSourceAudio) {
-    audioFilePath = await editAudio({ clips, tmpDir });
-  }
+  const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir });
 
-  if (verbose) console.log(JSON5.stringify(clips, null, 2));
+  const audioFilePath = !isGif ? await editAudio({ keepSourceAudio, arbitraryAudio, clipsAudioVolume, clips, audioNorm }) : undefined;
 
   // Try to detect parameters from first video
   let firstVideoWidth;
@@ -193,8 +190,6 @@ const Editly = async (config = {}) => {
       '-y', outPath,
     ];
 
-    const loopAudioArgs = loopAudio ? ['-stream_loop', '-1'] : [];
-
     const args = [
       ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']),
 
@@ -205,7 +200,7 @@ const Editly = async (config = {}) => {
       '-r', framerateStr,
       '-i', '-',
 
-      ...(audioFilePath ? [...loopAudioArgs, '-i', audioFilePath, '-shortest'] : []),
+      ...(audioFilePath ? ['-i', audioFilePath] : []),
 
       ...(!isGif ? ['-map', '0:v:0'] : []),
       ...(audioFilePath ? ['-map', '1:a:0'] : []),
@@ -374,7 +369,7 @@ const Editly = async (config = {}) => {
     if (verbose) console.log('Cleanup');
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
-    await fs.remove(tmpDir);
+    if (!keepTmp) await fs.remove(tmpDir);
   }
 
   try {
@@ -389,7 +384,8 @@ const Editly = async (config = {}) => {
   console.log(outPath);
 };
 
-// Pure function to get a frame at a certain time (excluding transitions)
+// Pure function to get a frame at a certain time
+// TODO I think this does not respect transition durations
 async function renderSingleFrame({
   time = 0,
   defaults,

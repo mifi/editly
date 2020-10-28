@@ -1,0 +1,15 @@
+{
+  outPath: './audio3.mp4',
+  width: 200, height: 200,
+  clips: [
+    { layers: [{ type: 'video', path: './assets/lofoten.mp4', cutTo: 2 }, { type: 'title', text: 'Arbitrary audio' }] },
+    { duration: 3, layers: [{ type: 'title-background', text: 'Voice starts in 1 sec' }, { type: 'detached-audio', path: './assets/Julen_ribas.m4a', mixVolume: 50, cutFrom: 2, start: 1 }] },
+    { duration: 1, layers: [{ type: 'title-background', text: 'Voice continues over clip 2' }] }, 
+    { duration: 3, layers: [{ type: 'title-background', text: 'Voice continues over clip 3' }] },
+    { duration: 2, layers: [{ type: 'title-background', text: 'XP sound starts' }, { type: 'detached-audio', path: './assets/winxp.mp3', mixVolume: 10, cutFrom: 0.5 }] },
+  ],
+  audioNorm: { enable: true, gaussSize: 3, maxGain: 100 },
+  audioTracks: [
+    { path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', cutFrom: 18 },
+  ],
+}
