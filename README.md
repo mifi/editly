@@ -2,7 +2,7 @@
 
 [![demo](https://github.com/mifi/gifs/raw/master/commonFeatures.gif)](https://youtu.be/LNeclLkxUEY)
 
-This GIF / YouTube was created with this command: "editly [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)". See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples).
+This GIF / YouTube was created with this command: "editly [commonFeatures.json5](examples/commonFeatures.json5)". See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples).
 
 **Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images, audio and titles**, with smooth transitions and music overlaid.
 
@@ -206,7 +206,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 
 ### Layer types
 
-See [examples](https://github.com/mifi/editly/tree/master/examples) and [commonFeatures.json5](https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5)
+See [examples](https://github.com/mifi/editly/tree/master/examples) and [commonFeatures.json5](examples/commonFeatures.json5)
 
 #### Layer type 'video'
 
@@ -244,7 +244,7 @@ This is a special case of `audioTracks` that makes it easier to start the audio 
 
 `detached-audio` has the exact same properties as [audioTracks](#arbitrary-audio-tracks), except `start` time is relative to the clip's start.
 
-[Example of detached audio tracks](https://github.com/mifi/editly/blob/master/examples/audio3.json5)
+[Example of detached audio tracks](examples/audio3.json5)
 
 #### Layer type 'image'
 
@@ -322,19 +322,19 @@ Title with background
 
 #### Layer type 'canvas'
 
-See [customCanvas.js](https://github.com/mifi/editly/blob/master/examples/customCanvas.js)
+See [customCanvas.js](examples/customCanvas.js)
 
 - `func` - Custom JavaScript function
 
 #### Layer type 'fabric'
 
-See [customFabric.js](https://github.com/mifi/editly/blob/master/examples/customFabric.js)
+See [customFabric.js](examples/customFabric.js)
 
 - `func` - Custom JavaScript function
 
 #### Layer type 'gl'
 
-Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/examples/gl.json5) and [rainbow-colors.frag](https://github.com/mifi/editly/blob/master/shaders/rainbow-colors.frag)
+Loads a GLSL shader. See [gl.json5](examples/gl.json5) and [rainbow-colors.frag](shaders/rainbow-colors.frag)
 
 - `fragmentPath`
 - `vertexPath` (optional)
@@ -353,7 +353,7 @@ Loads a GLSL shader. See [gl.json5](https://github.com/mifi/editly/blob/master/e
 
 The difference between `audioTracks` and **Layer type 'audio'** is that `audioTracks` will continue to play across multiple `clips` and can start and stop whenever needed.
 
-See `audioTracks` [example](https://github.com/mifi/editly/blob/master/examples/audio2.json5)
+See `audioTracks` [example](examples/audio2.json5)
 
 See also **Layer type 'detached-audio'**.
 
@@ -363,7 +363,7 @@ You can enable audio normalization of the final output audio. This is useful if 
 
 `audioNorm` parameters are [documented here.](https://ffmpeg.org/ffmpeg-filters.html#dynaudnorm)
 
-[Example of audio ducking](https://github.com/mifi/editly/blob/master/examples/audio2.json5)
+[Example of audio ducking](examples/audio2.json5)
 
 ### Resize modes
 
@@ -376,8 +376,8 @@ You can enable audio normalization of the final output audio. This is useful if 
 Default `contain-blur`.
 
 See:
-- [image.json5](https://github.com/mifi/editly/blob/master/examples/image.json5)
-- [videos.json5](https://github.com/mifi/editly/blob/master/examples/videos.json5)
+- [image.json5](examples/image.json5)
+- [videos.json5](examples/videos.json5)
 
 ### Position parameter
 
@@ -387,7 +387,7 @@ Certain layers support the position parameter
   - `top`, `bottom` `center`, `top-left`, `top-right`, `center-left`, `center-right`, `bottom-left`, `bottom-right`
   - An object `{ x, y, originX = 'left', originY = 'top' }`, where `{ x: 0, y: 0 }` is the upper left corner of the screen, and `{ x: 1, y: 1 }` is the lower right corner, `x` is relative to video width, `y` to video height. `originX` and `originY` are optional, and specify the position's origin (anchor position) of the object.
 
-See [position.json5](https://github.com/mifi/editly/blob/master/examples/position.json5)
+See [position.json5](examples/position.json5)
 
 ### Ken Burns parameters
 
