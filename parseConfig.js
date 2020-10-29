@@ -218,7 +218,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
       // These audio tracks are detached from the clips (can run over multiple clips)
       // This is useful so we can have audio start relative to clip start time
       if (type === 'detached-audio') {
-        const { cutFrom, cutTo, mixVolume, start } = layer;
+        const { cutFrom, cutTo, mixVolume } = layer;
         if (!detachedAudioByClip[clipIndex]) detachedAudioByClip[clipIndex] = [];
         detachedAudioByClip[clipIndex].push({ path, cutFrom, cutTo, mixVolume, start });
         return undefined;

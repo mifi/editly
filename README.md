@@ -341,7 +341,7 @@ Loads a GLSL shader. See [gl.json5](examples/gl.json5) and [rainbow-colors.frag]
 
 ### Arbitrary audio tracks
 
-`audioTracks` property can optionally contain a list of objects which specify audio tracks that can be started at arbitrary times in the final video. These tracks will be mixed (`mixVolume` specifying a relative number for how loud each track is compared to the other tracks). `clipsAudioVolume` specifies the volume of **all** the audio from `clips` relative to the volume of **all** the `audioTracks`.
+`audioTracks` property can optionally contain a list of objects which specify audio tracks that can be started at arbitrary times in the final video. These tracks will be mixed together (`mixVolume` specifying a relative number for how loud each track is compared to the other tracks). Because audio from `clips` will be mixed separately from `audioTracks`, `clipsAudioVolume` specifies the volume of the **combined** audio from `clips` relative to the volume of **each of the audio tracks** from `audioTracks`.
 
 | Parameter | Description | Default | |
 |-|-|-|-|
