@@ -216,17 +216,18 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
       }
 
       // These audio tracks are detached from the clips (can run over multiple clips)
-      // This is useful so we can have audio start relative to clip start time
+      // This is useful so we can have audio start relative to their parent clip's start time
       if (type === 'detached-audio') {
         const { cutFrom, cutTo, mixVolume } = layer;
         if (!detachedAudioByClip[clipIndex]) detachedAudioByClip[clipIndex] = [];
         detachedAudioByClip[clipIndex].push({ path, cutFrom, cutTo, mixVolume, start });
-        return undefined;
+        return undefined; // Will be filtered out
       }
 
       return layer;
     });
 
+    // Filter out deleted layers
     layersOut = layersOut.filter((l) => l);
 
     return {
@@ -240,11 +241,12 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
   let totalClipDuration = 0;
   const clipDetachedAudio = [];
 
-  // Need to map again because now we know all clip durations
+  // Need to map again because now we know all clip durations, and we can adjust transitions so they are safe
   clipsOut = await pMap(clipsOut, async (clip, i) => {
     const nextClip = clipsOut[i + 1];
 
-    // We clamp all transitions to half the length of every clip
+    // We clamp all transitions to half the length of every clip. If not, we risk that clips that are too short,
+    // will be eaten by transitions and could cause de-sync issues with audio/video
     // NOTE: similar logic is duplicated in index.js
     let safeTransitionDuration = 0;
     if (nextClip) {
@@ -269,7 +271,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
     };
   });
 
-  // Audio can either come from `audioFilePath`, `audio` or from "detached" audio layers in clips
+  // Audio can either come from `audioFilePath`, `audio` or from "detached" audio layers from clips
   const arbitraryAudio = [
     // Background audio is treated just like arbitrary audio
     ...(backgroundAudioPath ? [{ path: backgroundAudioPath, mixVolume: 1, loop: loopAudio ? -1 : 0 }] : []),

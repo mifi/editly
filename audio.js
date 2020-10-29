@@ -95,7 +95,7 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
 
         if (processedAudioLayers.length === 1) return { clipAudioPath: processedAudioLayers[0].layerAudioPath };
 
-        // Merge/mix all layer's audio
+        // Merge/mix all layers' audio
         const weights = processedAudioLayers.map(({ audioLayer }) => (audioLayer.mixVolume != null ? audioLayer.mixVolume : 1));
         const args = [
           ...getFfmpegCommonArgs({ enableFfmpegLog }),
@@ -120,12 +120,12 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
     }, { concurrency: 4 });
   }
 
-  async function mergeFadeClipAudio(clipAudio) {
+  async function crossFadeConcatClipAudio(clipAudio) {
     if (clipAudio.length < 2) {
       return clipAudio[0].path;
     }
 
-    const mergedClipAudioPath = join(tmpDir, 'audio-merged.flac');
+    const outPath = join(tmpDir, 'audio-concat.flac');
 
     if (verbose) console.log('Combining audio', clipAudio.map(({ path }) => basename(path)));
 
@@ -149,11 +149,11 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
       filterGraph,
       '-c', 'flac',
       '-y',
-      mergedClipAudioPath,
+      outPath,
     ];
     await execa(ffmpegPath, args);
 
-    return mergedClipAudioPath;
+    return outPath;
   }
 
   async function mixArbitraryAudio({ streams, audioNorm }) {
@@ -214,19 +214,19 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
     if (clipAudio.every((ca) => ca.silent) && arbitraryAudio.length === 0) return undefined;
 
     // Merge & fade the clip audio files
-    const mergedClipAudioPath = await mergeFadeClipAudio(clipAudio);
+    const concatedClipAudioPath = await crossFadeConcatClipAudio(clipAudio);
 
     const streams = [
-      // The first stream is required, and it determines the length of the output audio.
-      // All other streams will be truncated to this length
-      { path: mergedClipAudioPath, mixVolume: clipsAudioVolume },
+      // The first stream is required, as it determines the length of the output audio.
+      // All other streams will be truncated to its length
+      { path: concatedClipAudioPath, mixVolume: clipsAudioVolume },
 
       ...arbitraryAudio,
     ];
 
     console.log('Mixing clip audio with arbitrary audio');
 
-    if (streams.length < 2) return mergedClipAudioPath;
+    if (streams.length < 2) return concatedClipAudioPath;
 
     const mixedFile = await mixArbitraryAudio({ streams, audioNorm });
     return mixedFile;
