@@ -5,6 +5,7 @@ const JSON5 = require('json5');
 const fs = require('fs-extra');
 const { nanoid } = require('nanoid');
 
+const { testFf } = require('./ffmpeg');
 const { parseFps, multipleOf2 } = require('./util');
 const { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } = require('./sources/fabric');
 const { createFrameSource } = require('./sources/frameSource');
@@ -42,6 +43,9 @@ const Editly = async (config = {}) => {
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
   } = config;
+
+  await testFf(ffmpegPath, 'ffmpeg');
+  await testFf(ffprobePath, 'ffprobe');
 
   const isGif = outPath.toLowerCase().endsWith('.gif');
 
