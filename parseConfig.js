@@ -167,15 +167,15 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
 
     // We need to map again, because for audio, we need to know the correct clipDuration
     layersOut = await pMap(layersOut, async (layerIn) => {
-      const { type, path, visibleUntil, visibleFrom = 0 } = layerIn;
+      const { type, path, stop, start = 0 } = layerIn;
 
-      // This feature allows the user to show another layer overlayed (or replacing) parts of the lower layers (visibleFrom - visibleUntil)
-      const visibleDuration = ((visibleUntil || clipDuration) - visibleFrom);
-      assert(visibleDuration > 0 && visibleDuration <= clipDuration, `Invalid visibleFrom ${visibleFrom} or visibleUntil ${visibleUntil} (${clipDuration})`);
+      // This feature allows the user to show another layer overlayed (or replacing) parts of the lower layers (start - stop)
+      const layerDuration = ((stop || clipDuration) - start);
+      assert(layerDuration > 0 && layerDuration <= clipDuration, `Invalid start ${start} or stop ${stop} (${clipDuration})`);
       // TODO Also need to handle video layers (speedFactor etc)
-      // TODO handle audio in case of visibleFrom/visibleTo
+      // TODO handle audio in case of start/stop
 
-      const layer = { ...layerIn, visibleFrom, visibleDuration };
+      const layer = { ...layerIn, start, layerDuration };
 
       if (type === 'audio') {
         const { duration: fileDuration } = await readAudioFileInfo(ffprobePath, path);

@@ -33,10 +33,10 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
         // Has user enabled keep source audio?
         if (!keepSourceAudio) return createSilence();
 
-        const audioLayers = layers.filter(({ type, visibleFrom, visibleUntil }) => (
+        const audioLayers = layers.filter(({ type, start, stop }) => (
           ['audio', 'video'].includes(type)
-          // TODO: We don't support audio for visibleFrom/visibleUntil layers
-          && !visibleFrom && visibleUntil == null));
+          // TODO: We don't support audio for start/stop layers
+          && !start && stop == null));
 
         if (audioLayers.length === 0) return createSilence();
 

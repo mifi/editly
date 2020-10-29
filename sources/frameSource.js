@@ -52,8 +52,8 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
 
     // eslint-disable-next-line no-restricted-syntax
     for (const { frameSource, layer } of layerFrameSources) {
-      // console.log({ visibleFrom: layer.visibleFrom, visibleUntil: layer.visibleUntil, visibleDuration: layer.visibleDuration, time });
-      const offsetProgress = (time - (layer.visibleFrom)) / layer.visibleDuration;
+      // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });
+      const offsetProgress = (time - (layer.start)) / layer.layerDuration;
       // console.log({ offsetProgress });
       const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
 

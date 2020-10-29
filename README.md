@@ -189,8 +189,8 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `clips[].transition` | | Specify transition at the **end** of this clip. See `defaults.transition` | `defaults.transition` | |
 | `clips[].layers[]` | | List of layers within the current clip that will be overlaid in their natural order (final layer on top) | | |
 | `clips[].layers[].type` | | Layer type, see below | | |
-| `clips[].layers[].visibleFrom` | | What time into the clip should this layer start | | sec |
-| `clips[].layers[].visibleUntil` | | What time into the clip should this layer stop | | sec |
+| `clips[].layers[].start` | | What time into the clip should this layer start | | sec |
+| `clips[].layers[].stop` | | What time into the clip should this layer stop | | sec |
 | `audioTracks[]` | | List of arbitrary audio tracks. See [audio tracks](#arbitrary-audio-tracks). | `[]` | |
 | `audioFilePath` | `--audio-file-path` | Set an audio track for the whole video. See also [audio tracks](#arbitrary-audio-tracks) | | |
 | `loopAudio` | `--loop-audio` | Loop the audio track if it is shorter than video? | `false` | |
