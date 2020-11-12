@@ -416,6 +416,7 @@ This project is maintained by me alone. The project will always remain free and 
 - https://github.com/transitive-bullshit/awesome-ffmpeg
 - https://github.com/sjfricke/awesome-webgl
 - https://www.mltframework.org/docs/melt/
+- Icon made by [Freepik](https://www.flaticon.com/authors/freepik) from [www.flaticon.com](https://www.flaticon.com/)
 
 ## Videos made by you
 
