@@ -1,14 +1,14 @@
-# EDITLY 🏄‍♀️
-
-[![demo](https://github.com/mifi/gifs/raw/master/commonFeatures.gif)](https://youtu.be/LNeclLkxUEY)
-
-This GIF / YouTube was created with this command: "editly [commonFeatures.json5](examples/commonFeatures.json5)". See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples).
+![](logo.png)
 
 **Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images, audio and titles**, with smooth transitions and music overlaid.
 
 Editly has a simple CLI for quickly assembling a video from a set of clips or images, or you can use its more flexible JavaScript API.
 
 Inspired by [ffmpeg-concat](https://github.com/transitive-bullshit/ffmpeg-concat), editly is much faster and doesn't require much storage because it uses **streaming** editing. Editly aims to be very extensible and feature rich with a pluggable interface for adding new **dynamic content**.
+
+[![demo](https://github.com/mifi/gifs/raw/master/commonFeatures.gif)](https://youtu.be/LNeclLkxUEY)
+
+This GIF / YouTube was created with this command: "editly [commonFeatures.json5](examples/commonFeatures.json5)". See [more examples here](https://github.com/mifi/editly/tree/master/examples#examples).
 
 ## Features
 
