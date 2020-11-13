@@ -259,7 +259,7 @@ See also See [Ken Burns parameters](#ken-burns-parameters).
 
 #### Layer type 'image-overlay'
 
-Image overlay with a custom position and size on the screen.
+Image overlay with a custom position and size on the screen. NOTE: If you want to use animated GIFs use `video` instead.
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
