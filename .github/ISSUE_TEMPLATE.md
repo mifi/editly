@@ -1,3 +1,3 @@
-- [ ] I have tried with the newest version of editly: `npm i -g editly`
+- [ ] I have tried with the newest version of editly: `npm i -g editly` or `npm i editly@latest`
 - [ ] I have tried ffmpeg newest stable version
 - [ ] I have searched for existing issues
