@@ -1,0 +1,9 @@
+{
+  outPath: './vignette.mp4',
+  clips: [
+    { layers: [
+      { type: 'video', path: './assets/tungestolen.mp4', cutTo: 2 },
+      { type: 'image', path: './assets/vignette.png', resizeMode: 'stretch', zoomDirection: null },
+    ] },
+  ],
+}

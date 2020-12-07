@@ -26,6 +26,7 @@ This GIF / YouTube was created with this command: "editly [commonFeatures.json5]
 - Overlay transparent images or even videos with alpha channel
 - Show different sub-clips for parts of a clips duration (B-roll)
 - Picture-in-picture
+- Vignette
 - Preserve/mix multiple audio sources
 - Automatic audio crossfading
 - Automatic audio ducking and normalization
