@@ -40,6 +40,7 @@ const Editly = async (config = {}) => {
     allowRemoteRequests,
     audioNorm,
     outputVolume,
+    customOutputArgs,
 
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
@@ -177,13 +178,16 @@ const Editly = async (config = {}) => {
     return runGlTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams });
   }
 
-  function startFfmpegWriterProcess() {
+  function getOutputArgs() {
+    if (customOutputArgs) {
+      assert(Array.isArray(customOutputArgs), 'customOutputArgs must be an array of arguments');
+      return customOutputArgs;
+    }
+
     // https://superuser.com/questions/556029/how-do-i-convert-a-video-to-gif-using-ffmpeg-with-reasonable-quality
-    const outputArgs = isGif ? [
-      '-vf',
-      `format=rgb24,fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
+    const videoOutputArgs = isGif ? [
+      '-vf', `format=rgb24,fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
       '-loop', 0,
-      '-y', outPath,
     ] : [
       '-vf', 'format=yuv420p',
       '-vcodec', 'libx264',
@@ -192,9 +196,14 @@ const Editly = async (config = {}) => {
       '-crf', '18',
 
       '-movflags', 'faststart',
-      '-y', outPath,
     ];
 
+    const audioOutputArgs = audioFilePath ? ['-acodec', 'aac', '-b:a', '128k'] : [];
+
+    return [...audioOutputArgs, ...videoOutputArgs];
+  }
+
+  function startFfmpegWriterProcess() {
     const args = [
       ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']),
 
@@ -210,9 +219,9 @@ const Editly = async (config = {}) => {
       ...(!isGif ? ['-map', '0:v:0'] : []),
       ...(audioFilePath ? ['-map', '1:a:0'] : []),
 
-      ...(audioFilePath ? ['-acodec', 'aac', '-b:a', '128k'] : []),
+      ...getOutputArgs(),
 
-      ...outputArgs,
+      '-y', outPath,
     ];
     if (verbose) console.log('ffmpeg', args.join(' '));
     return execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'pipe', stdout: process.stdout, stderr: process.stderr });

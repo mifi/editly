@@ -176,6 +176,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `width` | `--width` | Width which all media will be converted to | `640` | |
 | `height` | `--height` | Height which all media will be converted to | auto based on `width` and aspect ratio of **first video** | |
 | `fps` | `--fps` | FPS which all videos will be converted to | First video FPS or `25` | |
+| `customOutputArgs` | | Specify custom output codec/format arguments for ffmpeg (See [example](https://github.com/mifi/editly/blob/master/examples/customOutputArgs.json5)) | auto (h264) | |
 | `allowRemoteRequests` | `--allow-remote-requests` | Allow remote URLs as paths | `false` | |
 | `fast` | `--fast`, `-f` | Fast mode (low resolution and FPS, useful for getting a quick preview ⏩) | `false` | |
 | `defaults.layer.fontPath` | `--font-path` | Set default font to a .ttf | System font | |
