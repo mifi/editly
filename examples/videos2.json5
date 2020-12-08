@@ -6,6 +6,7 @@
     transition: {
       name: 'linearblur',
     },
+    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
   },
   clips: [
     { layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0, cutTo: 2 }, { type: 'title', text: 'Video 1' }] },
