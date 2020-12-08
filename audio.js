@@ -156,7 +156,7 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
     return outPath;
   }
 
-  async function mixArbitraryAudio({ streams, audioNorm }) {
+  async function mixArbitraryAudio({ streams, audioNorm, outputVolume }) {
     let maxGain = 30;
     let gaussSize = 5;
     if (audioNorm) {
@@ -173,8 +173,9 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
       return `[${i}]atrim=start=${cutFrom || 0}${cutToArg},adelay=delays=${Math.floor((start || 0) * 1000)}:all=1${apadArg}[a${i}]`;
     }).join(';');
 
+    const volumeArg = outputVolume != null ? `,volume=${outputVolume}` : '';
     const audioNormArg = enableAudioNorm ? `,dynaudnorm=g=${gaussSize}:maxgain=${maxGain}` : '';
-    filterComplex += `;${streams.map((s, i) => `[a${i}]`).join('')}amix=inputs=${streams.length}:duration=first:dropout_transition=0:weights=${streams.map((s) => (s.mixVolume != null ? s.mixVolume : 1)).join(' ')}${audioNormArg}`;
+    filterComplex += `;${streams.map((s, i) => `[a${i}]`).join('')}amix=inputs=${streams.length}:duration=first:dropout_transition=0:weights=${streams.map((s) => (s.mixVolume != null ? s.mixVolume : 1)).join(' ')}${audioNormArg}${volumeArg}`;
 
     const mixedAudioPath = join(tmpDir, 'audio-mixed.flac');
 
@@ -198,7 +199,7 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
   }
 
 
-  async function editAudio({ keepSourceAudio, clips, arbitraryAudio, clipsAudioVolume, audioNorm }) {
+  async function editAudio({ keepSourceAudio, clips, arbitraryAudio, clipsAudioVolume, audioNorm, outputVolume }) {
     // We need clips to process audio, because we need to know duration
     if (clips.length === 0) return undefined;
 
@@ -228,7 +229,7 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
 
     if (streams.length < 2) return concatedClipAudioPath;
 
-    const mixedFile = await mixArbitraryAudio({ streams, audioNorm });
+    const mixedFile = await mixArbitraryAudio({ streams, audioNorm, outputVolume });
     return mixedFile;
   }
 

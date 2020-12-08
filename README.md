@@ -144,6 +144,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
   loopAudio: false,
   keepSourceAudio: false,
   clipsAudioVolume: 1,
+  outputVolume: 1,
   audio: [
     {
       path,
@@ -197,6 +198,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `loopAudio` | `--loop-audio` | Loop the audio track if it is shorter than video? | `false` | |
 | `keepSourceAudio` | `--keep-source-audio` | Keep source audio from `clips`? | `false` | |
 | `clipsAudioVolume` | | Volume of audio from `clips` relative to `audioTracks`. See [audio tracks](#arbitrary-audio-tracks). | `1` | |
+| `outputVolume` | `--output-volume` | Adjust output [volume](http://ffmpeg.org/ffmpeg-filters.html#volume) (final stage). See [example](https://github.com/mifi/editly/blob/master/examples/audio-volume.json5) | `1` | e.g. `0.5` or `10dB` |
 | `audioNorm.enable` | | Enable audio normalization? See [audio normalization](#audio-normalization). | `false` | |
 | `audioNorm.gaussSize` | | Audio normalization gauss size. See [audio normalization](#audio-normalization). | `5` | |
 | `audioNorm.maxGain` | | Audio normalization max gain. See [audio normalization](#audio-normalization). | `30` | |
