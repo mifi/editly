@@ -404,8 +404,8 @@ getting all the right versions of dependencies on your system.
 
 ```
 docker-compose up
-docker-compose run container bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"
-docker cp container:/outputs/audio1.mp4
+docker-compose run editly bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"
+docker cp editly:/outputs/audio1.mp4
 ```
 
 ## Troubleshooting

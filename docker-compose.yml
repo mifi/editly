@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  container:
+  editly:
     container_name: editly
     image: editly/editly:latest
     build:
