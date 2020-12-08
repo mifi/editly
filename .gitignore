@@ -103,7 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
-
+# Generated files and excluded assets repo
 /examples/assets
-/examples/*.mp4
-/examples/*.gif
+editly-tmp-*/
+*.mp4
+*.gif
