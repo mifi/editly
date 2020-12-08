@@ -2,6 +2,9 @@
   // enableFfmpegLog: true,
   outPath: './audio2.mp4',
   width: 200, height: 200,
+  defaults: {
+    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+  },
   clips: [
     { layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 1, cutTo: 2 }] },
     { duration: 15, layers: { type: 'title-background', text: 'Audio track' } },

@@ -4,6 +4,7 @@
   keepSourceAudio: true,
   defaults: {
     transition: null,
+    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
   },
   clips: [
     { duration: 0.5, layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 }] },

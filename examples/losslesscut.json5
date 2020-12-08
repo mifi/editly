@@ -7,7 +7,7 @@
   audioFilePath: './Believe - Roa [Vlog No Copyright Music]-qldyHxWPFUY.m4a',
   defaults: {
     transition: { name: 'crossZoom', duration: 1 },
-    layer: { fontPath: './Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
   },
   clips: [
     { duration: 3, layers: [{ type: 'title-background', text: 'LosslessCut', background: { type: 'linear-gradient' } }] },
