@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  container:
+    container_name: editly
+    image: editly/editly:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "outputs:/outputs"
+
+volumes:
+  outputs:

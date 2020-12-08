@@ -397,6 +397,17 @@ See [position.json5](examples/position.json5)
 | `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out` or `null` to disable | | |
 | `zoomAmount` | Zoom amount for Ken Burns effect | `0.1` | |
 
+## Docker
+
+This should help you use editly as a containerized CLI, without worrying about
+getting all the right versions of dependencies on your system.
+
+```
+docker-compose up
+docker-compose run container bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"
+docker cp container:/outputs/audio1.mp4
+```
+
 ## Troubleshooting
 
 - If you get `Error: The specified module could not be found.`, try: `npm un -g editly && npm i -g --build-from-source editly` (see [#15](https://github.com/mifi/editly/issues/15))
