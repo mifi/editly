@@ -425,6 +425,7 @@ This project is maintained by me alone. The project will always remain free and 
 
 ## See also
 
+- https://github.com/JonnyBurger/remotion - Awesome React based alternative to editly (not open source)
 - https://github.com/h2non/videoshow - Inspired editly
 - https://github.com/transitive-bullshit/ffmpeg-concat - Inspired editly
 - http://www.quasimondo.com/BoxBlurForCanvas/FastBlurDemo.html - Fast blur effect used in editly
