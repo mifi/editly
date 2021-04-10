@@ -46,6 +46,7 @@ const Editly = async (config = {}) => {
     ffprobePath = 'ffprobe',
     logoPath,
     logoWidth,
+    logoHeight,
     logoX,
     logoY,
   } = config;
@@ -188,12 +189,15 @@ const Editly = async (config = {}) => {
       return customOutputArgs;
     }
 
+    // if one of logo height or width has been specified, retain logo aspect ratio
+    var logoW = logoWidth ? (width + '*' + logoWidth) : 'oh*mdar';
+    var logoH = logoHeight ? (height + '*' + logoHeight) : 'ow/mdar';
     // https://superuser.com/questions/556029/how-do-i-convert-a-video-to-gif-using-ffmpeg-with-reasonable-quality
     const videoOutputArgs = isGif ? [
       '-vf', `format=rgb24,fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
       '-loop', 0,
     ] : [
-      ...(logoPath ? ['-filter_complex', '[0]format=yuv420p[main],[1][main]scale2ref=w=ceil(' + width + '*' + logoWidth + '/2)*2:h=ow/mdar[logo][mainvid];[mainvid][logo]overlay=x=' + width + '*' + logoX + '-overlay_w:y=' + height + '*' + logoY + '-overlay_h'] : ['-vf', 'format=yuv420p']),
+      ...(logoPath ? ['-filter_complex', '[0]format=yuv420p[main],[1][main]scale2ref=w=ceil(' + logoW + '/2)*2:h=ceil(' + logoH + '/2)*2[logo][mainvid];[mainvid][logo]overlay=x=' + width + '*' + logoX + ':y=' + height + '*' + logoY + '-overlay_h'] : ['-vf', 'format=yuv420p']),
       // scale2ref= scales the logo, keeping its aspect ratio, with outputs [logo] and [mainvid]
       // overlay= overlays [logo] onto [mainvid]
       '-vcodec', 'libx264',
