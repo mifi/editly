@@ -100,7 +100,7 @@ const cli = meow(`
     params.clips = clips.map((clip) => ({ layers: [clip] }));
   }
 
-  const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath, keepSourceAudio, loopAudio, outputVolume, allowRemoteRequests } = cli.flags;
+  const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath, keepSourceAudio, loopAudio, outputVolume, allowRemoteRequests, logoPath, logoWidth, logoX, logoY } = cli.flags;
 
   if (transitionName || transitionDuration != null) {
     params.defaults.transition = {};
@@ -125,6 +125,10 @@ const cli = meow(`
   if (width) params.width = width;
   if (height) params.height = height;
   if (fps) params.fps = fps;
+
+  if (!params.logoWidth) params.logoWidth = '0.2';
+  if (!params.logoX) params.logoX = '0.99';
+  if (!params.logoY) params.logoY = '0.95';
 
   if (fast) params.fast = fast;
   if (verbose) params.verbose = verbose;

@@ -44,6 +44,10 @@ const Editly = async (config = {}) => {
 
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
+    logoPath,
+    logoWidth,
+    logoX,
+    logoY,
   } = config;
 
   await testFf(ffmpegPath, 'ffmpeg');
@@ -142,15 +146,15 @@ const Editly = async (config = {}) => {
   let fps;
   let framerateStr;
 
-  if (fast) {
+  if (isGif) {
+    fps = 10;
+    framerateStr = String(fps);
+  } else if (fast) {
     fps = 15;
     framerateStr = String(fps);
   } else if (requestedFps && typeof requestedFps === 'number') {
     fps = requestedFps;
     framerateStr = String(requestedFps);
-  } else if (isGif) {
-    fps = 10;
-    framerateStr = String(fps);
   } else if (firstVideoFramerateStr) {
     fps = parseFps(firstVideoFramerateStr);
     framerateStr = firstVideoFramerateStr;
@@ -189,7 +193,9 @@ const Editly = async (config = {}) => {
       '-vf', `format=rgb24,fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
       '-loop', 0,
     ] : [
-      '-vf', 'format=yuv420p',
+      ...(logoPath ? ['-filter_complex', '[0]format=yuv420p[main],[1][main]scale2ref=w=ceil(' + width + '*' + logoWidth + '/2)*2:h=ow/mdar[logo][mainvid];[mainvid][logo]overlay=x=' + width + '*' + logoX + '-overlay_w:y=' + height + '*' + logoY + '-overlay_h'] : ['-vf', 'format=yuv420p']),
+      // scale2ref= scales the logo, keeping its aspect ratio, with outputs [logo] and [mainvid]
+      // overlay= overlays [logo] onto [mainvid]
       '-vcodec', 'libx264',
       '-profile:v', 'high',
       ...(fast ? ['-preset:v', 'ultrafast'] : ['-preset:v', 'medium']),
@@ -214,10 +220,11 @@ const Editly = async (config = {}) => {
       '-r', framerateStr,
       '-i', '-',
 
+      ...(logoPath && !isGif ? ['-i', logoPath] : []),
       ...(audioFilePath ? ['-i', audioFilePath] : []),
 
       ...(!isGif ? ['-map', '0:v:0'] : []),
-      ...(audioFilePath ? ['-map', '1:a:0'] : []),
+      ...(audioFilePath ? ['-map', (logoPath && !isGif ? '2' : '1') + ':a:0'] : []),
 
       ...getOutputArgs(),
 
