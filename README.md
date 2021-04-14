@@ -203,6 +203,11 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
 | `audioNorm.enable` | | Enable audio normalization? See [audio normalization](#audio-normalization). | `false` | |
 | `audioNorm.gaussSize` | | Audio normalization gauss size. See [audio normalization](#audio-normalization). | `5` | |
 | `audioNorm.maxGain` | | Audio normalization max gain. See [audio normalization](#audio-normalization). | `30` | |
+| `logoPath` | | Path to logo image. Only local paths are supported, even with `allowRemoteRequests`. Logo parameters are ignored if output is a `.gif`. | | |
+| `logoWidth` | | Logo width relative to screen width. Specify only one of `logoWidth` or `logoHeight` to retain the aspect ratio of the logo. | 0.2 | `0` to `1` |
+| `logoHeight` | | Logo height relative to screen height. Specify only one of `logoWidth` or `logoHeight` to retain the aspect ratio of the logo.| | `0` to `1` |
+| `logoX` | | X-position of the left edge of the logo relative to the screen width. | 0.78 | `0` to `1` |
+| `logoY` | | Y-position of the bottom edge of the logo relative to the screen height. | 0.98 | `0` to `1` |
 
 ### Transition types
 
