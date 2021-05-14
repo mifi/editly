@@ -342,6 +342,11 @@ Loads a GLSL shader. See [gl.json5](examples/gl.json5) and [rainbow-colors.frag]
 
 - `fragmentPath`
 - `vertexPath` (optional)
+- `fragmentSrc` (optional)
+- `vertexSrc` (optional)
+- `glParamsTypes` (optional)
+- `glDefaultParams` (optional)
+- `glParams` (optional)
 
 ### Arbitrary audio tracks
 
