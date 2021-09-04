@@ -415,7 +415,7 @@ async function renderSingleFrame({
   ffmpegPath = 'ffmpeg',
   outPath = `${Math.floor(Math.random() * 1e12)}.png`,
 }) {
-  const clips = await parseConfig({ defaults, clips: clipsIn, allowRemoteRequests, ffprobePath });
+  const clips = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: [], allowRemoteRequests, ffprobePath });
   let clipStartTime = 0;
   const clip = clips.find((c) => {
     if (clipStartTime <= time && clipStartTime + c.duration > time) return true;
