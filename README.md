@@ -423,6 +423,15 @@ This project is maintained by me alone. The project will always remain free and 
 
 [Paypal](https://paypal.me/mifino)
 
+## Thanks
+
+This package would not exist without the support and help from all the contributors and sponsors!
+
+**Special thanks to:**
+
+- [Patrick Connolly](https://github.com/patcon) - docker-compose support
+- [Skayo](https://github.com/Skayo) - Typescript support
+
 ## See also
 
 - https://github.com/JonnyBurger/remotion - Awesome React based alternative to editly (not open source)
@@ -438,14 +447,6 @@ This project is maintained by me alone. The project will always remain free and 
 ## Videos made by you
 
 Submit a PR if you want to share your videos or project created with editly here.
-
-## Thanks
-
-This package would not exist without the support and help from all the contributors and sponsors!
-
-**Special thanks to:**
-- [patcon](https://github.com/patcon) - docker-compose support
-- [Skayo](https://github.com/Skayo) - Typescript support
 
 ---
 
