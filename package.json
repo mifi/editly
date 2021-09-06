@@ -6,7 +6,8 @@
   "types": "index.d.ts",
   "author": "Mikael Finstad <finstaden@gmail.com>",
   "contributors": [
-    "Skayo (https://skayo.dev)"
+    "Patrick Connolly <patrick.c.connolly@gmail.com> (https://github.com/patcon)",
+    "Skayo <contact@skayo.dev> (https://skayo.dev)"
   ],
   "license": "MIT",
   "dependencies": {
