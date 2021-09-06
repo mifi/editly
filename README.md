@@ -439,6 +439,14 @@ This project is maintained by me alone. The project will always remain free and 
 
 Submit a PR if you want to share your videos or project created with editly here.
 
+## Thanks
+
+This package would not exist without the support and help from all the contributors and sponsors!
+
+**Special thanks to:**
+- [Skayo](https://github.com/Skayo) - Typescript support
+- [patcon](https://github.com/patcon) - docker-compose support
+
 ---
 
 Made with ❤️ in 🇳🇴
