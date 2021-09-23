@@ -421,7 +421,7 @@ docker cp editly:/outputs/audio1.mp4 .
 
 This project is maintained by me alone. The project will always remain free and open source, but if it's useful for you, consider supporting me. :) It will give me extra motivation to improve it.
 
-[Paypal](https://paypal.me/mifino)
+[Paypal](https://paypal.me/mifino/usd)
 
 ## See also
 
@@ -438,6 +438,8 @@ This project is maintained by me alone. The project will always remain free and 
 ## Videos made by you
 
 Submit a PR if you want to share your videos or project created with editly here.
+
+- https://www.youtube.com/channel/UCDUauYxuY5Cv1Z6AuD3UGDw?view_as=subscriber
 
 ---
 
