@@ -1,7 +1,8 @@
 const fs = require('fs-extra');
 const execa = require('execa');
 const assert = require('assert');
-const gte = require('semver/functions/gte');
+const compareVersions = require('compare-versions');
+
 
 const getFfmpegCommonArgs = ({ enableFfmpegLog }) => (enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']);
 
@@ -15,7 +16,7 @@ async function createConcatFile(segments, concatFilePath) {
 }
 
 async function testFf(exePath, name) {
-  const requiredVersion = '4.3.1';
+  const minRequiredVersion = '4.3.1';
 
   try {
     const { stdout } = await execa(exePath, ['-version']);
@@ -24,9 +25,9 @@ async function testFf(exePath, name) {
     assert(match, 'Unknown version string');
     const versionStr = match[1];
     console.log(`${name} version ${versionStr}`);
-    assert(gte(versionStr, requiredVersion), 'Version is outdated');
+    assert(compareVersions(versionStr, minRequiredVersion, '>='), 'Version is outdated');
   } catch (err) {
-    console.error(`WARNING: ${name} issue:`, err.message);
+    console.error(`WARNING: ${name}:`, err.message);
   }
 }
 

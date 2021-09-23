@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "canvas": "^2.6.1",
+    "compare-versions": "^3.6.0",
     "execa": "^4.0.0",
     "fabric": "^4.1.0",
     "file-type": "^14.1.4",
@@ -23,8 +24,7 @@
     "meow": "^6.1.0",
     "nanoid": "^3.1.12",
     "ndarray": "^1.0.19",
-    "p-map": "^4.0.0",
-    "semver": "^7.3.2"
+    "p-map": "^4.0.0"
   },
   "scripts": {
     "test": "exit 0",
