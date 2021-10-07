@@ -423,6 +423,15 @@ This project is maintained by me alone. The project will always remain free and 
 
 [Paypal](https://paypal.me/mifino/usd)
 
+## Thanks
+
+This package would not exist without the support and help from all the contributors and sponsors!
+
+**Special thanks to:**
+
+- [Patrick Connolly](https://github.com/patcon) - docker-compose support
+- [Skayo](https://github.com/Skayo) - Typescript support
+
 ## See also
 
 - https://github.com/JonnyBurger/remotion - Awesome React based alternative to editly (not open source)
