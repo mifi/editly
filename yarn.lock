@@ -38,6 +38,11 @@
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
   integrity sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==
 
+"@types/fabric@^4.5.3":
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/@types/fabric/-/fabric-4.5.3.tgz#f4f2e1168d086a7ffe12e5cea4193d0cd6a526f7"
+  integrity sha512-DCneYSkuVdGYpFbDQ2j5zT7DDdAiOlAPfSjS3PsVWHFt6f/DapCdV0ansPq3Ai5oe+j6BgFhdkh+DWne1yQMdw==
+
 "@types/minimist@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
