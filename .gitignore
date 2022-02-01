@@ -104,7 +104,7 @@ dist
 .tern-port
 
 # Generated files and excluded assets repo
-/examples/assets
+# /examples/assets
 editly-tmp-*/
 *.mp4
 *.gif
