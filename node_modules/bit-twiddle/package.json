@@ -1,0 +1,68 @@
+{
+  "name": "bit-twiddle",
+  "version": "1.0.2",
+  "description": "Bit twiddling hacks for JavaScript",
+  "main": "twiddle.js",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/bit-twiddle.git"
+  },
+  "devDependencies": {
+    "tape": "^2.12.3"
+  },
+  "keywords": [
+    "bit",
+    "twiddle",
+    "hacks",
+    "graphics",
+    "logarithm",
+    "exponent",
+    "base 2",
+    "binary",
+    "arithmetic",
+    "octree",
+    "quadtree",
+    "math",
+    "nextPow2",
+    "log",
+    "shift",
+    "combination",
+    "permutation",
+    "trailing",
+    "zero",
+    "one",
+    "interleave",
+    "revere",
+    "parity",
+    "population",
+    "count",
+    "exponent",
+    "power",
+    "sign",
+    "min",
+    "max"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "f0b4adc66dfb632473c57632e87d3a23f3dd2680",
+  "testling": {
+    "files": "test/*.js",
+    "browsers": [
+      "ie/8..latest",
+      "firefox/17..latest",
+      "firefox/nightly",
+      "chrome/22..latest",
+      "chrome/canary",
+      "opera/12..latest",
+      "opera/next",
+      "safari/5.1..latest",
+      "ipad/6.0..latest",
+      "iphone/6.0..latest",
+      "android-browser/4.2..latest"
+    ]
+  }
+}

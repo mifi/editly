@@ -247,21 +247,22 @@ async function imageOverlayFrameSource({ params, width, height }) {
 }
 
 async function titleFrameSource({ width, height, params }) {
-  const { text, textColor = '#ffffff', fontFamily = defaultFontFamily, position = 'center', zoomDirection = 'in', zoomAmount = 0.2 } = params;
-
+  // console.log(params)
+  const { text, textColor = '#ffffff', fontFamily = defaultFontFamily, position = 'center', zoomDirection = 'in', zoomAmount = 0.2, fontSize = 0.1} = params;
   async function onRender(progress, canvas) {
     // console.log('progress', progress);
 
     const min = Math.min(width, height);
 
-    const fontSize = Math.round(min * 0.1);
+    const fontSizeAbs = Math.round(min * fontSize);
+    // console.log('FontSizeAbs: ', fontSizeAbs)
 
     const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
 
     const textBox = new fabric.Textbox(text, {
       fill: textColor,
       fontFamily,
-      fontSize,
+      fontSize: fontSizeAbs,
       textAlign: 'center',
       width: width * 0.8,
     });

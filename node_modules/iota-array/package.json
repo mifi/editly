@@ -1,0 +1,33 @@
+{
+  "name": "iota-array",
+  "version": "1.0.0",
+  "description": "Generates an array of consecutive integers starting at 0",
+  "main": "iota.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tape": "^2.12.3"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/iota-array.git"
+  },
+  "keywords": [
+    "iota",
+    "array",
+    "sequence",
+    "integer",
+    "range",
+    "apl",
+    "c++"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "cce24a4f0e1a6a8d60faa4f597c600de13d46145"
+}

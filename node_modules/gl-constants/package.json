@@ -1,0 +1,42 @@
+{
+  "name": "gl-constants",
+  "version": "1.0.0",
+  "description": "all the WebGL 1.0 constants",
+  "main": "./1.0/index.js",
+  "license": "MIT",
+  "author": {
+    "name": "Matt DesLauriers",
+    "email": "dave.des@gmail.com",
+    "url": "https://github.com/mattdesl"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tape": "^4.0.0"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "gl",
+    "webgl",
+    "glsl",
+    "stackgl",
+    "constant",
+    "constants",
+    "flag",
+    "flags",
+    "param",
+    "params",
+    "fields",
+    "field",
+    "options"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mattdesl/gl-constants.git"
+  },
+  "homepage": "https://github.com/mattdesl/gl-constants",
+  "bugs": {
+    "url": "https://github.com/mattdesl/gl-constants/issues"
+  }
+}

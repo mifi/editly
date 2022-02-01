@@ -516,7 +516,6 @@ declare namespace Editly {
 		 * Position.
 		 */
 		position?: Position;
-
 	}
 
 	interface SubtitleLayer extends BaseLayer {
@@ -703,7 +702,7 @@ declare namespace Editly {
 		 * Array of two colors.
 		 * Defaults to random colors.
 		 */
-		colors?: [ string, string ];
+		colors?: [string, string];
 
 	}
 
@@ -718,7 +717,7 @@ declare namespace Editly {
 		 * Array of two colors.
 		 * Defaults to random colors.
 		 */
-		colors?: [ string, string ];
+		colors?: [string, string];
 
 	}
 

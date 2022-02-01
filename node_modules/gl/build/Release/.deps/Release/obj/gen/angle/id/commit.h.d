@@ -1,0 +1,1 @@
+cmd_Release/obj/gen/angle/id/commit.h := ln -f "../angle/src/commit.h" "Release/obj/gen/angle/id/commit.h" 2>/dev/null || (rm -rf "Release/obj/gen/angle/id/commit.h" && cp -af "../angle/src/commit.h" "Release/obj/gen/angle/id/commit.h")

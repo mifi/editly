@@ -1,0 +1,35 @@
+{
+  "name": "glsl-tokenizer",
+  "version": "2.1.5",
+  "description": "r/w stream of glsl tokens",
+  "main": "string.js",
+  "directories": {
+    "test": "test"
+  },
+  "authors": [
+    "Hugh Kennedy <hughskennedy@gmail.com> (http://hughsk.io/)",
+    "Mikola Lysenko <mikolalysenko@gmail.com> (http://0fps.net)",
+    "Chris Dickinson <chris@neversaw.us> (http://neversaw.us)"
+  ],
+  "scripts": {
+    "test": "node test/index.js | tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/gl-modules/glsl-tokenizer.git"
+  },
+  "keywords": [
+    "glsl",
+    "tokenizer",
+    "stream"
+  ],
+  "author": "Chris Dickinson <chris@neversaw.us>",
+  "license": "MIT",
+  "dependencies": {
+    "through2": "^0.6.3"
+  },
+  "devDependencies": {
+    "tap-spec": "^1.0.1",
+    "tape": "^3.0.2"
+  }
+}

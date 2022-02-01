@@ -1,0 +1,40 @@
+{
+  "name": "dup",
+  "version": "1.0.0",
+  "description": "Initialize an array of arrays to a constant",
+  "main": "dup.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tap": "~0.4.1"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/dup.git"
+  },
+  "keywords": [
+    "dup",
+    "initialize",
+    "array",
+    "constant",
+    "numeric",
+    "rep",
+    "zeros",
+    "matlab",
+    "clear",
+    "ndarray",
+    "grid",
+    "matrix",
+    "vector",
+    "tensor"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "66f747c219c492e9450d2d5b7bf8fb5c74d57dc2"
+}

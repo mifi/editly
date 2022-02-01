@@ -1,0 +1,1 @@
+cmd_Release/translator_static.a := rm -f Release/translator_static.a && ./gyp-mac-tool filter-libtool libtool  -static -o Release/translator_static.a Release/obj.target/translator_static/angle/src/compiler/translator/ShaderLang.o Release/obj.target/translator_static/angle/src/compiler/translator/ShaderVars.o

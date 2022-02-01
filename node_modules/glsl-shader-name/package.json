@@ -1,0 +1,35 @@
+{
+  "name": "glsl-shader-name",
+  "version": "1.0.0",
+  "description": "Extract a shader's name from its source",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "babel-node test | tap-spec"
+  },
+  "author": {
+    "name": "Hugh Kennedy",
+    "email": "hughskennedy@gmail.com",
+    "url": "http://hughsk.io/"
+  },
+  "dependencies": {
+    "atob-lite": "^1.0.0",
+    "glsl-tokenizer": "^2.0.2"
+  },
+  "devDependencies": {
+    "babel": "^5.5.8",
+    "tap-spec": "^4.0.0",
+    "tape": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/stackgl/glsl-shader-name.git"
+  },
+  "keywords": [
+    "ecosystem:stackgl"
+  ],
+  "homepage": "https://github.com/stackgl/glsl-shader-name",
+  "bugs": {
+    "url": "https://github.com/stackgl/glsl-shader-name/issues"
+  }
+}

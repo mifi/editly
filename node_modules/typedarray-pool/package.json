@@ -1,0 +1,56 @@
+{
+  "name": "typedarray-pool",
+  "version": "1.2.0",
+  "description": "Reuse typed arrays",
+  "main": "pool.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bit-twiddle": "^1.0.0",
+    "dup": "^1.0.0"
+  },
+  "devDependencies": {
+    "tape": "^2.12.3"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/typedarray-pool.git"
+  },
+  "keywords": [
+    "typed",
+    "array",
+    "cache",
+    "pool",
+    "memory",
+    "malloc",
+    "free",
+    "reuse",
+    "optimize",
+    "construct",
+    "overhead"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "d7a8a448caf51042e6c371b11074aab6ebaf53ad",
+  "testling": {
+    "files": "test/*.js",
+    "browsers": [
+      "ie/10..latest",
+      "firefox/17..latest",
+      "firefox/nightly",
+      "chrome/22..latest",
+      "chrome/canary",
+      "opera/12..latest",
+      "opera/next",
+      "safari/6.0..latest",
+      "ipad/6.0..latest",
+      "iphone/6.0..latest",
+      "android-browser/4.2..latest"
+    ]
+  }
+}
