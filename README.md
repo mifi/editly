@@ -434,7 +434,7 @@ This package would not exist without the support and help from all the contribut
 
 ## See also
 
-- https://github.com/JonnyBurger/remotion - Awesome React based alternative to editly (not open source)
+- https://github.com/JonnyBurger/remotion - Awesome React based alternative to editly
 - https://github.com/pankod/canvas2video - Similar project based on Cairo
 - https://github.com/h2non/videoshow - Inspired editly
 - https://github.com/transitive-bullshit/ffmpeg-concat - Inspired editly
