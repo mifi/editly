@@ -145,7 +145,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
   keepSourceAudio: false,
   clipsAudioVolume: 1,
   outputVolume: 1,
-  audio: [
+  audioTracks: [
     {
       path,
       mixVolume: 1,
