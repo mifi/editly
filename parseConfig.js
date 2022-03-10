@@ -13,13 +13,13 @@ const { assertFileValid, checkTransition } = require('./util');
 const loadedFonts = [];
 
 
-async function validateArbitraryAudio(audio) {
+async function validateArbitraryAudio(audio, allowRemoteRequests) {
   assert(audio === undefined || Array.isArray(audio));
 
   if (audio) {
     // eslint-disable-next-line no-restricted-syntax
     for (const { path, cutFrom, cutTo, start } of audio) {
-      await assertFileValid(path, false);
+      await assertFileValid(path, allowRemoteRequests);
 
       if (cutFrom != null && cutTo != null) assert(cutTo > cutFrom);
       if (cutFrom != null) assert(cutFrom >= 0);
@@ -279,7 +279,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
     ...clipDetachedAudio,
   ];
 
-  await validateArbitraryAudio(arbitraryAudio);
+  await validateArbitraryAudio(arbitraryAudio, allowRemoteRequests);
 
   return {
     clips: clipsOut,
