@@ -405,10 +405,14 @@ See [position.json5](examples/position.json5)
 This should help you use editly as a containerized CLI, without worrying about
 getting all the right versions of dependencies on your system.
 
-```
-docker-compose up
-docker-compose run editly bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"
-docker cp editly:/outputs/audio1.mp4 .
+```bash
+$ git clone https://github.com/mifi/editly.git
+$ cd editly/examples
+$ git clone https://github.com/mifi/editly-assets.git assets
+$ cd ..
+$ docker-compose up
+$ docker-compose run editly bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"
+$ docker cp editly:/outputs/audio1.mp4 .
 ```
 
 ## Troubleshooting
