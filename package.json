@@ -17,7 +17,7 @@
     "fabric": "^4.1.0",
     "file-type": "^14.1.4",
     "file-url": "^3.0.0",
-    "fs-extra": "^9.0.0",
+    "fs-extra": "^10.1.0",
     "gl": "^5.0.0",
     "gl-buffer": "^2.1.2",
     "gl-shader": "^4.2.1",
