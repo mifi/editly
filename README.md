@@ -1,6 +1,6 @@
 ![](logo.png)
 
-[![Discord](https://img.shields.io/discord/986052452245700659)](https://discord.com/channels/986052452245700659) [![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/mifino/usd)
+[![Discord](https://img.shields.io/discord/986052452245700659)](https://discord.gg/P3u6zKbDK7) [![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/mifino/usd)
 
 **Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images, audio and titles**, with smooth transitions and music overlaid.
 
