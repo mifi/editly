@@ -18,10 +18,12 @@ module.exports = ({ width, height, channels }) => {
       return ndarray(buf, [width, height, channels], [channels, width * channels, 1]);
     }
 
-    const buffer = createBuffer(gl,
+    const buffer = createBuffer(
+      gl,
       [-1, -1, -1, 4, 4, -1],
       gl.ARRAY_BUFFER,
-      gl.STATIC_DRAW);
+      gl.STATIC_DRAW,
+    );
 
     let transition;
 
