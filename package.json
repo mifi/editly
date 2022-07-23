@@ -15,7 +15,7 @@
     "compare-versions": "^3.6.0",
     "execa": "^4.0.0",
     "fabric": "^4.1.0",
-    "file-type": "^14.1.4",
+    "file-type": "^16.5.4",
     "file-url": "^3.0.0",
     "fs-extra": "^10.1.0",
     "gl": "^5.0.0",
