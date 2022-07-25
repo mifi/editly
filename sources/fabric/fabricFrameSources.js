@@ -397,6 +397,38 @@ async function slideInTextFrameSource({ width, height, params: { position, text,
   return { onRender };
 }
 
+async function interactiveTextFrameSource({ width, height, params: { position, text, fontSize, charSpacing = 0.1, color , fontFamily = defaultFontFamily,styles } = {} }) {
+  async function onRender(progress, canvas) {
+    const fontSizeAbs = Math.round(width * fontSize || 0.05);
+    let stylesMap = new Map();
+    if (styles) {
+      styles.forEach((item) => {
+        LayerStyleItem = stylesMap[item.lindex] || new Map();
+        LayerStyleItem[item.cindex] = item.style;
+        stylesMap[item.lindex] = LayerStyleItem
+      });
+    }
+    const { left, top, originX, originY } = getPositionProps({ position, width, height });
+    const textBox = new fabric.IText(text, {
+      fill: color|| '#ffffff',
+      fontFamily,
+      fontSize: fontSizeAbs,
+      charSpacing: width * charSpacing,
+      styles: stylesMap
+    });
+    textBox.setOptions({
+      originX,
+      originY,
+      top,
+      left
+
+    });
+    canvas.add(textBox);
+  }
+  return { onRender };
+}
+
+
 async function customFabricFrameSource({ canvas, width, height, params }) {
   return params.func(({ width, height, fabric, canvas, params }));
 }
@@ -412,4 +444,5 @@ module.exports = {
   imageFrameSource,
   imageOverlayFrameSource,
   slideInTextFrameSource,
+  interactiveTextFrameSource
 };

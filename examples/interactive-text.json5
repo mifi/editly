@@ -1,0 +1,181 @@
+{
+  width: 600,
+  height: 300,
+  outPath: "./interactiveText.mp4",
+  defaults: {
+    transition: { name: "directionalwarp" },
+    layer: {
+      fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf",
+    },
+  },
+  clips: [
+    {
+      duration: 3,
+      layers: [
+        { type: "rainbow-colors" },
+        {
+          type: "slide-in-text",
+          text: "m",
+          color: "#fcba03",
+          position: { x: 0.04, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.3,
+        },
+        {
+          type: "interactive-text",
+          text: "at",
+          color: "#fcba03",
+          position: { x: 0.3, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.3,
+          styles: [
+            {
+              lindex: 0,
+              cindex: 0,
+              style: {
+                strokeWidth: 3,
+                stroke: "white",
+                fill: "red",
+                shadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              },
+            },
+            {
+              lindex: 0,
+              cindex: 1,
+              style: {
+                strokeWidth: 3,
+                stroke: "white",
+                fill: "red",
+                shadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      duration: 3,
+      layers: [
+        { type: "rainbow-colors" },
+        {
+          type: "slide-in-text",
+          text: "b",
+          color: "#fcba03",
+          position: { x: 0.04, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.3,
+        },
+        {
+          type: "interactive-text",
+          text: "at",
+          color: "#fcba03",
+          position: { x: 0.23, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.3,
+          styles: [
+            {
+              lindex: 0,
+              cindex: 0,
+              style: {
+                strokeWidth: 3,
+                stroke: "white",
+                fill: "red",
+                shadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              },
+            },
+            {
+              lindex: 0,
+              cindex: 1,
+              style: {
+                strokeWidth: 3,
+                stroke: "white",
+                fill: "red",
+                shadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      duration: 3,
+      layers: [
+        { type: "rainbow-colors" },
+        {
+          type: "slide-in-text",
+          text: "f",
+          color: "#fcba03",
+          position: { x: 0.04, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.3,
+        },
+        {
+          type: "interactive-text",
+          text: "at",
+          color: "#fcba03",
+          position: { x: 0.23, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.3,
+          styles: [
+            {
+              lindex: 0,
+              cindex: 0,
+              style: {
+                strokeWidth: 3,
+                stroke: "white",
+                fill: "red",
+                shadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              },
+            },
+            {
+              lindex: 0,
+              cindex: 1,
+              style: {
+                strokeWidth: 3,
+                stroke: "white",
+                fill: "red",
+                shadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      duration: 3,
+      layers: [
+        { type: "rainbow-colors" },
+        {
+          type: "slide-in-text",
+          text: "h",
+          color: "#fcba03",
+          position: { x: 0.04, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.3,
+        },
+        {
+          type: "interactive-text",
+          text: "at",
+          color: "#fcba03",
+          position: { x: 0.23, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.3,
+          styles: [
+            {
+              lindex: 0,
+              cindex: 0,
+              style: {
+                strokeWidth: 3,
+                stroke: "white",
+                fill: "red",
+                shadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              },
+            },
+            {
+              lindex: 0,
+              cindex: 1,
+              style: {
+                strokeWidth: 3,
+                stroke: "white",
+                fill: "red",
+                shadow: "0px 0px 10px rgba(0,0,0,0.3)",
+              },
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}

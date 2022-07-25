@@ -3,7 +3,7 @@ const pMap = require('p-map');
 
 const { rgbaToFabricImage, createCustomCanvasFrameSource, createFabricFrameSource, createFabricCanvas, renderFabricCanvas } = require('./fabric');
 
-const { customFabricFrameSource, subtitleFrameSource, titleFrameSource, newsTitleFrameSource, fillColorFrameSource, radialGradientFrameSource, linearGradientFrameSource, imageFrameSource, imageOverlayFrameSource, slideInTextFrameSource } = require('./fabric/fabricFrameSources');
+const { customFabricFrameSource, subtitleFrameSource, titleFrameSource, newsTitleFrameSource,fillColorFrameSource, radialGradientFrameSource, linearGradientFrameSource, imageFrameSource, imageOverlayFrameSource, slideInTextFrameSource, interactiveTextFrameSource } = require('./fabric/fabricFrameSources');
 
 const createVideoFrameSource = require('./videoFrameSource');
 const { createGlFrameSource } = require('./glFrameSource');
@@ -19,6 +19,7 @@ const fabricFrameSources = {
   'fill-color': fillColorFrameSource,
   'news-title': newsTitleFrameSource,
   'slide-in-text': slideInTextFrameSource,
+  'interactive-text': interactiveTextFrameSource,
 };
 
 async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
