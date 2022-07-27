@@ -44,13 +44,15 @@ function createFabricCanvas({ width, height }) {
   return new fabric.StaticCanvas(null, { width, height });
 }
 
-async function renderFabricCanvas(canvas) {
+async function renderFabricCanvas(canvas, clear = true) {
   // console.time('canvas.renderAll');
   canvas.renderAll();
   // console.timeEnd('canvas.renderAll');
   const rgba = fabricCanvasToRgba(canvas);
-  canvas.clear();
-  canvas.dispose();
+  if (clear) {
+    canvas.clear();
+    canvas.dispose();
+  }
   return rgba;
 }
 
