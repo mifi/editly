@@ -8,11 +8,11 @@ function getRandomTransition() {
 
 // https://easings.net/
 
-function easeOutExpo(x) {
+export function easeOutExpo(x) {
   return x === 1 ? 1 : 1 - (2 ** (-10 * x));
 }
 
-function easeInOutCubic(x) {
+export function easeInOutCubic(x) {
   return x < 0.5 ? 4 * x * x * x : 1 - ((-2 * x + 2) ** 3) / 2;
 }
 
@@ -24,7 +24,7 @@ function getTransitionEasingFunction(easing, transitionName) {
   return (progress) => progress;
 }
 
-function calcTransition(defaults, transition, isLastClip) {
+export function calcTransition(defaults, transition, isLastClip) {
   if (transition === null || isLastClip) return { duration: 0 };
 
   const getTransitionDefault = (key) => (defaults.transition ? defaults.transition[key] : undefined);
@@ -60,9 +60,3 @@ function calcTransition(defaults, transition, isLastClip) {
     easingFunction: getTransitionEasingFunction(transitionOrDefault.easing, transitionOrDefault.name),
   };
 }
-
-export default {
-  calcTransition,
-  easeInOutCubic,
-  easeOutExpo,
-};

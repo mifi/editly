@@ -8,9 +8,18 @@ import {
   createFabricCanvas,
   renderFabricCanvas,
 } from './fabric';
-
-import { customFabricFrameSource, subtitleFrameSource, titleFrameSource, newsTitleFrameSource, fillColorFrameSource, radialGradientFrameSource, linearGradientFrameSource, imageFrameSource, imageOverlayFrameSource, slideInTextFrameSource } from './fabric/fabricFrameSources';
-
+import {
+  customFabricFrameSource,
+  subtitleFrameSource,
+  titleFrameSource,
+  newsTitleFrameSource,
+  fillColorFrameSource,
+  radialGradientFrameSource,
+  linearGradientFrameSource,
+  imageFrameSource,
+  imageOverlayFrameSource,
+  slideInTextFrameSource,
+} from './fabric/fabricFrameSources';
 import createVideoFrameSource from './videoFrameSource';
 import { createGlFrameSource } from './glFrameSource';
 

@@ -15,7 +15,7 @@ import Audio from './audio';
 
 const channels = 4;
 
-const Editly = async (config = {}) => {
+export const Editly = async (config = {}) => {
   const {
     // Testing options:
     enableFfmpegLog = false,
@@ -398,7 +398,7 @@ const Editly = async (config = {}) => {
 
 // Pure function to get a frame at a certain time
 // TODO I think this does not respect transition durations
-async function renderSingleFrame({
+export async function renderSingleFrame({
   time = 0,
   defaults,
   width = 800,
