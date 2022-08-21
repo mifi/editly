@@ -46,24 +46,22 @@ const cli = meow(`
   Examples
     $ editly title:'My video' clip1.mov clip2.mov title:'My slideshow' img1.jpg img2.jpg title:'THE END' --audio-file-path /path/to/music.mp3 --font-path /path/to/my-favorite-font.ttf
     $ editly my-editly.json5 --out output.gif
-`,
-  {
-    importMeta: import.meta,
-    flags: {
-      verbose: { type: 'boolean', alias: 'v' },
-      keepSourceAudio: { type: 'boolean' },
-      allowRemoteRequests: { type: 'boolean' },
-      fast: { type: 'boolean', alias: 'f' },
-      transitionDuration: { type: 'number' },
-      clipDuration: { type: 'number' },
-      width: { type: 'number' },
-      height: { type: 'number' },
-      fps: { type: 'number' },
-      loopAudio: { type: 'boolean' },
-      outputVolume: { type: 'string' },
-    },
-  }
-);
+`, {
+  importMeta: import.meta,
+  flags: {
+    verbose: { type: 'boolean', alias: 'v' },
+    keepSourceAudio: { type: 'boolean' },
+    allowRemoteRequests: { type: 'boolean' },
+    fast: { type: 'boolean', alias: 'f' },
+    transitionDuration: { type: 'number' },
+    clipDuration: { type: 'number' },
+    width: { type: 'number' },
+    height: { type: 'number' },
+    fps: { type: 'number' },
+    loopAudio: { type: 'boolean' },
+    outputVolume: { type: 'string' },
+  },
+});
 
 (async () => {
   let { json } = cli.flags;
