@@ -1,7 +1,7 @@
 import pMap from 'p-map';
 import { join, basename, resolve } from 'path';
 import execa from 'execa';
-import { flatMap } from 'lodash';
+import lodash from 'lodash';
 
 import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg.js';
 import { readFileStreams } from './util.js';
@@ -99,7 +99,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
         const weights = processedAudioLayers.map(({ audioLayer }) => (audioLayer.mixVolume != null ? audioLayer.mixVolume : 1));
         const args = [
           ...getFfmpegCommonArgs({ enableFfmpegLog }),
-          ...flatMap(processedAudioLayers, ({ layerAudioPath }) => ['-i', layerAudioPath]),
+          ...lodash.flatMap(processedAudioLayers, ({ layerAudioPath }) => ['-i', layerAudioPath]),
           '-filter_complex', `amix=inputs=${processedAudioLayers.length}:duration=longest:weights=${weights.join(' ')}`,
           '-c:a', 'flac',
           '-y',
@@ -144,7 +144,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
 
     const args = [
       ...getFfmpegCommonArgs({ enableFfmpegLog }),
-      ...(flatMap(clipAudio, ({ path }) => ['-i', path])),
+      ...(lodash.flatMap(clipAudio, ({ path }) => ['-i', path])),
       '-filter_complex',
       filterGraph,
       '-c', 'flac',
@@ -181,7 +181,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
 
     const args = [
       ...getFfmpegCommonArgs({ enableFfmpegLog }),
-      ...(flatMap(streams, ({ path, loop }) => ([
+      ...(lodash.flatMap(streams, ({ path, loop }) => ([
         '-stream_loop', (loop || 0),
         '-i', path,
       ]))),

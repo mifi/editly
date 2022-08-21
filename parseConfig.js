@@ -1,6 +1,6 @@
 import pMap from 'p-map';
 import { basename, join } from 'path';
-import { flatMap } from 'lodash';
+import lodash from 'lodash';
 import assert from 'assert';
 
 import {
@@ -127,7 +127,7 @@ export async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryA
 
     const transition = calcTransition(defaults, userTransition, clipIndex === clips.length - 1);
 
-    let layersOut = flatMap(await pMap(layers, async (layerIn) => {
+    let layersOut = lodash.flatMap(await pMap(layers, async (layerIn) => {
       const globalLayerDefaults = defaults.layer || {};
       const thisLayerDefaults = (defaults.layerType || {})[layerIn.type];
 

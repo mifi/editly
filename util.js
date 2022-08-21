@@ -1,6 +1,6 @@
 import execa from 'execa';
 import assert from 'assert';
-import { sortBy } from 'lodash';
+import lodash from 'lodash';
 import fsExtra from 'fs-extra';
 
 export function parseFps(fps) {
@@ -127,7 +127,7 @@ export function getPositionProps({ position, width, height }) {
 
 export function getFrameByKeyFrames(keyframes, progress) {
   if (keyframes.length < 2) throw new Error('Keyframes must be at least 2');
-  const sortedKeyframes = sortBy(keyframes, 't');
+  const sortedKeyframes = lodash.sortBy(keyframes, 't');
 
   // TODO check that max is 1
   // TODO check that all keyframes have all props
