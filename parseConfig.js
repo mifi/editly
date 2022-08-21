@@ -1,6 +1,6 @@
 import pMap from 'p-map';
 import { basename, join } from 'path';
-import flatMap from 'lodash/flatMap';
+import { flatMap } from 'lodash';
 import assert from 'assert';
 
 import {
@@ -287,7 +287,3 @@ export async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryA
     arbitraryAudio,
   };
 }
-
-export default {
-  parseConfig,
-};

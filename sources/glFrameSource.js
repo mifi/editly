@@ -1,6 +1,6 @@
 import GL from 'gl';
 import createShader from 'gl-shader';
-import { readFile } from 'fs-extra';
+import fsExtra from 'fs-extra';
 
 // I have no idea what I'm doing but it works ¯\_(ツ)_/¯
 
@@ -18,8 +18,8 @@ export async function createGlFrameSource({ width, height, channels, params }) {
   let fragmentSrc = fragmentSrcIn;
   let vertexSrc = vertexSrcIn;
 
-  if (fragmentPath) fragmentSrc = await readFile(fragmentPath);
-  if (vertexPath) vertexSrc = await readFile(vertexPath);
+  if (fragmentPath) fragmentSrc = await fsExtra.readFile(fragmentPath);
+  if (vertexPath) vertexSrc = await fsExtra.readFile(vertexPath);
 
   if (!vertexSrc) vertexSrc = defaultVertexSrc;
 
@@ -59,7 +59,3 @@ export async function createGlFrameSource({ width, height, channels, params }) {
     close: () => {},
   };
 }
-
-export default {
-  createGlFrameSource,
-};

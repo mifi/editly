@@ -1,7 +1,7 @@
 import execa from 'execa';
 import assert from 'assert';
-import sortBy from 'lodash/sortBy';
-import { exists } from 'fs-extra';
+import { sortBy } from 'lodash';
+import fsExtra from 'fs-extra';
 
 export function parseFps(fps) {
   const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
@@ -159,7 +159,7 @@ export const assertFileValid = async (path, allowRemoteRequests) => {
     assert(allowRemoteRequests, 'Remote requests are not allowed');
     return;
   }
-  assert(await exists(path), `File does not exist ${path}`);
+  assert(await fsExtra.exists(path), `File does not exist ${path}`);
 };
 
 // See #16

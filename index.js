@@ -2,7 +2,7 @@ import execa from 'execa';
 import assert from 'assert';
 import { join, dirname } from 'path';
 import { stringify } from 'json5';
-import { mkdirp, remove, writeFile } from 'fs-extra';
+import fsExtra from 'fs-extra';
 import { nanoid } from 'nanoid';
 
 import { testFf } from './ffmpeg.js';
@@ -64,7 +64,7 @@ export const Editly = async (config = {}) => {
   const outDir = dirname(outPath);
   const tmpDir = join(outDir, `editly-tmp-${nanoid()}`);
   if (verbose) console.log({ tmpDir });
-  await mkdirp(tmpDir);
+  await fsExtra.mkdirp(tmpDir);
 
   const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir });
 
@@ -381,7 +381,7 @@ export const Editly = async (config = {}) => {
     if (verbose) console.log('Cleanup');
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
-    if (!keepTmp) await remove(tmpDir);
+    if (!keepTmp) await fsExtra.remove(tmpDir);
   }
 
   try {
@@ -431,7 +431,7 @@ export async function renderSingleFrame({
   canvas.add(fabricImage);
   canvas.renderAll();
   const internalCanvas = getNodeCanvasFromFabricCanvas(canvas);
-  await writeFile(outPath, internalCanvas.toBuffer('image/png'));
+  await fsExtra.writeFile(outPath, internalCanvas.toBuffer('image/png'));
   canvas.clear();
   canvas.dispose();
   await frameSource.close();
