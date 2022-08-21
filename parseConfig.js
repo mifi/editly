@@ -1,17 +1,19 @@
-const pMap = require('p-map');
-const { basename, join } = require('path');
-const flatMap = require('lodash/flatMap');
-const assert = require('assert');
+import pMap from 'p-map';
+import { basename, join } from 'path';
+import flatMap from 'lodash/flatMap';
+import assert from 'assert';
 
-const { readVideoFileInfo, readAudioFileInfo } = require('./util');
-const { registerFont } = require('./sources/fabric');
-const { calcTransition } = require('./transitions');
-
-const { assertFileValid, checkTransition } = require('./util');
+import {
+  readVideoFileInfo,
+  readAudioFileInfo,
+  assertFileValid,
+  checkTransition,
+} from './util';
+import { registerFont } from './sources/fabric';
+import { calcTransition } from './transitions';
 
 // Cache
 const loadedFonts = [];
-
 
 async function validateArbitraryAudio(audio, allowRemoteRequests) {
   assert(audio === undefined || Array.isArray(audio));
@@ -29,7 +31,7 @@ async function validateArbitraryAudio(audio, allowRemoteRequests) {
   }
 }
 
-async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath }) {
+export async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath }) {
   const defaults = {
     duration: 4,
     ...defaultsIn,
@@ -237,7 +239,6 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
     };
   }, { concurrency: 1 });
 
-
   let totalClipDuration = 0;
   const clipDetachedAudio = [];
 
@@ -287,6 +288,6 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
   };
 }
 
-module.exports = {
+export default {
   parseConfig,
 };

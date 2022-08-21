@@ -1,10 +1,10 @@
-const GL = require('gl');
-const createShader = require('gl-shader');
-const fs = require('fs-extra');
+import GL from 'gl';
+import createShader from 'gl-shader';
+import { readFile } from 'fs-extra';
 
 // I have no idea what I'm doing but it works ¯\_(ツ)_/¯
 
-async function createGlFrameSource({ width, height, channels, params }) {
+export async function createGlFrameSource({ width, height, channels, params }) {
   const gl = GL(width, height);
 
   const defaultVertexSrc = `
@@ -18,8 +18,8 @@ async function createGlFrameSource({ width, height, channels, params }) {
   let fragmentSrc = fragmentSrcIn;
   let vertexSrc = vertexSrcIn;
 
-  if (fragmentPath) fragmentSrc = await fs.readFile(fragmentPath);
-  if (vertexPath) vertexSrc = await fs.readFile(vertexPath);
+  if (fragmentPath) fragmentSrc = await readFile(fragmentPath);
+  if (vertexPath) vertexSrc = await readFile(vertexPath);
 
   if (!vertexSrc) vertexSrc = defaultVertexSrc;
 
@@ -60,6 +60,6 @@ async function createGlFrameSource({ width, height, channels, params }) {
   };
 }
 
-module.exports = {
+export default {
   createGlFrameSource,
 };

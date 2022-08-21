@@ -1,21 +1,19 @@
-const execa = require('execa');
-const assert = require('assert');
-const { join, dirname } = require('path');
-const JSON5 = require('json5');
-const fs = require('fs-extra');
-const { nanoid } = require('nanoid');
+import execa from 'execa';
+import assert from 'assert';
+import { join, dirname } from 'path';
+import { stringify } from 'json5';
+import { mkdirp, remove, writeFile } from 'fs-extra';
+import { nanoid } from 'nanoid';
 
-const { testFf } = require('./ffmpeg');
-const { parseFps, multipleOf2 } = require('./util');
-const { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } = require('./sources/fabric');
-const { createFrameSource } = require('./sources/frameSource');
-const { parseConfig } = require('./parseConfig');
-const GlTransitions = require('./glTransitions');
-const Audio = require('./audio');
-const { assertFileValid, checkTransition } = require('./util');
+import { testFf } from './ffmpeg';
+import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util';
+import { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } from './sources/fabric';
+import { createFrameSource } from './sources/frameSource';
+import { parseConfig } from './parseConfig';
+import GlTransitions from './glTransitions';
+import Audio from './audio';
 
 const channels = 4;
-
 
 const Editly = async (config = {}) => {
   const {
@@ -55,18 +53,18 @@ const Editly = async (config = {}) => {
 
   checkTransition(defaults.transition);
 
-  if (verbose) console.log(JSON5.stringify(config, null, 2));
+  if (verbose) console.log(stringify(config, null, 2));
 
   assert(outPath, 'Please provide an output path');
   assert(clipsIn.length > 0, 'Please provide at least 1 clip');
 
   const { clips, arbitraryAudio } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath });
-  if (verbose) console.log('Calculated', JSON5.stringify({ clips, arbitraryAudio }, null, 2));
+  if (verbose) console.log('Calculated', stringify({ clips, arbitraryAudio }, null, 2));
 
   const outDir = dirname(outPath);
   const tmpDir = join(outDir, `editly-tmp-${nanoid()}`);
   if (verbose) console.log({ tmpDir });
-  await fs.mkdirp(tmpDir);
+  await mkdirp(tmpDir);
 
   const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir });
 
@@ -383,7 +381,7 @@ const Editly = async (config = {}) => {
     if (verbose) console.log('Cleanup');
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
-    if (!keepTmp) await fs.remove(tmpDir);
+    if (!keepTmp) await remove(tmpDir);
   }
 
   try {
@@ -433,7 +431,7 @@ async function renderSingleFrame({
   canvas.add(fabricImage);
   canvas.renderAll();
   const internalCanvas = getNodeCanvasFromFabricCanvas(canvas);
-  await fs.writeFile(outPath, internalCanvas.toBuffer('image/png'));
+  await writeFile(outPath, internalCanvas.toBuffer('image/png'));
   canvas.clear();
   canvas.dispose();
   await frameSource.close();
@@ -441,4 +439,4 @@ async function renderSingleFrame({
 
 Editly.renderSingleFrame = renderSingleFrame;
 
-module.exports = Editly;
+export default Editly;

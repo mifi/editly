@@ -1,11 +1,11 @@
-const GL = require('gl');
-const ndarray = require('ndarray');
-const createBuffer = require('gl-buffer');
-const transitions = require('gl-transitions');
-const createTransition = require('gl-transition').default;
-const createTexture = require('gl-texture2d');
+import GL from 'gl';
+import ndarray from 'ndarray';
+import createBuffer from 'gl-buffer';
+import { find } from 'gl-transitions';
+import createTransition from 'gl-transition';
+import createTexture from 'gl-texture2d';
 
-module.exports = ({ width, height, channels }) => {
+export default ({ width, height, channels }) => {
   const gl = GL(width, height);
 
   if (!gl) {
@@ -30,7 +30,7 @@ module.exports = ({ width, height, channels }) => {
     try {
       const resizeMode = 'stretch';
 
-      const transitionSource = transitions.find((t) => t.name.toLowerCase() === transitionName.toLowerCase());
+      const transitionSource = find((t) => t.name.toLowerCase() === transitionName.toLowerCase());
 
       transition = createTransition(gl, transitionSource, { resizeMode });
 

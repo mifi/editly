@@ -4,12 +4,13 @@
     "node": true
   },
   "parserOptions": {
-    "sourceType": "script"
+    "sourceType": "module"
   },
   "rules": {
     "max-len": 0,
     "no-console": 0,
     "object-curly-newline": 0,
     "no-await-in-loop": 0,
+    "no-promise-executor-return": 0
   }
 }

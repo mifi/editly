@@ -1,13 +1,12 @@
-const { fabric } = require('fabric');
-const fileUrl = require('file-url');
+import { fabric } from 'fabric';
+import fileUrl from 'file-url';
 
-const { getRandomGradient, getRandomColors } = require('../../colors');
-const { easeOutExpo, easeInOutCubic } = require('../../transitions');
-const { getPositionProps, getFrameByKeyFrames, isUrl } = require('../../util');
-const { blurImage } = require('../fabric');
+import { getRandomGradient, getRandomColors } from '../../colors';
+import { easeOutExpo, easeInOutCubic } from '../../transitions';
+import { getPositionProps, getFrameByKeyFrames, isUrl } from '../../util';
+import { blurImage } from '../fabric';
 
 // http://fabricjs.com/kitchensink
-
 
 const defaultFontFamily = 'sans-serif';
 
@@ -401,7 +400,7 @@ async function customFabricFrameSource({ canvas, width, height, params }) {
   return params.func(({ width, height, fabric, canvas, params }));
 }
 
-module.exports = {
+export default {
   customFabricFrameSource,
   subtitleFrameSource,
   titleFrameSource,

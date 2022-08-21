@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-const meow = require('meow');
-const fs = require('fs');
-const FileType = require('file-type');
-const pMap = require('p-map');
-const JSON5 = require('json5');
-const assert = require('assert');
+import meow from 'meow';
+import { readFileSync } from 'fs';
+import { fromFile } from 'file-type';
+import pMap from 'p-map';
+import { parse, stringify } from 'json5';
+import assert from 'assert';
 
-const editly = require('.');
+import editly from '.';
 
 // See also readme
 const cli = meow(`
@@ -72,7 +72,7 @@ const cli = meow(`
   };
 
   if (json) {
-    params = JSON5.parse(fs.readFileSync(json, 'utf-8'));
+    params = parse(readFileSync(json, 'utf-8'));
   } else {
     const clipsIn = cli.input;
     if (clipsIn.length < 1) cli.showHelp();
@@ -81,7 +81,7 @@ const cli = meow(`
       const match = clip.match(/^title:(.+)$/);
       if (match) return { type: 'title-background', text: match[1] };
 
-      const fileType = await FileType.fromFile(clip);
+      const fileType = await fromFile(clip);
       if (!fileType) {
         console.error('Invalid file for clip', clip);
         cli.showHelp();
@@ -129,7 +129,7 @@ const cli = meow(`
   if (fast) params.fast = fast;
   if (verbose) params.verbose = verbose;
 
-  if (params.verbose) console.log(JSON5.stringify(params, null, 2));
+  if (params.verbose) console.log(stringify(params, null, 2));
 
   if (!params.outPath) params.outPath = './editly-out.mp4';
 

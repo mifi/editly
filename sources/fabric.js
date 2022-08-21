@@ -1,12 +1,11 @@
-const { fabric } = require('fabric');
-const nodeCanvas = require('canvas');
+import { fabric } from 'fabric';
+import { createCanvas, ImageData } from 'canvas';
 
-const { boxBlurImage } = require('../BoxBlur');
+import { boxBlurImage } from '../BoxBlur';
 
 // Fabric is used as a fundament for compositing layers in editly
 
-
-function canvasToRgba(ctx) {
+export function canvasToRgba(ctx) {
   // const bgra = canvas.toBuffer('raw');
 
   /* const rgba = Buffer.allocUnsafe(bgra.length);
@@ -24,13 +23,13 @@ function canvasToRgba(ctx) {
   return Buffer.from(imageData.data);
 }
 
-function getNodeCanvasFromFabricCanvas(fabricCanvas) {
+export function getNodeCanvasFromFabricCanvas(fabricCanvas) {
   // https://github.com/fabricjs/fabric.js/blob/26e1a5b55cbeeffb59845337ced3f3f91d533d7d/src/static_canvas.class.js
   // https://github.com/fabricjs/fabric.js/issues/3885
   return fabric.util.getNodeCanvas(fabricCanvas.lowerCanvasEl);
 }
 
-function fabricCanvasToRgba(fabricCanvas) {
+export function fabricCanvasToRgba(fabricCanvas) {
   const internalCanvas = getNodeCanvasFromFabricCanvas(fabricCanvas);
   const ctx = internalCanvas.getContext('2d');
 
@@ -40,11 +39,11 @@ function fabricCanvasToRgba(fabricCanvas) {
   return canvasToRgba(ctx);
 }
 
-function createFabricCanvas({ width, height }) {
+export function createFabricCanvas({ width, height }) {
   return new fabric.StaticCanvas(null, { width, height });
 }
 
-async function renderFabricCanvas(canvas) {
+export async function renderFabricCanvas(canvas) {
   // console.time('canvas.renderAll');
   canvas.renderAll();
   // console.timeEnd('canvas.renderAll');
@@ -54,7 +53,7 @@ async function renderFabricCanvas(canvas) {
   return rgba;
 }
 
-function toUint8ClampedArray(buffer) {
+export function toUint8ClampedArray(buffer) {
   // return Uint8ClampedArray.from(buffer);
   // Some people are finding that manual copying is orders of magnitude faster than Uint8ClampedArray.from
   // Since I'm getting similar times for both methods, then why not:
@@ -65,22 +64,22 @@ function toUint8ClampedArray(buffer) {
   return data;
 }
 
-function fabricCanvasToFabricImage(fabricCanvas) {
+export function fabricCanvasToFabricImage(fabricCanvas) {
   const canvas = getNodeCanvasFromFabricCanvas(fabricCanvas);
   return new fabric.Image(canvas);
 }
 
-async function rgbaToFabricImage({ width, height, rgba }) {
-  const canvas = nodeCanvas.createCanvas(width, height);
+export async function rgbaToFabricImage({ width, height, rgba }) {
+  const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
   // https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData
-  ctx.putImageData(new nodeCanvas.ImageData(toUint8ClampedArray(rgba), width, height), 0, 0);
+  ctx.putImageData(new ImageData(toUint8ClampedArray(rgba), width, height), 0, 0);
   // https://stackoverflow.com/questions/58209996/unable-to-render-tiff-images-and-add-it-as-a-fabric-object
   return new fabric.Image(canvas);
 }
 
-async function createFabricFrameSource(func, { width, height, ...rest }) {
+export async function createFabricFrameSource(func, { width, height, ...rest }) {
   const onInit = async () => func(({ width, height, fabric, ...rest }));
 
   const { onRender = () => {}, onClose = () => {} } = await onInit() || {};
@@ -91,8 +90,8 @@ async function createFabricFrameSource(func, { width, height, ...rest }) {
   };
 }
 
-async function createCustomCanvasFrameSource({ width, height, params }) {
-  const canvas = nodeCanvas.createCanvas(width, height);
+export async function createCustomCanvasFrameSource({ width, height, params }) {
+  const canvas = createCanvas(width, height);
   const context = canvas.getContext('2d');
 
   const { onClose, onRender } = await params.func(({ width, height, canvas }));
@@ -112,11 +111,11 @@ async function createCustomCanvasFrameSource({ width, height, params }) {
   };
 }
 
-function registerFont(...args) {
+export function registerFont(...args) {
   fabric.nodeCanvas.registerFont(...args);
 }
 
-async function blurImage({ mutableImg, width, height }) {
+export async function blurImage({ mutableImg, width, height }) {
   mutableImg.setOptions({ scaleX: width / mutableImg.width, scaleY: height / mutableImg.height });
 
   const fabricCanvas = createFabricCanvas({ width, height });
@@ -132,16 +131,3 @@ async function blurImage({ mutableImg, width, height }) {
 
   return new fabric.Image(internalCanvas);
 }
-
-module.exports = {
-  registerFont,
-  createFabricFrameSource,
-  createCustomCanvasFrameSource,
-
-  createFabricCanvas,
-  renderFabricCanvas,
-  rgbaToFabricImage,
-  fabricCanvasToFabricImage,
-  getNodeCanvasFromFabricCanvas,
-  blurImage,
-};

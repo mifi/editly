@@ -1,4 +1,4 @@
-const assert = require('assert');
+import assert from 'assert';
 
 const randomTransitionsSet = ['fade', 'fadegrayscale', 'directionalwarp', 'crosswarp', 'dreamyzoom', 'burn', 'crosszoom', 'simplezoom', 'linearblur', 'directional-left', 'directional-right', 'directional-up', 'directional-down'];
 
@@ -61,7 +61,7 @@ function calcTransition(defaults, transition, isLastClip) {
   };
 }
 
-module.exports = {
+export default {
   calcTransition,
   easeInOutCubic,
   easeOutExpo,

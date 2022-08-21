@@ -1,12 +1,18 @@
-const assert = require('assert');
-const pMap = require('p-map');
+import assert from 'assert';
+import pMap from 'p-map';
 
-const { rgbaToFabricImage, createCustomCanvasFrameSource, createFabricFrameSource, createFabricCanvas, renderFabricCanvas } = require('./fabric');
+import {
+  rgbaToFabricImage,
+  createCustomCanvasFrameSource,
+  createFabricFrameSource,
+  createFabricCanvas,
+  renderFabricCanvas,
+} from './fabric';
 
-const { customFabricFrameSource, subtitleFrameSource, titleFrameSource, newsTitleFrameSource, fillColorFrameSource, radialGradientFrameSource, linearGradientFrameSource, imageFrameSource, imageOverlayFrameSource, slideInTextFrameSource } = require('./fabric/fabricFrameSources');
+import { customFabricFrameSource, subtitleFrameSource, titleFrameSource, newsTitleFrameSource, fillColorFrameSource, radialGradientFrameSource, linearGradientFrameSource, imageFrameSource, imageOverlayFrameSource, slideInTextFrameSource } from './fabric/fabricFrameSources';
 
-const createVideoFrameSource = require('./videoFrameSource');
-const { createGlFrameSource } = require('./glFrameSource');
+import createVideoFrameSource from './videoFrameSource';
+import { createGlFrameSource } from './glFrameSource';
 
 const fabricFrameSources = {
   fabric: customFabricFrameSource,
@@ -21,7 +27,7 @@ const fabricFrameSources = {
   'slide-in-text': slideInTextFrameSource,
 };
 
-async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
+export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
   const { layers, duration } = clip;
 
   const visualLayers = layers.filter((layer) => layer.type !== 'audio');
@@ -95,6 +101,6 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
   };
 }
 
-module.exports = {
+export default {
   createFrameSource,
 };
