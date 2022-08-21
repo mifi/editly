@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import meow from 'meow';
 import { readFileSync } from 'fs';
-import { fromFile } from 'file-type';
+import { fileTypeFromFile } from 'file-type';
 import pMap from 'p-map';
-import { parse, stringify } from 'json5';
+import json5 from 'json5';
 import assert from 'assert';
 
 import { Editly } from './index.js';
@@ -46,21 +46,24 @@ const cli = meow(`
   Examples
     $ editly title:'My video' clip1.mov clip2.mov title:'My slideshow' img1.jpg img2.jpg title:'THE END' --audio-file-path /path/to/music.mp3 --font-path /path/to/my-favorite-font.ttf
     $ editly my-editly.json5 --out output.gif
-`, {
-  flags: {
-    verbose: { type: 'boolean', alias: 'v' },
-    keepSourceAudio: { type: 'boolean' },
-    allowRemoteRequests: { type: 'boolean' },
-    fast: { type: 'boolean', alias: 'f' },
-    transitionDuration: { type: 'number' },
-    clipDuration: { type: 'number' },
-    width: { type: 'number' },
-    height: { type: 'number' },
-    fps: { type: 'number' },
-    loopAudio: { type: 'boolean' },
-    outputVolume: { type: 'string' },
-  },
-});
+`,
+  {
+    importMeta: import.meta,
+    flags: {
+      verbose: { type: 'boolean', alias: 'v' },
+      keepSourceAudio: { type: 'boolean' },
+      allowRemoteRequests: { type: 'boolean' },
+      fast: { type: 'boolean', alias: 'f' },
+      transitionDuration: { type: 'number' },
+      clipDuration: { type: 'number' },
+      width: { type: 'number' },
+      height: { type: 'number' },
+      fps: { type: 'number' },
+      loopAudio: { type: 'boolean' },
+      outputVolume: { type: 'string' },
+    },
+  }
+);
 
 (async () => {
   let { json } = cli.flags;
@@ -72,7 +75,7 @@ const cli = meow(`
   };
 
   if (json) {
-    params = parse(readFileSync(json, 'utf-8'));
+    params = json5.parse(readFileSync(json, 'utf-8'));
   } else {
     const clipsIn = cli.input;
     if (clipsIn.length < 1) cli.showHelp();
@@ -81,7 +84,7 @@ const cli = meow(`
       const match = clip.match(/^title:(.+)$/);
       if (match) return { type: 'title-background', text: match[1] };
 
-      const fileType = await fromFile(clip);
+      const fileType = await fileTypeFromFile(clip);
       if (!fileType) {
         console.error('Invalid file for clip', clip);
         cli.showHelp();
@@ -129,7 +132,7 @@ const cli = meow(`
   if (fast) params.fast = fast;
   if (verbose) params.verbose = verbose;
 
-  if (params.verbose) console.log(stringify(params, null, 2));
+  if (params.verbose) console.log(json5.stringify(params, null, 2));
 
   if (!params.outPath) params.outPath = './editly-out.mp4';
 

@@ -1,7 +1,7 @@
 import GL from 'gl';
 import ndarray from 'ndarray';
 import createBuffer from 'gl-buffer';
-import { find } from 'gl-transitions';
+import glTransitions from 'gl-transitions';
 import createTransition from 'gl-transition';
 import createTexture from 'gl-texture2d';
 
@@ -30,7 +30,7 @@ export default ({ width, height, channels }) => {
     try {
       const resizeMode = 'stretch';
 
-      const transitionSource = find((t) => t.name.toLowerCase() === transitionName.toLowerCase());
+      const transitionSource = glTransitions.find((t) => t.name.toLowerCase() === transitionName.toLowerCase());
 
       transition = createTransition(gl, transitionSource, { resizeMode });
 

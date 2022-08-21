@@ -1,7 +1,7 @@
 import execa from 'execa';
 import assert from 'assert';
 import { join, dirname } from 'path';
-import { stringify } from 'json5';
+import json5 from 'json5';
 import fsExtra from 'fs-extra';
 import { nanoid } from 'nanoid';
 
@@ -53,13 +53,13 @@ export const Editly = async (config = {}) => {
 
   checkTransition(defaults.transition);
 
-  if (verbose) console.log(stringify(config, null, 2));
+  if (verbose) console.log(json5.stringify(config, null, 2));
 
   assert(outPath, 'Please provide an output path');
   assert(clipsIn.length > 0, 'Please provide at least 1 clip');
 
   const { clips, arbitraryAudio } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath });
-  if (verbose) console.log('Calculated', stringify({ clips, arbitraryAudio }, null, 2));
+  if (verbose) console.log('Calculated', json5.stringify({ clips, arbitraryAudio }, null, 2));
 
   const outDir = dirname(outPath);
   const tmpDir = join(outDir, `editly-tmp-${nanoid()}`);
