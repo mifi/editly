@@ -7,7 +7,7 @@ import {
   createFabricFrameSource,
   createFabricCanvas,
   renderFabricCanvas,
-} from './fabric';
+} from './fabric.js';
 import {
   customFabricFrameSource,
   subtitleFrameSource,
@@ -19,9 +19,9 @@ import {
   imageFrameSource,
   imageOverlayFrameSource,
   slideInTextFrameSource,
-} from './fabric/fabricFrameSources';
-import createVideoFrameSource from './videoFrameSource';
-import { createGlFrameSource } from './glFrameSource';
+} from './fabric/fabricFrameSources.js';
+import createVideoFrameSource from './videoFrameSource.js';
+import { createGlFrameSource } from './glFrameSource.js';
 
 const fabricFrameSources = {
   fabric: customFabricFrameSource,

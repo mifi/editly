@@ -8,9 +8,9 @@ import {
   readAudioFileInfo,
   assertFileValid,
   checkTransition,
-} from './util';
-import { registerFont } from './sources/fabric';
-import { calcTransition } from './transitions';
+} from './util.js';
+import { registerFont } from './sources/fabric.js';
+import { calcTransition } from './transitions.js';
 
 // Cache
 const loadedFonts = [];

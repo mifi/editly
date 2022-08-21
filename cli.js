@@ -6,7 +6,7 @@ import pMap from 'p-map';
 import { parse, stringify } from 'json5';
 import assert from 'assert';
 
-import editly from './index';
+import { Editly } from './index.js';
 
 // See also readme
 const cli = meow(`
@@ -133,7 +133,7 @@ const cli = meow(`
 
   if (!params.outPath) params.outPath = './editly-out.mp4';
 
-  await editly(params);
+  await Editly(params);
 })().catch((err) => {
   console.error('Caught error', err);
   process.exitCode = 1;

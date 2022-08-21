@@ -3,8 +3,8 @@ import { join, basename, resolve } from 'path';
 import execa from 'execa';
 import flatMap from 'lodash/flatMap';
 
-import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg';
-import { readFileStreams } from './util';
+import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg.js';
+import { readFileStreams } from './util.js';
 
 export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) => {
   async function createMixedAudioClips({ clips, keepSourceAudio }) {

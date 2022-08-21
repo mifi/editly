@@ -5,13 +5,13 @@ import { stringify } from 'json5';
 import { mkdirp, remove, writeFile } from 'fs-extra';
 import { nanoid } from 'nanoid';
 
-import { testFf } from './ffmpeg';
-import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util';
-import { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } from './sources/fabric';
-import { createFrameSource } from './sources/frameSource';
-import { parseConfig } from './parseConfig';
-import GlTransitions from './glTransitions';
-import Audio from './audio';
+import { testFf } from './ffmpeg.js';
+import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util.js';
+import { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } from './sources/fabric.js';
+import { createFrameSource } from './sources/frameSource.js';
+import { parseConfig } from './parseConfig.js';
+import GlTransitions from './glTransitions.js';
+import Audio from './audio.js';
 
 const channels = 4;
 

@@ -1,7 +1,7 @@
 import { fabric } from 'fabric';
 import { createCanvas, ImageData } from 'canvas';
 
-import { boxBlurImage } from '../BoxBlur';
+import { boxBlurImage } from '../BoxBlur.js';
 
 // Fabric is used as a fundament for compositing layers in editly
 

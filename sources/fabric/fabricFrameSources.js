@@ -1,10 +1,10 @@
 import { fabric } from 'fabric';
 import fileUrl from 'file-url';
 
-import { getRandomGradient, getRandomColors } from '../../colors';
-import { easeOutExpo, easeInOutCubic } from '../../transitions';
-import { getPositionProps, getFrameByKeyFrames, isUrl } from '../../util';
-import { blurImage } from '../fabric';
+import { getRandomGradient, getRandomColors } from '../../colors.js';
+import { easeOutExpo, easeInOutCubic } from '../../transitions.js';
+import { getPositionProps, getFrameByKeyFrames, isUrl } from '../../util.js';
+import { blurImage } from '../fabric.js';
 
 // http://fabricjs.com/kitchensink
 
