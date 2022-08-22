@@ -159,7 +159,7 @@ export const assertFileValid = async (path, allowRemoteRequests) => {
     assert(allowRemoteRequests, 'Remote requests are not allowed');
     return;
   }
-  assert(await fsExtra.exists(path), `File does not exist ${path}`);
+  assert(await fsExtra.pathExists(path), `File does not exist ${path}`);
 };
 
 // See #16
