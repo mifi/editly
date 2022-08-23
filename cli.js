@@ -78,8 +78,11 @@ const cli = meow(`
     if (clipsIn.length < 1) cli.showHelp();
 
     const clips = await pMap(clipsIn, async (clip) => {
-      const match = clip.match(/^title:(.+)$/);
+      let match = clip.match(/^title:(.+)$/);
       if (match) return { type: 'title-background', text: match[1] };
+
+      match = clip.match(/^https?:\/\/.*\.(jpg|jpeg|png|webp|gif|svg)$/); // todo improve
+      if (match) return { type: 'image', path: clip };
 
       const fileType = await FileType.fromFile(clip);
       if (!fileType) {
