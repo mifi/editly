@@ -1,6 +1,6 @@
 import pMap from 'p-map';
 import { basename, join } from 'path';
-import flatMap from 'lodash-es/flatMap';
+import flatMap from 'lodash-es/flatMap.js';
 import assert from 'assert';
 
 import {
