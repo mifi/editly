@@ -6,7 +6,7 @@ import pMap from 'p-map';
 import JSON5 from 'json5';
 import assert from 'assert';
 
-import { Editly } from './index.js';
+import Editly from './index.js';
 
 // See also readme
 const cli = meow(`
