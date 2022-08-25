@@ -3,7 +3,7 @@ import meow from 'meow';
 import { readFileSync } from 'fs';
 import { fileTypeFromFile } from 'file-type';
 import pMap from 'p-map';
-import json5 from 'json5';
+import JSON5 from 'json5';
 import assert from 'assert';
 
 import { Editly } from './index.js';
@@ -73,7 +73,7 @@ const cli = meow(`
   };
 
   if (json) {
-    params = json5.parse(readFileSync(json, 'utf-8'));
+    params = JSON5.parse(readFileSync(json, 'utf-8'));
   } else {
     const clipsIn = cli.input;
     if (clipsIn.length < 1) cli.showHelp();
@@ -130,7 +130,7 @@ const cli = meow(`
   if (fast) params.fast = fast;
   if (verbose) params.verbose = verbose;
 
-  if (params.verbose) console.log(json5.stringify(params, null, 2));
+  if (params.verbose) console.log(JSON5.stringify(params, null, 2));
 
   if (!params.outPath) params.outPath = './editly-out.mp4';
 

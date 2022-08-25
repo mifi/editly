@@ -6,7 +6,7 @@
   "parserOptions": {
     "sourceType": "module"
   },
-  "import/extensions": [],
+  "import/extensions": [".js"],
   "rules": {
     "max-len": 0,
     "no-console": 0,
