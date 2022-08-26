@@ -33,7 +33,7 @@
     "p-map": "^5.5.0"
   },
   "scripts": {
-    "test": "exit 0",
+    "test": "node test.js",
     "lint": "eslint ."
   },
   "repository": {
