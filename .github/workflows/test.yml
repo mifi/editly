@@ -8,6 +8,8 @@ jobs:
 
     steps:
       - uses: FedericoCarboni/setup-ffmpeg@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
