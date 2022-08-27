@@ -1043,6 +1043,13 @@ declare namespace Editly {
 		audioFilePath?: string;
 
 		/**
+		 * Background Volume
+		 *
+		 * @see [Audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
+		 */
+		backgroundAudioVolume?: string | number;
+
+		/**
 		 * Loop the audio track if it is shorter than video?
 		 *
 		 * @default false

@@ -35,6 +35,7 @@ const Editly = async (config = {}) => {
     fps: requestedFps,
     defaults = {},
     audioFilePath: backgroundAudioPath,
+    backgroundAudioVolume,
     loopAudio,
     keepSourceAudio,
     allowRemoteRequests,
@@ -60,7 +61,7 @@ const Editly = async (config = {}) => {
   assert(outPath, 'Please provide an output path');
   assert(clipsIn.length > 0, 'Please provide at least 1 clip');
 
-  const { clips, arbitraryAudio } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath });
+  const { clips, arbitraryAudio } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests, ffprobePath });
   if (verbose) console.log('Calculated', JSON5.stringify({ clips, arbitraryAudio }, null, 2));
 
   const outDir = dirname(outPath);
