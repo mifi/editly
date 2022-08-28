@@ -91,11 +91,10 @@ Without `--fast`, it will default to using the **width**, **height** and **frame
 ## JavaScript library
 
 ```js
-const editly = require('editly');
+import editly from 'editly';
 
 // See editSpec documentation
 await editly(editSpec)
-  .catch(console.error);
 ```
 
 ## Edit spec
