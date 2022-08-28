@@ -4,3 +4,9 @@
 /Dockerfile
 /docker-compose.yml
 /logo.png
+/examples
+/.cache
+/yarn-error.log
+editly-tmp-*/
+*.mp4
+*.gif
