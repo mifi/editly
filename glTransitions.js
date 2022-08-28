@@ -2,8 +2,10 @@ import GL from 'gl';
 import ndarray from 'ndarray';
 import createBuffer from 'gl-buffer';
 import glTransitions from 'gl-transitions';
-import createTransition from 'gl-transition';
+import glTransition from 'gl-transition';
 import createTexture from 'gl-texture2d';
+
+const { default: createTransition } = glTransition;
 
 export default ({ width, height, channels }) => {
   const gl = GL(width, height);

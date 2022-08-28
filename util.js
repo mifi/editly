@@ -1,4 +1,4 @@
-import execa from 'execa';
+import { execa } from 'execa';
 import assert from 'assert';
 import sortBy from 'lodash-es/sortBy.js';
 import fsExtra from 'fs-extra';

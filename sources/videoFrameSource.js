@@ -1,4 +1,4 @@
-import execa from 'execa';
+import { execa } from 'execa';
 import assert from 'assert';
 
 import { getFfmpegCommonArgs } from '../ffmpeg.js';

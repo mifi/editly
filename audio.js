@@ -1,6 +1,6 @@
 import pMap from 'p-map';
 import { join, basename, resolve } from 'path';
-import execa from 'execa';
+import { execa } from 'execa';
 import flatMap from 'lodash-es/flatMap.js';
 
 import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg.js';

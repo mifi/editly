@@ -1,4 +1,4 @@
-import execa from 'execa';
+import { execa } from 'execa';
 import assert from 'assert';
 import { join, dirname } from 'path';
 import JSON5 from 'json5';

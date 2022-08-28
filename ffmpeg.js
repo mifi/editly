@@ -1,5 +1,5 @@
 import fsExtra from 'fs-extra';
-import execa from 'execa';
+import { execa } from 'execa';
 import assert from 'assert';
 import compareVersions from 'compare-versions';
 
