@@ -2,6 +2,7 @@ import pMap from 'p-map';
 import { basename, join } from 'path';
 import flatMap from 'lodash-es/flatMap.js';
 import assert from 'assert';
+import { fileURLToPath } from 'url';
 
 import {
   readVideoFileInfo,
@@ -11,6 +12,8 @@ import {
 } from './util.js';
 import { registerFont } from './sources/fabric.js';
 import { calcTransition } from './transitions.js';
+
+const dirname = fileURLToPath(new URL('.', import.meta.url));
 
 // Cache
 const loadedFonts = [];
@@ -61,7 +64,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
     // TODO if random-background radial-gradient linear etc
     if (type === 'pause') return handleLayer({ ...restLayer, type: 'fill-color' });
 
-    if (type === 'rainbow-colors') return handleLayer({ type: 'gl', fragmentPath: join(__dirname, 'shaders/rainbow-colors.frag') });
+    if (type === 'rainbow-colors') return handleLayer({ type: 'gl', fragmentPath: join(dirname, 'shaders/rainbow-colors.frag') });
 
     if (type === 'editly-banner') {
       const { fontPath } = layer;
