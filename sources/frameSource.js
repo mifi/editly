@@ -1,12 +1,27 @@
-const assert = require('assert');
-const pMap = require('p-map');
+import assert from 'assert';
+import pMap from 'p-map';
 
-const { rgbaToFabricImage, createCustomCanvasFrameSource, createFabricFrameSource, createFabricCanvas, renderFabricCanvas } = require('./fabric');
-
-const { customFabricFrameSource, subtitleFrameSource, titleFrameSource, newsTitleFrameSource, fillColorFrameSource, radialGradientFrameSource, linearGradientFrameSource, imageFrameSource, imageOverlayFrameSource, slideInTextFrameSource } = require('./fabric/fabricFrameSources');
-
-const createVideoFrameSource = require('./videoFrameSource');
-const { createGlFrameSource } = require('./glFrameSource');
+import {
+  rgbaToFabricImage,
+  createCustomCanvasFrameSource,
+  createFabricFrameSource,
+  createFabricCanvas,
+  renderFabricCanvas,
+} from './fabric.js';
+import {
+  customFabricFrameSource,
+  subtitleFrameSource,
+  titleFrameSource,
+  newsTitleFrameSource,
+  fillColorFrameSource,
+  radialGradientFrameSource,
+  linearGradientFrameSource,
+  imageFrameSource,
+  imageOverlayFrameSource,
+  slideInTextFrameSource,
+} from './fabric/fabricFrameSources.js';
+import createVideoFrameSource from './videoFrameSource.js';
+import createGlFrameSource from './glFrameSource.js';
 
 const fabricFrameSources = {
   fabric: customFabricFrameSource,
@@ -21,7 +36,7 @@ const fabricFrameSources = {
   'slide-in-text': slideInTextFrameSource,
 };
 
-async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
+export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
   const { layers, duration } = clip;
 
   const visualLayers = layers.filter((layer) => layer.type !== 'audio');
@@ -95,6 +110,6 @@ async function createFrameSource({ clip, clipIndex, width, height, channels, ver
   };
 }
 
-module.exports = {
+export default {
   createFrameSource,
 };

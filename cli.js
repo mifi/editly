@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-const meow = require('meow');
-const fs = require('fs');
-const FileType = require('file-type');
-const pMap = require('p-map');
-const JSON5 = require('json5');
-const assert = require('assert');
+import meow from 'meow';
+import { readFileSync } from 'fs';
+import { fileTypeFromFile } from 'file-type';
+import pMap from 'p-map';
+import JSON5 from 'json5';
+import assert from 'assert';
 
-const editly = require('.');
+import Editly from './index.js';
 
 // See also readme
 const cli = meow(`
@@ -47,6 +47,7 @@ const cli = meow(`
     $ editly title:'My video' clip1.mov clip2.mov title:'My slideshow' img1.jpg img2.jpg title:'THE END' --audio-file-path /path/to/music.mp3 --font-path /path/to/my-favorite-font.ttf
     $ editly my-editly.json5 --out output.gif
 `, {
+  importMeta: import.meta,
   flags: {
     verbose: { type: 'boolean', alias: 'v' },
     keepSourceAudio: { type: 'boolean' },
@@ -72,7 +73,7 @@ const cli = meow(`
   };
 
   if (json) {
-    params = JSON5.parse(fs.readFileSync(json, 'utf-8'));
+    params = JSON5.parse(readFileSync(json, 'utf-8'));
   } else {
     const clipsIn = cli.input;
     if (clipsIn.length < 1) cli.showHelp();
@@ -84,7 +85,7 @@ const cli = meow(`
       match = clip.match(/^https?:\/\/.*\.(jpg|jpeg|png|webp|gif|svg)$/); // todo improve
       if (match) return { type: 'image', path: clip };
 
-      const fileType = await FileType.fromFile(clip);
+      const fileType = await fileTypeFromFile(clip);
       if (!fileType) {
         console.error('Invalid file for clip', clip);
         cli.showHelp();
@@ -136,7 +137,7 @@ const cli = meow(`
 
   if (!params.outPath) params.outPath = './editly-out.mp4';
 
-  await editly(params);
+  await Editly(params);
 })().catch((err) => {
   console.error('Caught error', err);
   process.exitCode = 1;

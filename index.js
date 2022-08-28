@@ -1,23 +1,21 @@
-const execa = require('execa');
-const assert = require('assert');
-const { join, dirname } = require('path');
-const JSON5 = require('json5');
-const fs = require('fs-extra');
-const { nanoid } = require('nanoid');
+import { execa } from 'execa';
+import assert from 'assert';
+import { join, dirname } from 'path';
+import JSON5 from 'json5';
+import fsExtra from 'fs-extra';
+import { nanoid } from 'nanoid';
 
-const { testFf } = require('./ffmpeg');
-const { parseFps, multipleOf2 } = require('./util');
-const { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } = require('./sources/fabric');
-const { createFrameSource } = require('./sources/frameSource');
-const { parseConfig } = require('./parseConfig');
-const GlTransitions = require('./glTransitions');
-const Audio = require('./audio');
-const { assertFileValid, checkTransition } = require('./util');
+import { testFf } from './ffmpeg.js';
+import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util.js';
+import { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } from './sources/fabric.js';
+import { createFrameSource } from './sources/frameSource.js';
+import parseConfig from './parseConfig.js';
+import GlTransitions from './glTransitions.js';
+import Audio from './audio.js';
 
 const channels = 4;
 
-
-const Editly = async (config = {}) => {
+async function Editly(config = {}) {
   const {
     // Testing options:
     enableFfmpegLog = false,
@@ -66,7 +64,7 @@ const Editly = async (config = {}) => {
   const outDir = dirname(outPath);
   const tmpDir = join(outDir, `editly-tmp-${nanoid()}`);
   if (verbose) console.log({ tmpDir });
-  await fs.mkdirp(tmpDir);
+  await fsExtra.mkdirp(tmpDir);
 
   const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir });
 
@@ -383,7 +381,7 @@ const Editly = async (config = {}) => {
     if (verbose) console.log('Cleanup');
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
-    if (!keepTmp) await fs.remove(tmpDir);
+    if (!keepTmp) await fsExtra.remove(tmpDir);
   }
 
   try {
@@ -396,7 +394,7 @@ const Editly = async (config = {}) => {
   console.log();
   console.log('Done. Output file can be found at:');
   console.log(outPath);
-};
+}
 
 // Pure function to get a frame at a certain time
 // TODO I think this does not respect transition durations
@@ -433,7 +431,7 @@ async function renderSingleFrame({
   canvas.add(fabricImage);
   canvas.renderAll();
   const internalCanvas = getNodeCanvasFromFabricCanvas(canvas);
-  await fs.writeFile(outPath, internalCanvas.toBuffer('image/png'));
+  await fsExtra.writeFile(outPath, internalCanvas.toBuffer('image/png'));
   canvas.clear();
   canvas.dispose();
   await frameSource.close();
@@ -441,4 +439,4 @@ async function renderSingleFrame({
 
 Editly.renderSingleFrame = renderSingleFrame;
 
-module.exports = Editly;
+export default Editly;
