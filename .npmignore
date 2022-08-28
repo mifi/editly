@@ -1,0 +1,6 @@
+/.github/workflows/test.yml
+/.eslintrc.cjs
+/test.js
+/Dockerfile
+/docker-compose.yml
+/logo.png
