@@ -21,7 +21,7 @@ import {
   slideInTextFrameSource,
 } from './fabric/fabricFrameSources.js';
 import createVideoFrameSource from './videoFrameSource.js';
-import { createGlFrameSource } from './glFrameSource.js';
+import createGlFrameSource from './glFrameSource.js';
 
 const fabricFrameSources = {
   fabric: customFabricFrameSource,

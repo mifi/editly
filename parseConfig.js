@@ -31,7 +31,7 @@ async function validateArbitraryAudio(audio, allowRemoteRequests) {
   }
 }
 
-export async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath }) {
+export default async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath }) {
   const defaults = {
     duration: 4,
     ...defaultsIn,

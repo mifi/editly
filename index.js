@@ -9,7 +9,7 @@ import { testFf } from './ffmpeg.js';
 import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util.js';
 import { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } from './sources/fabric.js';
 import { createFrameSource } from './sources/frameSource.js';
-import { parseConfig } from './parseConfig.js';
+import parseConfig from './parseConfig.js';
 import GlTransitions from './glTransitions.js';
 import Audio from './audio.js';
 
@@ -394,7 +394,7 @@ async function Editly(config = {}) {
   console.log();
   console.log('Done. Output file can be found at:');
   console.log(outPath);
-};
+}
 
 // Pure function to get a frame at a certain time
 // TODO I think this does not respect transition durations

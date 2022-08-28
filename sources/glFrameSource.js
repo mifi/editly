@@ -4,7 +4,7 @@ import fsExtra from 'fs-extra';
 
 // I have no idea what I'm doing but it works ¯\_(ツ)_/¯
 
-export async function createGlFrameSource({ width, height, channels, params }) {
+export default async function createGlFrameSource({ width, height, channels, params }) {
   const gl = GL(width, height);
 
   const defaultVertexSrc = `
