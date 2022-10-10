@@ -34,7 +34,13 @@ export async function readVideoFileInfo(ffprobePath, p) {
 
   const duration = await readDuration(ffprobePath, p);
 
-  const rotation = stream.tags && stream.tags.rotate && parseInt(stream.tags.rotate, 10);
+  let rotation = parseInt(stream.tags && stream.tags.rotate, 10);
+
+  // If we can't find rotation, try side_data_list
+  if (Number.isNaN(rotation) && Array.isArray(stream.side_data_list) && stream.side_data_list[0] && stream.side_data_list[0].rotation) {
+    rotation = parseInt(stream.side_data_list[0].rotation, 10);
+  }
+
   return {
     // numFrames: parseInt(stream.nb_frames, 10),
     duration,

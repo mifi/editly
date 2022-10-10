@@ -151,7 +151,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
 
         const inputDuration = cutTo - cutFrom;
 
-        const isRotated = rotation === 90 || rotation === 270;
+        const isRotated = [-90, 90, 270, -270].includes(rotation);
         const inputWidth = isRotated ? heightIn : widthIn;
         const inputHeight = isRotated ? widthIn : heightIn;
 
