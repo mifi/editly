@@ -51,6 +51,7 @@ See [examples](https://github.com/mifi/editly/tree/master/examples)
 - [Node.js installed](https://nodejs.org/en/) (Use of the latest LTS version is recommended, [v12.16.2 or newer on MacOS](https://github.com/sindresorhus/meow/issues/144).)
 - `ffmpeg` (and `ffprobe`) [installed](http://ffmpeg.org/) and available in `PATH`
 - (Linux) may require some extra steps. See [headless-gl](https://github.com/stackgl/headless-gl#system-dependencies).
+- **Editly is now ESM only**
 
 ## Installing
 
@@ -91,11 +92,10 @@ Without `--fast`, it will default to using the **width**, **height** and **frame
 ## JavaScript library
 
 ```js
-const editly = require('editly');
+import editly from 'editly';
 
 // See editSpec documentation
 await editly(editSpec)
-  .catch(console.error);
 ```
 
 ## Edit spec
