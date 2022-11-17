@@ -377,12 +377,12 @@ async function Editly(config = {}) {
     outProcess.stdin.end();
   } catch (err) {
     outProcess.kill();
+    if (!keepTmp) await fsExtra.remove(tmpDir);
     throw err;
   } finally {
     if (verbose) console.log('Cleanup');
     if (frameSource1) await frameSource1.close();
     if (frameSource2) await frameSource2.close();
-    if (!keepTmp) await fsExtra.remove(tmpDir);
   }
 
   try {
@@ -390,6 +390,8 @@ async function Editly(config = {}) {
     await outProcess;
   } catch (err) {
     if (outProcessExitCode !== 0 && !err.killed) throw err;
+  } finally {
+    if (!keepTmp) await fsExtra.remove(tmpDir);
   }
 
   console.log();
