@@ -249,147 +249,148 @@ async function Editly(config = {}) {
   const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
 
   try {
-    outProcess = startFfmpegWriterProcess();
+    try {
+      outProcess = startFfmpegWriterProcess();
 
-    let outProcessError;
+      let outProcessError;
 
-    outProcess.on('exit', (code) => {
-      if (verbose) console.log('Output ffmpeg exited', code);
-      outProcessExitCode = code;
-    });
+      outProcess.on('exit', (code) => {
+        if (verbose) console.log('Output ffmpeg exited', code);
+        outProcessExitCode = code;
+      });
 
-    // If we write and get an EPIPE (like when ffmpeg fails or is finished), we could get an unhandled rejection if we don't catch the promise
-    // (and meow causes the CLI to exit on unhandled rejections making it hard to see)
-    outProcess.catch((err) => {
-      outProcessError = err;
-    });
+      // If we write and get an EPIPE (like when ffmpeg fails or is finished), we could get an unhandled rejection if we don't catch the promise
+      // (and meow causes the CLI to exit on unhandled rejections making it hard to see)
+      outProcess.catch((err) => {
+        outProcessError = err;
+      });
 
-    frameSource1 = await getTransitionFromSource();
-    frameSource2 = await getTransitionToSource();
+      frameSource1 = await getTransitionFromSource();
+      frameSource2 = await getTransitionToSource();
 
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const transitionToClip = getTransitionToClip();
-      const transitionFromClip = getTransitionFromClip();
-      const fromClipNumFrames = Math.round(transitionFromClip.duration * fps);
-      const toClipNumFrames = transitionToClip && Math.round(transitionToClip.duration * fps);
-      const fromClipProgress = fromClipFrameAt / fromClipNumFrames;
-      const toClipProgress = transitionToClip && toClipFrameAt / toClipNumFrames;
-      const fromClipTime = transitionFromClip.duration * fromClipProgress;
-      const toClipTime = transitionToClip && transitionToClip.duration * toClipProgress;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const transitionToClip = getTransitionToClip();
+        const transitionFromClip = getTransitionFromClip();
+        const fromClipNumFrames = Math.round(transitionFromClip.duration * fps);
+        const toClipNumFrames = transitionToClip && Math.round(transitionToClip.duration * fps);
+        const fromClipProgress = fromClipFrameAt / fromClipNumFrames;
+        const toClipProgress = transitionToClip && toClipFrameAt / toClipNumFrames;
+        const fromClipTime = transitionFromClip.duration * fromClipProgress;
+        const toClipTime = transitionToClip && transitionToClip.duration * toClipProgress;
 
-      const currentTransition = transitionFromClip.transition;
+        const currentTransition = transitionFromClip.transition;
 
-      const transitionNumFrames = Math.round(currentTransition.duration * fps);
+        const transitionNumFrames = Math.round(currentTransition.duration * fps);
 
-      // Each clip has two transitions, make sure we leave enough room:
-      const transitionNumFramesSafe = Math.floor(Math.min(Math.min(fromClipNumFrames, toClipNumFrames != null ? toClipNumFrames : Number.MAX_SAFE_INTEGER) / 2, transitionNumFrames));
-      // How many frames into the transition are we? negative means not yet started
-      const transitionFrameAt = fromClipFrameAt - (fromClipNumFrames - transitionNumFramesSafe);
+        // Each clip has two transitions, make sure we leave enough room:
+        const transitionNumFramesSafe = Math.floor(Math.min(Math.min(fromClipNumFrames, toClipNumFrames != null ? toClipNumFrames : Number.MAX_SAFE_INTEGER) / 2, transitionNumFrames));
+        // How many frames into the transition are we? negative means not yet started
+        const transitionFrameAt = fromClipFrameAt - (fromClipNumFrames - transitionNumFramesSafe);
 
-      if (!verbose) {
-        const percentDone = Math.floor(100 * (totalFramesWritten / estimatedTotalFrames));
-        if (totalFramesWritten % 10 === 0) process.stdout.write(`${String(percentDone).padStart(3, ' ')}% `);
-      }
-
-      // console.log({ transitionFrameAt, transitionNumFramesSafe })
-      // const transitionLastFrameIndex = transitionNumFramesSafe - 1;
-      const transitionLastFrameIndex = transitionNumFramesSafe;
-
-      // Done with transition?
-      if (transitionFrameAt >= transitionLastFrameIndex) {
-        transitionFromClipId += 1;
-        console.log(`Done with transition, switching to next transitionFromClip (${transitionFromClipId})`);
-
-        if (!getTransitionFromClip()) {
-          console.log('No more transitionFromClip, done');
-          break;
+        if (!verbose) {
+          const percentDone = Math.floor(100 * (totalFramesWritten / estimatedTotalFrames));
+          if (totalFramesWritten % 10 === 0) process.stdout.write(`${String(percentDone).padStart(3, ' ')}% `);
         }
 
-        // Cleanup completed frameSource1, swap and load next frameSource2
-        await frameSource1.close();
-        frameSource1 = frameSource2;
-        frameSource2 = await getTransitionToSource();
+        // console.log({ transitionFrameAt, transitionNumFramesSafe })
+        // const transitionLastFrameIndex = transitionNumFramesSafe - 1;
+        const transitionLastFrameIndex = transitionNumFramesSafe;
 
-        fromClipFrameAt = transitionLastFrameIndex;
-        toClipFrameAt = 0;
+        // Done with transition?
+        if (transitionFrameAt >= transitionLastFrameIndex) {
+          transitionFromClipId += 1;
+          console.log(`Done with transition, switching to next transitionFromClip (${transitionFromClipId})`);
 
-        // eslint-disable-next-line no-continue
-        continue;
-      }
+          if (!getTransitionFromClip()) {
+            console.log('No more transitionFromClip, done');
+            break;
+          }
 
-      if (logTimes) console.time('Read frameSource1');
-      const newFrameSource1Data = await frameSource1.readNextFrame({ time: fromClipTime });
-      if (logTimes) console.timeEnd('Read frameSource1');
-      // If we got no data, use the old data
-      // TODO maybe abort?
-      if (newFrameSource1Data) frameSource1Data = newFrameSource1Data;
-      else console.warn('No frame data returned, using last frame');
+          // Cleanup completed frameSource1, swap and load next frameSource2
+          await frameSource1.close();
+          frameSource1 = frameSource2;
+          frameSource2 = await getTransitionToSource();
 
-      const isInTransition = frameSource2 && transitionNumFramesSafe > 0 && transitionFrameAt >= 0;
+          fromClipFrameAt = transitionLastFrameIndex;
+          toClipFrameAt = 0;
 
-      let outFrameData;
+          // eslint-disable-next-line no-continue
+          continue;
+        }
 
-      if (isInTransition) {
-        if (logTimes) console.time('Read frameSource2');
-        const frameSource2Data = await frameSource2.readNextFrame({ time: toClipTime });
-        if (logTimes) console.timeEnd('Read frameSource2');
+        if (logTimes) console.time('Read frameSource1');
+        const newFrameSource1Data = await frameSource1.readNextFrame({ time: fromClipTime });
+        if (logTimes) console.timeEnd('Read frameSource1');
+        // If we got no data, use the old data
+        // TODO maybe abort?
+        if (newFrameSource1Data) frameSource1Data = newFrameSource1Data;
+        else console.warn('No frame data returned, using last frame');
 
-        if (frameSource2Data) {
-          const progress = transitionFrameAt / transitionNumFramesSafe;
-          const easedProgress = currentTransition.easingFunction(progress);
+        const isInTransition = frameSource2 && transitionNumFramesSafe > 0 && transitionFrameAt >= 0;
 
-          if (logTimes) console.time('runTransitionOnFrame');
-          outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data, toFrame: frameSource2Data, progress: easedProgress, transitionName: currentTransition.name, transitionParams: currentTransition.params });
-          if (logTimes) console.timeEnd('runTransitionOnFrame');
+        let outFrameData;
+
+        if (isInTransition) {
+          if (logTimes) console.time('Read frameSource2');
+          const frameSource2Data = await frameSource2.readNextFrame({ time: toClipTime });
+          if (logTimes) console.timeEnd('Read frameSource2');
+
+          if (frameSource2Data) {
+            const progress = transitionFrameAt / transitionNumFramesSafe;
+            const easedProgress = currentTransition.easingFunction(progress);
+
+            if (logTimes) console.time('runTransitionOnFrame');
+            outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data, toFrame: frameSource2Data, progress: easedProgress, transitionName: currentTransition.name, transitionParams: currentTransition.params });
+            if (logTimes) console.timeEnd('runTransitionOnFrame');
+          } else {
+            console.warn('Got no frame data from transitionToClip!');
+            // We have probably reached end of clip2 but transition is not complete. Just pass thru clip1
+            outFrameData = frameSource1Data;
+          }
         } else {
-          console.warn('Got no frame data from transitionToClip!');
-          // We have probably reached end of clip2 but transition is not complete. Just pass thru clip1
+          // Not in transition. Pass thru clip 1
           outFrameData = frameSource1Data;
         }
-      } else {
-        // Not in transition. Pass thru clip 1
-        outFrameData = frameSource1Data;
-      }
 
-      if (verbose) {
-        if (isInTransition) console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`, 'to clip', getTransitionToClipId(), `(frame ${toClipFrameAt} / ${transitionNumFramesSafe})`, currentTransition.name, `${currentTransition.duration}s`);
-        else console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`);
-        // console.log(outFrameData.length / 1e6, 'MB');
-      }
+        if (verbose) {
+          if (isInTransition) console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`, 'to clip', getTransitionToClipId(), `(frame ${toClipFrameAt} / ${transitionNumFramesSafe})`, currentTransition.name, `${currentTransition.duration}s`);
+          else console.log('Writing frame:', totalFramesWritten, 'from clip', transitionFromClipId, `(frame ${fromClipFrameAt})`);
+          // console.log(outFrameData.length / 1e6, 'MB');
+        }
 
-      const nullOutput = false;
+        const nullOutput = false;
 
-      if (logTimes) console.time('outProcess.write');
+        if (logTimes) console.time('outProcess.write');
 
-      // If we don't wait, then we get EINVAL when dealing with high resolution files (big writes)
-      if (!nullOutput) await new Promise((r) => outProcess.stdin.write(outFrameData, r));
+        // If we don't wait, then we get EINVAL when dealing with high resolution files (big writes)
+        if (!nullOutput) await new Promise((r) => outProcess.stdin.write(outFrameData, r));
 
-      if (logTimes) console.timeEnd('outProcess.write');
+        if (logTimes) console.timeEnd('outProcess.write');
 
-      if (outProcessError) break;
+        if (outProcessError) break;
 
-      totalFramesWritten += 1;
-      fromClipFrameAt += 1;
-      if (isInTransition) toClipFrameAt += 1;
-    } // End while loop
+        totalFramesWritten += 1;
+        fromClipFrameAt += 1;
+        if (isInTransition) toClipFrameAt += 1;
+      } // End while loop
 
-    outProcess.stdin.end();
-  } catch (err) {
-    outProcess.kill();
-    if (!keepTmp) await fsExtra.remove(tmpDir);
-    throw err;
-  } finally {
-    if (verbose) console.log('Cleanup');
-    if (frameSource1) await frameSource1.close();
-    if (frameSource2) await frameSource2.close();
-  }
+      outProcess.stdin.end();
+    } catch (err) {
+      outProcess.kill();
+      throw err;
+    } finally {
+      if (verbose) console.log('Cleanup');
+      if (frameSource1) await frameSource1.close();
+      if (frameSource2) await frameSource2.close();
+    }
 
-  try {
-    if (verbose) console.log('Waiting for output ffmpeg process to finish');
-    await outProcess;
-  } catch (err) {
-    if (outProcessExitCode !== 0 && !err.killed) throw err;
+    try {
+      if (verbose) console.log('Waiting for output ffmpeg process to finish');
+      await outProcess;
+    } catch (err) {
+      if (outProcessExitCode !== 0 && !err.killed) throw err;
+    }
   } finally {
     if (!keepTmp) await fsExtra.remove(tmpDir);
   }
