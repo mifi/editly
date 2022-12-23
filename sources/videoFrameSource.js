@@ -65,7 +65,8 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
 
   // TODO assert that we have read the correct amount of frames
 
-  const buf = Buffer.allocUnsafe(frameByteSize);
+  let buf = Buffer.allocUnsafe(frameByteSize);
+  const frameBuffer = Buffer.allocUnsafe(frameByteSize);
   let length = 0;
   // let inFrameCount = 0;
 
@@ -109,8 +110,27 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     ended = true;
   });
 
+  // returns a frame from the buffer if available
+  function getNextFrame() {
+    if (length >= frameByteSize) {
+      // copy the frame
+      buf.copy(frameBuffer, 0, 0, frameByteSize);
+      // move remaining buffer content to the beginning
+      buf.copy(buf, 0, frameByteSize, length);
+      length -= frameByteSize;
+      return frameBuffer;
+    }
+    return null;
+  }
+
   async function readNextFrame(progress, canvas) {
     const rgba = await new Promise((resolve, reject) => {
+      const frame = getNextFrame();
+      if (frame) {
+        resolve(frame);
+        return;
+      }
+
       if (ended) {
         console.log(path, 'Tried to read next video frame after ffmpeg video stream ended');
         resolve();
@@ -131,28 +151,25 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
       }
 
       function handleChunk(chunk) {
-        // console.log('chunk', chunk.length);
-        const nCopied = length + chunk.length > frameByteSize ? frameByteSize - length : chunk.length;
+        const nCopied = Math.min(buf.length - length, chunk.length);
         chunk.copy(buf, length, 0, nCopied);
         length += nCopied;
-
-        if (length > frameByteSize) console.error('Video data overflow', length);
-
-        if (length >= frameByteSize) {
-          // console.log('Finished reading frame', inFrameCount, path);
-          const out = Buffer.from(buf);
-
-          const restLength = chunk.length - nCopied;
-          if (restLength > 0) {
-            // if (verbose) console.log('Left over data', nCopied, chunk.length, restLength);
-            chunk.slice(nCopied).copy(buf, 0);
-            length = restLength;
-          } else {
-            length = 0;
+        const out = getNextFrame();
+        const restLength = chunk.length - nCopied;
+        if (restLength > 0) {
+          if (verbose) console.log('Left over data', nCopied, chunk.length, restLength);
+          // make sure the buffer can store all chunk data
+          if (chunk.length > buf.length) {
+            if (verbose) console.log('resizing buffer', buf.length, chunk.length);
+            const newBuf = Buffer.allocUnsafe(chunk.length);
+            buf.copy(newBuf, 0, 0, length);
+            buf = newBuf;
           }
+          chunk.copy(buf, length, nCopied);
+          length += restLength;
+        }
 
-          // inFrameCount += 1;
-
+        if (out) {
           clearTimeout(timeout);
           cleanup();
           resolve(out);
