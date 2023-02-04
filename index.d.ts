@@ -281,6 +281,12 @@ declare namespace Editly {
 
 	}
 
+	interface VideoPostProcessingFunctionArgs {
+		canvas: Fabric.Canvas;
+		image: Fabric.Image;
+		progress: number;	
+	}
+
 	/**
 	 * For video layers, if parent `clip.duration` is specified, the video will be slowed/sped-up to match `clip.duration`.
 	 * If `cutFrom`/`cutTo` is set, the resulting segment (`cutTo`-`cutFrom`) will be slowed/sped-up to fit `clip.duration`.
@@ -372,6 +378,10 @@ declare namespace Editly {
 		 */
 		mixVolume?: number | string;
 
+		/**
+		 * Post-processing function after calling rgbaToFabricImage but before adding it to StaticCanvas.
+		 */
+		fabricImagePostProcessing?: (data: VideoPostProcessingFunctionArgs) => Promise<void>;
 	}
 
 	/**
