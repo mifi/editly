@@ -284,6 +284,7 @@ declare namespace Editly {
 	interface VideoPostProcessingFunctionArgs {
 		canvas: Fabric.Canvas;
 		image: Fabric.Image;
+		fabric: typeof Fabric,
 		progress: number;	
 	}
 

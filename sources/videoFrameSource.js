@@ -1,5 +1,6 @@
 import { execa } from 'execa';
 import assert from 'assert';
+import { fabric } from 'fabric';
 
 import { getFfmpegCommonArgs } from '../ffmpeg.js';
 import { readFileStreams } from '../util.js';
@@ -228,7 +229,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     }
 
     if (fabricImagePostProcessing) {
-      fabricImagePostProcessing({ image: img, progress, canvas });
+      fabricImagePostProcessing({ image: img, progress, fabric, canvas });
     }
 
     canvas.add(img);
