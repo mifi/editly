@@ -285,7 +285,8 @@ declare namespace Editly {
 		canvas: Fabric.Canvas;
 		image: Fabric.Image;
 		fabric: typeof Fabric,
-		progress: number;	
+		progress: number;
+		time: number;
 	}
 
 	/**
