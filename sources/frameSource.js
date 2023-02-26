@@ -75,7 +75,7 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
 
       if (shouldDrawLayer) {
         if (logTimes) console.time('frameSource.readNextFrame');
-        const rgba = await frameSource.readNextFrame(offsetProgress, canvas, secondsProgress);
+        const rgba = await frameSource.readNextFrame(offsetProgress, canvas, offsetTime);
         if (logTimes) console.timeEnd('frameSource.readNextFrame');
 
         // Frame sources can either render to the provided canvas and return nothing
