@@ -53,7 +53,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
     // https://github.com/mifi/editly/issues/39
     if (['image', 'image-overlay'].includes(type)) {
       await assertFileValid(restLayer.path, allowRemoteRequests);
-    } else if (type === 'gl') {
+    } else if (type === 'gl' && restLayer.fragmentPath) {
       await assertFileValid(restLayer.fragmentPath, allowRemoteRequests);
     }
 
