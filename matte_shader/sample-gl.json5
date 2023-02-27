@@ -1,0 +1,21 @@
+{
+  outPath: './mia-edit.mp4',
+  fast: false,
+  keepSourceAudio: true,
+  outputVolume: 1,
+  clips: [
+    {
+      layers: [
+        {
+          type: 'video',
+          path: './mia.mp4'
+        },
+        {
+          type: 'gl',
+          fragmentPath: './matte.gl',
+          vertexPath: './matte_vert.gl',
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+precision highp float;
+uniform sampler2D tex;
+varying vec2 TextureCoordsVarying;
+uniform float time; 
+uniform float duration;
+const float PI = 3.1415926;
+const float _ColorCutoff = 0.223;
+const float _ColorFeathering = 0.321;
+const vec3 _KeyColor = vec3(0.09411766, 0.7568628, 0.5568628);
+const vec4 _TintColor = vec4(236.0 / 255.0, 3.0 / 255.0, 252.0 / 255.0, 1.0);
+const float _Sharpening = 0.654;
+const float _MaskFeathering = 0.89;
+const float _Despill = 0.271;
+const float _DespillLuminanceAdd = 0.58;
+
+float rgb2y(vec3 c) 
+{
+    return (0.299*c.r + 0.587*c.g + 0.114*c.b);
+}
+
+float rgb2cb(vec3 c) 
+{
+    return (0.5 + -0.168736*c.r - 0.331264*c.g + 0.5*c.b);
+}
+
+float rgb2cr(vec3 c) 
+{
+    return (0.5 + 0.5*c.r - 0.418688*c.g - 0.081312*c.b);
+}
+
+float colorclose(float Cb_p, float Cr_p, float Cb_key, float Cr_key, float tola, float tolb)
+{
+    float temp = (Cb_key-Cb_p)*(Cb_key-Cb_p)+(Cr_key-Cr_p)*(Cr_key-Cr_p);
+    float tola2 = tola*tola;
+    float tolb2 = tolb*tolb;
+    if (temp < tola2) return 0.0;
+    if (temp < tolb2) return (temp-tola2)/(tolb2-tola2);
+    return 1.0;
+}
+
+float maskedTex2D(sampler2D tex, vec2 uv)
+{
+    vec4 color = texture2D(tex, uv);
+    
+    // Chroma key to CYK conversion
+    float key_cb = rgb2cb(_KeyColor.rgb);
+    float key_cr = rgb2cr(_KeyColor.rgb);
+    float pix_cb = rgb2cb(color.rgb);
+    float pix_cr = rgb2cr(color.rgb);
+
+    return colorclose(pix_cb, pix_cr, key_cb, key_cr, _ColorCutoff, _ColorFeathering);
+}
+    
+void main() {
+
+    vec2 texSize2D = vec2(1920, 1080);
+    float textureSize = float(texSize2D.x);
+    float texelSize = 1.0 / textureSize;
+
+    vec2 pixelWidth = vec2(texelSize, 0);
+    vec2 pixelHeight = vec2(0, texelSize);
+    
+    vec4 color = texture2D(tex, TextureCoordsVarying);
+
+    float mask = maskedTex2D(tex, TextureCoordsVarying);
+
+    float c = mask;
+    float r = maskedTex2D(tex, TextureCoordsVarying + pixelWidth);
+    float l = maskedTex2D(tex, TextureCoordsVarying - pixelWidth);
+    float d = maskedTex2D(tex, TextureCoordsVarying + pixelHeight); 
+    float u = maskedTex2D(tex, TextureCoordsVarying - pixelHeight);
+    float rd = maskedTex2D(tex, TextureCoordsVarying + pixelWidth + pixelHeight) * .707;
+    float dl = maskedTex2D(tex, TextureCoordsVarying - pixelWidth + pixelHeight) * .707;
+    float lu = maskedTex2D(tex, TextureCoordsVarying - pixelHeight - pixelWidth) * .707;
+    float ur = maskedTex2D(tex, TextureCoordsVarying + pixelWidth - pixelHeight) * .707;
+    float blurContribution = (r + l + d + u + rd + dl + lu + ur + c) * 0.12774655;
+    float x = mix(c, blurContribution, _MaskFeathering);
+    float smoothedMask = smoothstep(_Sharpening, 1.0, x);
+    vec4 result = color * smoothedMask;
+
+    float v = (2.0 * result.b + result.r) / 4.0;
+    if(result.g > v) result.g = mix(result.g, v, _Despill);
+    vec4 dif = (color - result);
+    float desaturatedDif = rgb2y(dif.xyz);
+    result += mix(0.0, desaturatedDif, _DespillLuminanceAdd);
+
+    result = result * smoothedMask;
+    result = result + (_TintColor * (1.0 - smoothedMask));
+
+    gl_FragColor = vec4(result.xyz, 1.0);
+}
+

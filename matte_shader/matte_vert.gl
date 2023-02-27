@@ -1,0 +1,12 @@
+attribute vec2 position;
+varying vec2 TextureCoordsVarying;
+const float PI = 3.1415926;
+uniform float time;
+
+void main(void) {
+    gl_Position = vec4(position, 0, 1);
+    //TextureCoordsVarying = position;
+    
+    TextureCoordsVarying.x = position.x * 0.5 + 0.5;
+    TextureCoordsVarying.y = position.y * 0.5 + 0.5;
+}
