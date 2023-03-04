@@ -124,7 +124,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     return null;
   }
 
-  async function readNextFrame(progress, canvas) {
+  async function readNextFrame(progress, canvas, time) {
     const rgba = await new Promise((resolve, reject) => {
       const frame = getNextFrame();
       if (frame) {
@@ -229,7 +229,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     }
 
     if (fabricImagePostProcessing) {
-      fabricImagePostProcessing({ image: img, progress, fabric, canvas });
+      fabricImagePostProcessing({ image: img, progress, fabric, canvas, time });
     }
 
     canvas.add(img);

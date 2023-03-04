@@ -68,13 +68,14 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
     // eslint-disable-next-line no-restricted-syntax
     for (const { frameSource, layer } of layerFrameSources) {
       // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });
-      const offsetProgress = (time - (layer.start)) / layer.layerDuration;
+      const offsetTime = time - layer.start;
+      const offsetProgress = offsetTime / layer.layerDuration;
       // console.log({ offsetProgress });
       const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
 
       if (shouldDrawLayer) {
         if (logTimes) console.time('frameSource.readNextFrame');
-        const rgba = await frameSource.readNextFrame(offsetProgress, canvas);
+        const rgba = await frameSource.readNextFrame(offsetProgress, canvas, offsetTime);
         if (logTimes) console.timeEnd('frameSource.readNextFrame');
 
         // Frame sources can either render to the provided canvas and return nothing
