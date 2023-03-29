@@ -1,25 +1,30 @@
-const pMap = require('p-map');
-const { basename, join } = require('path');
-const flatMap = require('lodash/flatMap');
-const assert = require('assert');
+import pMap from 'p-map';
+import { basename, join } from 'path';
+import flatMap from 'lodash-es/flatMap.js';
+import assert from 'assert';
+import { fileURLToPath } from 'url';
 
-const { readVideoFileInfo, readAudioFileInfo } = require('./util');
-const { registerFont } = require('./sources/fabric');
-const { calcTransition } = require('./transitions');
+import {
+  readVideoFileInfo,
+  readAudioFileInfo,
+  assertFileValid,
+  checkTransition,
+} from './util.js';
+import { registerFont } from './sources/fabric.js';
+import { calcTransition } from './transitions.js';
 
-const { assertFileValid, checkTransition } = require('./util');
+const dirname = fileURLToPath(new URL('.', import.meta.url));
 
 // Cache
 const loadedFonts = [];
 
-
-async function validateArbitraryAudio(audio) {
+async function validateArbitraryAudio(audio, allowRemoteRequests) {
   assert(audio === undefined || Array.isArray(audio));
 
   if (audio) {
     // eslint-disable-next-line no-restricted-syntax
     for (const { path, cutFrom, cutTo, start } of audio) {
-      await assertFileValid(path, false);
+      await assertFileValid(path, allowRemoteRequests);
 
       if (cutFrom != null && cutTo != null) assert(cutTo > cutFrom);
       if (cutFrom != null) assert(cutFrom >= 0);
@@ -29,7 +34,7 @@ async function validateArbitraryAudio(audio) {
   }
 }
 
-async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, loopAudio, allowRemoteRequests, ffprobePath }) {
+export default async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests, ffprobePath }) {
   const defaults = {
     duration: 4,
     ...defaultsIn,
@@ -59,7 +64,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
     // TODO if random-background radial-gradient linear etc
     if (type === 'pause') return handleLayer({ ...restLayer, type: 'fill-color' });
 
-    if (type === 'rainbow-colors') return handleLayer({ type: 'gl', fragmentPath: join(__dirname, 'shaders/rainbow-colors.frag') });
+    if (type === 'rainbow-colors') return handleLayer({ type: 'gl', fragmentPath: join(dirname, 'shaders/rainbow-colors.frag') });
 
     if (type === 'editly-banner') {
       const { fontPath } = layer;
@@ -146,7 +151,7 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
 
         const inputDuration = cutTo - cutFrom;
 
-        const isRotated = rotation === 90 || rotation === 270;
+        const isRotated = [-90, 90, 270, -270].includes(rotation);
         const inputWidth = isRotated ? heightIn : widthIn;
         const inputHeight = isRotated ? widthIn : heightIn;
 
@@ -237,7 +242,6 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
     };
   }, { concurrency: 1 });
 
-
   let totalClipDuration = 0;
   const clipDetachedAudio = [];
 
@@ -274,19 +278,15 @@ async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: a
   // Audio can either come from `audioFilePath`, `audio` or from "detached" audio layers from clips
   const arbitraryAudio = [
     // Background audio is treated just like arbitrary audio
-    ...(backgroundAudioPath ? [{ path: backgroundAudioPath, mixVolume: 1, loop: loopAudio ? -1 : 0 }] : []),
+    ...(backgroundAudioPath ? [{ path: backgroundAudioPath, mixVolume: backgroundAudioVolume != null ? backgroundAudioVolume : 1, loop: loopAudio ? -1 : 0 }] : []),
     ...arbitraryAudioIn,
     ...clipDetachedAudio,
   ];
 
-  await validateArbitraryAudio(arbitraryAudio);
+  await validateArbitraryAudio(arbitraryAudio, allowRemoteRequests);
 
   return {
     clips: clipsOut,
     arbitraryAudio,
   };
 }
-
-module.exports = {
-  parseConfig,
-};

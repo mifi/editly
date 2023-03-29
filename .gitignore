@@ -108,3 +108,7 @@ dist
 editly-tmp-*/
 *.mp4
 *.gif
+
+# Other
+.idea
+pnpm-lock.yaml

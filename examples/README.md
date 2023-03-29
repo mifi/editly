@@ -86,6 +86,11 @@ node customCanvas.js
 node customFabric.js
 ```
 
+## `fabricImagePostProcessing`
+
+https://user-images.githubusercontent.com/907138/214545896-ab420beb-bd50-4974-9bad-9657e4f0c849.mp4
+
+[fabricImagePostProcessing.js](fabricImagePostProcessing.js)
 
 ## LosslessCut tutorial
 

@@ -1,0 +1,12 @@
+/.github/workflows/test.yml
+/.eslintrc.cjs
+/test.js
+/Dockerfile
+/docker-compose.yml
+/logo.png
+/examples
+/.cache
+/yarn-error.log
+editly-tmp-*/
+*.mp4
+*.gif
