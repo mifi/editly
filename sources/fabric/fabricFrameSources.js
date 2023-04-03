@@ -14,9 +14,20 @@ const loadImage = async (pathOrUrl) => new Promise((resolve) => fabric.util.load
 
 function getZoomParams({ progress, zoomDirection, zoomAmount }) {
   let scaleFactor = 1;
+  if (zoomDirection === 'left' || zoomDirection === 'right') return 1.3;
   if (zoomDirection === 'in') scaleFactor = (1 + zoomAmount * progress);
   else if (zoomDirection === 'out') scaleFactor = (1 + zoomAmount * (1 - progress));
   return scaleFactor;
+}
+
+function getTranslationParams({ progress, zoomDirection, zoomAmount }) {
+  let translation = 0;
+  const range = zoomAmount * 1000;
+
+  if (zoomDirection === 'right') translation = (progress) * range - range / 2;
+  else if (zoomDirection === 'left') translation = (100 - progress * 100) * range - range / 2;
+
+  return translation;
 }
 
 export async function imageFrameSource({ verbose, params, width, height }) {
@@ -46,9 +57,12 @@ export async function imageFrameSource({ verbose, params, width, height }) {
     const img = createImg();
 
     const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
+    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
 
     const ratioW = width / img.width;
     const ratioH = height / img.height;
+
+    img.left = width / 2 + translationParams;
 
     if (['contain', 'contain-blur'].includes(resizeMode)) {
       if (ratioW > ratioH) {
@@ -230,6 +244,9 @@ export async function imageOverlayFrameSource({ params, width, height }) {
   async function onRender(progress, canvas) {
     const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
 
+    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
+    img.left = width / 2 + translationParams;
+
     if (relWidth != null) {
       img.scaleToWidth(relWidth * width * scaleFactor);
     } else if (relHeight != null) {
@@ -257,6 +274,8 @@ export async function titleFrameSource({ width, height, params }) {
 
     const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
 
+    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
+
     const textBox = new fabric.Textbox(text, {
       fill: textColor,
       fontFamily,
@@ -273,7 +292,7 @@ export async function titleFrameSource({ width, height, params }) {
     textImage.set({
       originX,
       originY,
-      left,
+      left: left + translationParams,
       top,
       scaleX: scaleFactor,
       scaleY: scaleFactor,
