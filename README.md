@@ -404,7 +404,7 @@ See [position.json5](examples/position.json5)
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
-| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out` or `null` to disable | | |
+| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out`, `left`, `right` or `null` to disable | | |
 | `zoomAmount` | Zoom amount for Ken Burns effect | `0.1` | |
 
 ## Docker

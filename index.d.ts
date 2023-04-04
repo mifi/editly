@@ -230,7 +230,7 @@ declare namespace Editly {
 		 * Zoom direction for Ken Burns effect.
 		 * Use `null` to disable.
 		 */
-		zoomDirection?: 'in' | 'out' | null;
+		zoomDirection?: 'in' | 'out' | 'left' | `right` | null;
 
 		/**
 		 * Zoom amount for Ken Burns effect.
