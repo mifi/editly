@@ -304,36 +304,40 @@ export async function titleFrameSource({ width, height, params }) {
 }
 
 export async function newsTitleFrameSource({ width, height, params }) {
-  const { text, textColor = '#ffffff', backgroundColor = '#d02a42', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
+  const { text, textColor = '#ffffff', backgroundColor = '#d02a42', fontFamily = defaultFontFamily, fontSize = 0.05, position = { x:0, y:0.08 }, delay = 0, speed = 1 } = params;
 
   async function onRender(progress, canvas) {
     const min = Math.min(width, height);
 
-    const fontSize = Math.round(min * 0.05);
+    const { left, top, originX, originY } = getPositionProps({ position, width, height });
+    const fromLeft = left / width < 0.5;
+    const fontSizeAbs = Math.round(min * fontSize);
 
     const easedBgProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed * 3, 1)));
     const easedTextProgress = easeOutExpo(Math.max(0, Math.min((progress - delay - 0.02) * speed * 4, 1)));
     const easedTextOpacityProgress = easeOutExpo(Math.max(0, Math.min((progress - delay - 0.07) * speed * 4, 1)));
-
-    const top = height * 0.08;
 
     const paddingV = 0.07 * min;
     const paddingH = 0.03 * min;
 
     const textBox = new fabric.Text(text, {
       top,
-      left: paddingV + (easedTextProgress - 1) * width,
       fill: textColor,
       opacity: easedTextOpacityProgress,
       fontFamily,
-      fontSize,
+      fontSize: fontSizeAbs,
       charSpacing: width * 0.1,
     });
+    if (fromLeft) {
+      textBox.set('left', left + paddingV + (easedTextProgress - 1) * width);
+    } else {
+      textBox.set('left', left - paddingV - easedTextProgress * textBox.width);
+    }
 
     const bgWidth = textBox.width + (paddingV * 2);
     const rect = new fabric.Rect({
       top: top - paddingH,
-      left: (easedBgProgress - 1) * bgWidth,
+      left: fromLeft ? (left + (easedBgProgress - 1) * bgWidth) : (left - (easedBgProgress * bgWidth)),
       width: bgWidth,
       height: textBox.height + (paddingH * 2),
       fill: backgroundColor,

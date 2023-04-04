@@ -301,6 +301,7 @@ Title with background
 #### Layer type 'news-title'
 - `fontPath` - See `defaults.layer.fontPath`
 - `text`
+- `fontSize`
 - `textColor` - default `#ffffff`
 - `backgroundColor` - default `#d02a42`
 - `position` - See [Position parameter](#position-parameter)
