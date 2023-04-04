@@ -26,7 +26,7 @@ function getTranslationParams({ progress, zoomDirection, zoomAmount }) {
 
   if (zoomDirection === 'right') translation = (progress) * range - range / 2;
   else if (zoomDirection === 'left') translation = -((progress) * range - range / 2);
-  
+
   return translation;
 }
 
