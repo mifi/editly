@@ -14,7 +14,7 @@ const loadImage = async (pathOrUrl) => new Promise((resolve) => fabric.util.load
 
 function getZoomParams({ progress, zoomDirection, zoomAmount }) {
   let scaleFactor = 1;
-  if (zoomDirection === 'left' || zoomDirection === 'right') return 1.3;
+  if (zoomDirection === 'left' || zoomDirection === 'right') return 1.3 + zoomAmount;
   if (zoomDirection === 'in') scaleFactor = (1 + zoomAmount * progress);
   else if (zoomDirection === 'out') scaleFactor = (1 + zoomAmount * (1 - progress));
   return scaleFactor;
@@ -25,7 +25,7 @@ function getTranslationParams({ progress, zoomDirection, zoomAmount }) {
   const range = zoomAmount * 1000;
 
   if (zoomDirection === 'right') translation = (progress) * range - range / 2;
-  else if (zoomDirection === 'left') translation = (100 - progress * 100) * range - range / 2;
+  else if (zoomDirection === 'left') translation = -((progress) * range - range / 2);
 
   return translation;
 }
