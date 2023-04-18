@@ -279,6 +279,7 @@ See also [Ken Burns parameters](#ken-burns-parameters).
 #### Layer type 'title'
 - `fontPath` - See `defaults.layer.fontPath`
 - `text` - Title text to show, keep it short
+- `fontSize` - Size for font relative to smaller of width/height (default 0.1)
 - `textColor` - default `#ffffff`
 - `position` - See [Position parameter](#position-parameter)
 
