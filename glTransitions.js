@@ -8,13 +8,24 @@ import createTexture from 'gl-texture2d';
 const { default: createTransition } = glTransition;
 
 export default ({ width, height, channels }) => {
-  const gl = GL(width, height);
+  let hasInitBeenCalled = false;
+  let gl;
 
-  if (!gl) {
-    throw new Error('gl returned null, this probably means that some dependencies are not installed. See README.');
+  function initGL() {
+    hasInitBeenCalled = true;
+
+    gl = GL(width, height);
+
+    if (!gl) {
+      throw new Error('gl returned null, this probably means that some dependencies are not installed. See README.');
+    }
   }
 
   function runTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams = {} }) {
+    if (!hasInitBeenCalled) {
+      initGL();
+    }
+
     function convertFrame(buf) {
       // @see https://github.com/stackgl/gl-texture2d/issues/16
       return ndarray(buf, [width, height, channels], [channels, width * channels, 1]);

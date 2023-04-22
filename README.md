@@ -53,6 +53,8 @@ See [examples](https://github.com/mifi/editly/tree/master/examples)
 - (Linux) may require some extra steps. See [headless-gl](https://github.com/stackgl/headless-gl#system-dependencies).
 - **Editly is now ESM only**
 
+Note: While OpenGL is required for transitions, you may disable transitions and circumvent the need for OpenGL by setting all transition durations to zero. This is particularly useful on platforms that do not support installing Xvfb, like Google Cloud Functions.
+
 ## Installing
 
 `npm i -g editly`
