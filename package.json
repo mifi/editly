@@ -12,7 +12,7 @@
   "type": "module",
   "license": "MIT",
   "dependencies": {
-    "canvas": "^2.9.3",
+    "canvas": "^2.11.2",
     "compare-versions": "^4.1.4",
     "execa": "^6.1.0",
     "fabric": "^5.2.4",
