@@ -281,6 +281,7 @@ See also [Ken Burns parameters](#ken-burns-parameters).
 - `text` - Title text to show, keep it short
 - `textColor` - default `#ffffff`
 - `position` - See [Position parameter](#position-parameter)
+- `splitByGrapheme` - To split strings that have no white space concept. This is a cheap way to help with chinese/japanese. Default `false`
 
 See also [Ken Burns parameters](#ken-burns-parameters)
 
@@ -288,6 +289,7 @@ See also [Ken Burns parameters](#ken-burns-parameters)
 - `fontPath` - See `defaults.layer.fontPath`
 - `text` - Subtitle text to show
 - `textColor` - default `#ffffff`
+- `splitByGrapheme` - To split strings that have no white space concept. This is a cheap way to help with chinese/japanese. Default `false`
 
 #### Layer type 'title-background'
 

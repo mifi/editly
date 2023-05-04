@@ -188,7 +188,7 @@ export async function linearGradientFrameSource({ width, height, params }) {
 }
 
 export async function subtitleFrameSource({ width, height, params }) {
-  const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
+  const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = defaultFontFamily, delay = 0, speed = 1, splitByGrapheme } = params;
 
   async function onRender(progress, canvas) {
     const easedProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed, 1)));
@@ -199,7 +199,7 @@ export async function subtitleFrameSource({ width, height, params }) {
     const textBox = new fabric.Textbox(text, {
       fill: textColor,
       fontFamily,
-
+      splitByGrapheme,
       fontSize: min / 20,
       textAlign: 'left',
       width: width - padding * 2,
@@ -263,7 +263,7 @@ export async function imageOverlayFrameSource({ params, width, height }) {
 }
 
 export async function titleFrameSource({ width, height, params }) {
-  const { text, textColor = '#ffffff', fontFamily = defaultFontFamily, position = 'center', zoomDirection = 'in', zoomAmount = 0.2 } = params;
+  const { text, textColor = '#ffffff', fontFamily = defaultFontFamily, position = 'center', zoomDirection = 'in', zoomAmount = 0.2, splitByGrapheme } = params;
 
   async function onRender(progress, canvas) {
     // console.log('progress', progress);
@@ -278,6 +278,7 @@ export async function titleFrameSource({ width, height, params }) {
 
     const textBox = new fabric.Textbox(text, {
       fill: textColor,
+      splitByGrapheme,
       fontFamily,
       fontSize,
       textAlign: 'center',
