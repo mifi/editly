@@ -528,7 +528,11 @@ declare namespace Editly {
 		 * Position.
 		 */
 		position?: Position;
-
+		/**
+		 * To split strings that have no white space concept. This is a cheap way to help with chinese/japanese
+		 * Defaults to `false`.
+		 */
+		splitByGrapheme?: boolean;
 	}
 
 	interface SubtitleLayer extends BaseLayer {
@@ -559,7 +563,11 @@ declare namespace Editly {
 		 * WARNING: Undocumented feature!
 		 */
 		backgroundColor?: string;
-
+		/**
+		 * To split strings that have no white space concept. This is a cheap way to help with chinese/japanese
+		 * Defaults to `false`.
+		 */
+		splitByGrapheme?: boolean;
 	}
 
 	/**
