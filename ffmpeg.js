@@ -1,7 +1,7 @@
+import assert from 'node:assert';
 import fsExtra from 'fs-extra';
 import { execa } from 'execa';
-import assert from 'assert';
-import compareVersions from 'compare-versions';
+import { compareVersions } from 'compare-versions';
 
 export const getFfmpegCommonArgs = ({ enableFfmpegLog }) => (enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']);
 

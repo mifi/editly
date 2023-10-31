@@ -1,7 +1,7 @@
+import { basename, join } from 'node:path';
+import assert from 'node:assert';
 import pMap from 'p-map';
-import { basename, join } from 'path';
 import flatMap from 'lodash-es/flatMap.js';
-import assert from 'assert';
 import { fileURLToPath } from 'url';
 
 import {

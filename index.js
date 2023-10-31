@@ -1,6 +1,6 @@
+import assert from 'node:assert';
+import { join, dirname } from 'node:path';
 import { execa } from 'execa';
-import assert from 'assert';
-import { join, dirname } from 'path';
 import JSON5 from 'json5';
 import fsExtra from 'fs-extra';
 import { nanoid } from 'nanoid';

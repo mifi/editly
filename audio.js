@@ -1,5 +1,5 @@
+import { join, basename, resolve } from 'node:path';
 import pMap from 'p-map';
-import { join, basename, resolve } from 'path';
 import { execa } from 'execa';
 import flatMap from 'lodash-es/flatMap.js';
 

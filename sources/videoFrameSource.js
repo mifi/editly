@@ -1,5 +1,5 @@
+import assert from 'node:assert';
 import { execa } from 'execa';
-import assert from 'assert';
 import { fabric } from 'fabric';
 
 import { getFfmpegCommonArgs } from '../ffmpeg.js';

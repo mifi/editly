@@ -1,4 +1,4 @@
-import editly from '..';
+import editly from '../index.js';
 
 // See https://github.com/mifi/editly/pull/222
 
