@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import meow from 'meow';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
+import assert from 'node:assert';
 import { fileTypeFromFile } from 'file-type';
 import pMap from 'p-map';
 import JSON5 from 'json5';
-import assert from 'assert';
+import meow from 'meow';
 
 import Editly from './index.js';
 

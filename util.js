@@ -1,5 +1,5 @@
+import assert from 'node:assert';
 import { execa } from 'execa';
-import assert from 'assert';
 import sortBy from 'lodash-es/sortBy.js';
 import fsExtra from 'fs-extra';
 

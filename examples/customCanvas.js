@@ -1,4 +1,4 @@
-import editly from '..';
+import editly from '../index.js';
 
 async function func({ canvas }) {
   async function onRender(progress) {

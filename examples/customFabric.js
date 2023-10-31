@@ -1,4 +1,4 @@
-import editly from '..';
+import editly from '../index.js';
 
 /* eslint-disable spaced-comment,no-param-reassign */
 
