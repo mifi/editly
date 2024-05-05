@@ -10,7 +10,7 @@ import {
 } from './fabric.js';
 
 export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
-  const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null } = params;
+  const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null, loop } = params;
 
   const requestedWidth = requestedWidthRel ? Math.round(requestedWidthRel * canvasWidth) : canvasWidth;
   const requestedHeight = requestedHeightRel ? Math.round(requestedHeightRel * canvasHeight) : canvasHeight;
@@ -83,12 +83,14 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
   // http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
+
   const args = [
     ...getFfmpegCommonArgs({ enableFfmpegLog }),
     ...(inputCodec ? ['-vcodec', inputCodec] : []),
     ...(cutFrom ? ['-ss', cutFrom] : []),
+    ...(loop ? ['-stream_loop','-1'] : []),
     '-i', path,
-    ...(cutTo ? ['-t', (cutTo - cutFrom) * speedFactor] : []),
+    ...(cutTo && !loop ? ['-t', (cutTo - cutFrom) * speedFactor] : []),
     '-vf', `${ptsFilter}fps=${framerateStr},${scaleFilter}`,
     '-map', 'v:0',
     '-vcodec', 'rawvideo',

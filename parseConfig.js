@@ -135,9 +135,10 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
       const thisLayerDefaults = (defaults.layerType || {})[layerIn.type];
 
       const layer = { ...globalLayerDefaults, ...thisLayerDefaults, ...layerIn };
-      const { type, path } = layer;
+      const { type, path, loop } = layer;
 
       if (type === 'video') {
+
         const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = await readVideoFileInfo(ffprobePath, path);
         let { cutFrom, cutTo } = layer;
         if (!cutFrom) cutFrom = 0;
@@ -155,7 +156,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
         const inputWidth = isRotated ? heightIn : widthIn;
         const inputHeight = isRotated ? widthIn : heightIn;
 
-        return { ...layer, cutFrom, cutTo, inputDuration, framerateStr, inputWidth, inputHeight };
+        return { ...layer, cutFrom, cutTo, inputDuration, framerateStr, inputWidth, inputHeight, loop };
       }
 
       // Audio is handled later
@@ -205,12 +206,15 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
       }
 
       if (type === 'video') {
-        const { inputDuration } = layer;
+        const { inputDuration, loop } = layer;
+        console.log('loop: ', loop);
 
         let speedFactor;
 
         // If user explicitly specified duration for clip, it means that should be the output duration of the video
-        if (userClipDuration) {
+        if (loop){
+          speedFactor = 1;
+        } else if (userClipDuration) {
           // Later we will speed up or slow down video using this factor
           speedFactor = userClipDuration / inputDuration;
         } else {

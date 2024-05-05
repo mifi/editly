@@ -321,6 +321,8 @@ declare namespace Editly {
 		 */
 		cutFrom?: number;
 
+		loop?: boolean;
+
 		/**
 		 * Time value to cut to (in seconds).
 		 * Defaults to *end of video*.
