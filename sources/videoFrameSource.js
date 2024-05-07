@@ -9,8 +9,8 @@ import {
   blurImage,
 } from './fabric.js';
 
-export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
-  const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null, loop } = params;
+export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, duration, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
+  const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null, loop = false } = params;
 
   const requestedWidth = requestedWidthRel ? Math.round(requestedWidthRel * canvasWidth) : canvasWidth;
   const requestedHeight = requestedHeightRel ? Math.round(requestedHeightRel * canvasHeight) : canvasHeight;
@@ -84,13 +84,14 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
 
+  // TODO: maybe change to -vf loop=loop=XXXXX
   const args = [
     ...getFfmpegCommonArgs({ enableFfmpegLog }),
     ...(inputCodec ? ['-vcodec', inputCodec] : []),
     ...(cutFrom ? ['-ss', cutFrom] : []),
     ...(loop ? ['-stream_loop','-1'] : []),
     '-i', path,
-    ...(cutTo && !loop ? ['-t', (cutTo - cutFrom) * speedFactor] : []),
+    ...(loop ? ['-t',duration] : cutTo ? ['-t', (cutTo - cutFrom) * speedFactor] : []),
     '-vf', `${ptsFilter}fps=${framerateStr},${scaleFilter}`,
     '-map', 'v:0',
     '-vcodec', 'rawvideo',
@@ -123,6 +124,10 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
       length -= frameByteSize;
       return frameBuffer;
     }
+    if(length == 0){
+      console.log('No more frames')
+    }
+    // TODO: is this is here to get the end of the video?
     return null;
   }
 
