@@ -124,9 +124,6 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
       length -= frameByteSize;
       return frameBuffer;
     }
-    if(length == 0){
-      console.log('No more frames')
-    }
     // TODO: is this is here to get the end of the video?
     return null;
   }
