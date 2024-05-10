@@ -12,6 +12,7 @@ import {
 } from './util.js';
 import { registerFont } from './sources/fabric.js';
 import { calcTransition } from './transitions.js';
+import fabric from 'fabric';
 
 const dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -46,6 +47,13 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
       ...defaultsIn.transition,
     },
   };
+
+  // register default font
+  if(defaultsIn?.layer?.fontPath && defaultsIn.layer.fontFamily){
+    registerFont(defaultsIn.layer.fontPath, { family: defaultsIn.layer.fontFamily, weight: 'regular', style: 'normal' });
+    loadedFonts.push(defaultsIn.layer.fontFamily);
+    console.log('Default font registered');
+  }
 
   async function handleLayer(layer) {
     const { type, ...restLayer } = layer;
