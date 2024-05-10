@@ -49,9 +49,11 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
   };
 
   // register default font
-  if(defaultsIn?.layer?.fontPath && defaultsIn.layer.fontFamily){
-    registerFont(defaultsIn.layer.fontPath, { family: defaultsIn.layer.fontFamily, weight: 'regular', style: 'normal' });
-    loadedFonts.push(defaultsIn.layer.fontFamily);
+  // console.log(defaultsIn);
+  const { layer } = defaultsIn;
+  if(layer !== undefined && layer.fontPath !== undefined && layer.fontFamilly !== undefined){
+    registerFont(layer.fontPath, { family: layer.fontFamilly, weight: 'regular', style: 'normal' });
+    loadedFonts.push(layer.fontFamilly);
     console.log('Default font registered');
   }
 
