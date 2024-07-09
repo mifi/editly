@@ -112,3 +112,5 @@ editly-tmp-*/
 # Other
 .idea
 pnpm-lock.yaml
+yarn.lock
+package-lock.json
