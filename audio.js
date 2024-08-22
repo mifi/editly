@@ -170,7 +170,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
       const cutToArg = (cutTo != null ? `:end=${cutTo}` : '');
       const apadArg = i > 0 ? ',apad' : ''; // Don't pad the first track (audio from video clips with correct duration)
 
-      return `[${i}]atrim=start=${cutFrom || 0}${cutToArg},adelay=delays=${Math.floor((start || 0) * 1000)}:all=1${apadArg}[a${i}]`;
+      return `[${i}:a]atrim=start=${cutFrom || 0}${cutToArg},adelay=delays=${Math.floor((start || 0) * 1000)}:all=1${apadArg}[a${i}]`;
     }).join(';');
 
     const volumeArg = outputVolume != null ? `,volume=${outputVolume}` : '';
@@ -185,6 +185,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
         '-stream_loop', (loop || 0),
         '-i', path,
       ]))),
+      '-vn',
       '-filter_complex', filterComplex,
       '-c:a', 'flac',
       '-y',
