@@ -171,14 +171,14 @@ const gradientColors = [
   ],
 ]; */
 
-function getRandomColor(colors = allColors) {
+export function getRandomColor(colors = allColors) {
   const index = Math.floor(Math.random() * colors.length);
   const remainingColors = [...colors];
   remainingColors.splice(index, 1);
   return { remainingColors, color: colors[index] || allColors[0] };
 }
 
-function getRandomColors(num) {
+export function getRandomColors(num) {
   let colors = allColors;
   const out = [];
   for (let i = 0; i < Math.min(num, allColors.length); i += 1) {
@@ -189,11 +189,6 @@ function getRandomColors(num) {
   return out;
 }
 
-function getRandomGradient() {
+export function getRandomGradient() {
   return gradientColors[Math.floor(Math.random() * gradientColors.length)];
 }
-
-module.exports = {
-  getRandomColors,
-  getRandomGradient,
-};

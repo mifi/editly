@@ -1,4 +1,4 @@
-const editly = require('..');
+import editly from '..';
 
 /* eslint-disable spaced-comment,no-param-reassign */
 

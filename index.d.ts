@@ -230,7 +230,7 @@ declare namespace Editly {
 		 * Zoom direction for Ken Burns effect.
 		 * Use `null` to disable.
 		 */
-		zoomDirection?: 'in' | 'out' | null;
+		zoomDirection?: 'in' | 'out' | 'left' | `right` | null;
 
 		/**
 		 * Zoom amount for Ken Burns effect.
@@ -279,6 +279,14 @@ declare namespace Editly {
 		 */
 		stop?: number;
 
+	}
+
+	interface VideoPostProcessingFunctionArgs {
+		canvas: Fabric.Canvas;
+		image: Fabric.Image;
+		fabric: typeof Fabric,
+		progress: number;
+		time: number;
 	}
 
 	/**
@@ -372,6 +380,10 @@ declare namespace Editly {
 		 */
 		mixVolume?: number | string;
 
+		/**
+		 * Post-processing function after calling rgbaToFabricImage but before adding it to StaticCanvas.
+		 */
+		fabricImagePostProcessing?: (data: VideoPostProcessingFunctionArgs) => Promise<void>;
 	}
 
 	/**
@@ -1042,6 +1054,13 @@ declare namespace Editly {
 		audioFilePath?: string;
 
 		/**
+		 * Background Volume
+		 *
+		 * @see [Audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
+		 */
+		backgroundAudioVolume?: string | number;
+
+		/**
 		 * Loop the audio track if it is shorter than video?
 		 *
 		 * @default false
@@ -1117,7 +1136,7 @@ declare namespace Editly {
 		/**
 		 * Output path (`.mp4` or `.mkv`, can also be a `.gif`).
 		 */
-		outPath: string | undefined;
+		outPath: string;
 
 		/**
 		 * Timestamp to render.

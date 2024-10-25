@@ -1,9 +1,9 @@
-const execa = require('execa');
-const assert = require('assert');
-const sortBy = require('lodash/sortBy');
-const fs = require('fs-extra');
+import { execa } from 'execa';
+import assert from 'assert';
+import sortBy from 'lodash-es/sortBy.js';
+import fsExtra from 'fs-extra';
 
-function parseFps(fps) {
+export function parseFps(fps) {
   const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
   if (match) {
     const num = parseInt(match[1], 10);
@@ -13,14 +13,14 @@ function parseFps(fps) {
   return undefined;
 }
 
-async function readDuration(ffprobePath, p) {
+export async function readDuration(ffprobePath, p) {
   const { stdout } = await execa(ffprobePath, ['-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', p]);
   const parsed = parseFloat(stdout);
   assert(!Number.isNaN(parsed));
   return parsed;
 }
 
-async function readFileStreams(ffprobePath, p) {
+export async function readFileStreams(ffprobePath, p) {
   const { stdout } = await execa(ffprobePath, [
     '-show_entries', 'stream', '-of', 'json', p,
   ]);
@@ -28,13 +28,19 @@ async function readFileStreams(ffprobePath, p) {
   return json.streams;
 }
 
-async function readVideoFileInfo(ffprobePath, p) {
+export async function readVideoFileInfo(ffprobePath, p) {
   const streams = await readFileStreams(ffprobePath, p);
   const stream = streams.find((s) => s.codec_type === 'video'); // TODO
 
   const duration = await readDuration(ffprobePath, p);
 
-  const rotation = stream.tags && stream.tags.rotate && parseInt(stream.tags.rotate, 10);
+  let rotation = parseInt(stream.tags && stream.tags.rotate, 10);
+
+  // If we can't find rotation, try side_data_list
+  if (Number.isNaN(rotation) && Array.isArray(stream.side_data_list) && stream.side_data_list[0] && stream.side_data_list[0].rotation) {
+    rotation = parseInt(stream.side_data_list[0].rotation, 10);
+  }
+
   return {
     // numFrames: parseInt(stream.nb_frames, 10),
     duration,
@@ -45,13 +51,13 @@ async function readVideoFileInfo(ffprobePath, p) {
   };
 }
 
-async function readAudioFileInfo(ffprobePath, p) {
+export async function readAudioFileInfo(ffprobePath, p) {
   const duration = await readDuration(ffprobePath, p);
 
   return { duration };
 }
 
-function toArrayInteger(buffer) {
+export function toArrayInteger(buffer) {
   if (buffer.length > 0) {
     const data = new Uint8ClampedArray(buffer.length);
     for (let i = 0; i < buffer.length; i += 1) {
@@ -63,9 +69,9 @@ function toArrayInteger(buffer) {
 }
 
 // x264 requires multiple of 2
-const multipleOf2 = (x) => Math.round(x / 2) * 2;
+export const multipleOf2 = (x) => Math.round(x / 2) * 2;
 
-function getPositionProps({ position, width, height }) {
+export function getPositionProps({ position, width, height }) {
   let originY = 'center';
   let originX = 'center';
   let top = height / 2;
@@ -125,7 +131,7 @@ function getPositionProps({ position, width, height }) {
   return { originX, originY, top, left };
 }
 
-function getFrameByKeyFrames(keyframes, progress) {
+export function getFrameByKeyFrames(keyframes, progress) {
   if (keyframes.length < 2) throw new Error('Keyframes must be at least 2');
   const sortedKeyframes = sortBy(keyframes, 't');
 
@@ -152,30 +158,15 @@ function getFrameByKeyFrames(keyframes, progress) {
   return Object.fromEntries(Object.entries(prevKeyframe.props).map(([propName, prevVal]) => ([propName, prevVal + ((nextKeyframe.props[propName] - prevVal) * interProgress)])));
 }
 
-const isUrl = (path) => /^https?:\/\//.test(path);
+export const isUrl = (path) => /^https?:\/\//.test(path);
 
-const assertFileValid = async (path, allowRemoteRequests) => {
+export const assertFileValid = async (path, allowRemoteRequests) => {
   if (isUrl(path)) {
     assert(allowRemoteRequests, 'Remote requests are not allowed');
     return;
   }
-  assert(await fs.exists(path), `File does not exist ${path}`);
+  assert(await fsExtra.pathExists(path), `File does not exist ${path}`);
 };
 
 // See #16
-const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', 'Transition must be an object');
-
-
-module.exports = {
-  parseFps,
-  readVideoFileInfo,
-  readAudioFileInfo,
-  multipleOf2,
-  toArrayInteger,
-  readFileStreams,
-  getPositionProps,
-  getFrameByKeyFrames,
-  isUrl,
-  assertFileValid,
-  checkTransition,
-};
+export const checkTransition = (transition) => assert(transition == null || typeof transition === 'object', 'Transition must be an object');

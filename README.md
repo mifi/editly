@@ -1,5 +1,7 @@
 ![](logo.png)
 
+[![Discord](https://img.shields.io/discord/986052452245700659)](https://discord.gg/P3u6zKbDK7) [![NPM version](https://img.shields.io/npm/v/editly.svg?style=flat-square)](https://npmjs.org/package/editly) ![Build status](https://github.com/mifi/editly/actions/workflows/test.yml/badge.svg) [![PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/mifino/usd)
+
 **Editly** is a tool and framework for declarative NLE (**non-linear video editing**) using Node.js and ffmpeg. Editly allows you to easily and **programmatically create a video** from a **set of clips, images, audio and titles**, with smooth transitions and music overlaid.
 
 Editly has a simple CLI for quickly assembling a video from a set of clips or images, or you can use its more flexible JavaScript API.
@@ -49,6 +51,7 @@ See [examples](https://github.com/mifi/editly/tree/master/examples)
 - [Node.js installed](https://nodejs.org/en/) (Use of the latest LTS version is recommended, [v12.16.2 or newer on MacOS](https://github.com/sindresorhus/meow/issues/144).)
 - `ffmpeg` (and `ffprobe`) [installed](http://ffmpeg.org/) and available in `PATH`
 - (Linux) may require some extra steps. See [headless-gl](https://github.com/stackgl/headless-gl#system-dependencies).
+- **Editly is now ESM only**
 
 ## Installing
 
@@ -89,11 +92,10 @@ Without `--fast`, it will default to using the **width**, **height** and **frame
 ## JavaScript library
 
 ```js
-const editly = require('editly');
+import editly from 'editly';
 
 // See editSpec documentation
 await editly(editSpec)
-  .catch(console.error);
 ```
 
 ## Edit spec
@@ -145,7 +147,7 @@ Edit specs are JavaScript / JSON objects describing the whole edit operation wit
   keepSourceAudio: false,
   clipsAudioVolume: 1,
   outputVolume: 1,
-  audio: [
+  audioTracks: [
     {
       path,
       mixVolume: 1,
@@ -397,7 +399,7 @@ See [position.json5](examples/position.json5)
 
 | Parameter  | Description | Default | |
 |-|-|-|-|
-| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out` or `null` to disable | | |
+| `zoomDirection` | Zoom direction for Ken Burns effect: `in`, `out`, `left`, `right` or `null` to disable | | |
 | `zoomAmount` | Zoom amount for Ken Burns effect | `0.1` | |
 
 ## Docker
@@ -405,10 +407,14 @@ See [position.json5](examples/position.json5)
 This should help you use editly as a containerized CLI, without worrying about
 getting all the right versions of dependencies on your system.
 
-```
-docker-compose up
-docker-compose run editly bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"
-docker cp editly:/outputs/audio1.mp4 .
+```bash
+$ git clone https://github.com/mifi/editly.git
+$ cd editly/examples
+$ git clone https://github.com/mifi/editly-assets.git assets
+$ cd ..
+$ docker-compose up
+$ docker-compose run editly bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"
+$ docker cp editly:/outputs/audio1.mp4 .
 ```
 
 ## Troubleshooting
@@ -434,7 +440,8 @@ This package would not exist without the support and help from all the contribut
 
 ## See also
 
-- https://github.com/JonnyBurger/remotion - Awesome React based alternative to editly (not open source)
+- https://github.com/mifi/reactive-video - React based alternative to editly
+- https://github.com/JonnyBurger/remotion - React based alternative to editly (not open source)
 - https://github.com/pankod/canvas2video - Similar project based on Cairo
 - https://github.com/h2non/videoshow - Inspired editly
 - https://github.com/transitive-bullshit/ffmpeg-concat - Inspired editly

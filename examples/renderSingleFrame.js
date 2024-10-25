@@ -1,11 +1,12 @@
-const JSON5 = require('json5');
-const fs = require('fs-extra');
+import { parse } from 'json5';
+import fsExtra from 'fs-extra';
 
-const { renderSingleFrame } = require('..');
+// eslint-disable-next-line import/named
+import { renderSingleFrame } from '..';
 
 (async () => {
   await renderSingleFrame({
     time: 0,
-    clips: JSON5.parse(await fs.readFile('./videos.json5', 'utf-8')).clips,
+    clips: parse(await fsExtra.readFile('./videos.json5', 'utf-8')).clips,
   });
 })().catch(console.error);

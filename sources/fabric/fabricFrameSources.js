@@ -1,38 +1,37 @@
-const {fabric} = require('fabric')
-const fileUrl = require('file-url')
+import { fabric } from 'fabric';
+import fileUrl from 'file-url';
 
-const {getRandomGradient, getRandomColors} = require('../../colors')
-const {easeOutExpo, easeInOutCubic} = require('../../transitions')
-const {getPositionProps, getFrameByKeyFrames, isUrl} = require('../../util')
-const {blurImage} = require('../fabric')
+import { getRandomGradient, getRandomColors } from '../../colors.js';
+import { easeOutExpo, easeInOutCubic } from '../../transitions.js';
+import { getPositionProps, getFrameByKeyFrames, isUrl } from '../../util.js';
+import { blurImage } from '../fabric.js';
 
 // http://fabricjs.com/kitchensink
 
-const defaultFontFamily = 'sans-serif'
+const defaultFontFamily = 'sans-serif';
 
-const loadImage = async (pathOrUrl) =>
-  new Promise((resolve) =>
-    fabric.util.loadImage(
-      isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl),
-      resolve
-    )
-  )
+const loadImage = async (pathOrUrl) => new Promise((resolve) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl), resolve));
 
-function getZoomParams({progress, zoomDirection, zoomAmount}) {
-  let scaleFactor = 1
-  if (zoomDirection === 'in') scaleFactor = 1 + zoomAmount * progress
-  else if (zoomDirection === 'out')
-    scaleFactor = 1 + zoomAmount * (1 - progress)
-  return scaleFactor
+function getZoomParams({ progress, zoomDirection, zoomAmount }) {
+  let scaleFactor = 1;
+  if (zoomDirection === 'left' || zoomDirection === 'right') return 1.3 + zoomAmount;
+  if (zoomDirection === 'in') scaleFactor = (1 + zoomAmount * progress);
+  else if (zoomDirection === 'out') scaleFactor = (1 + zoomAmount * (1 - progress));
+  return scaleFactor;
 }
 
-async function imageFrameSource({verbose, params, width, height}) {
-  const {
-    path,
-    zoomDirection = 'in',
-    zoomAmount = 0.1,
-    resizeMode = 'contain-blur',
-  } = params
+function getTranslationParams({ progress, zoomDirection, zoomAmount }) {
+  let translation = 0;
+  const range = zoomAmount * 1000;
+
+  if (zoomDirection === 'right') translation = (progress) * range - range / 2;
+  else if (zoomDirection === 'left') translation = -((progress) * range - range / 2);
+
+  return translation;
+}
+
+export async function imageFrameSource({ verbose, params, width, height }) {
+  const { path, zoomDirection = 'in', zoomAmount = 0.1, resizeMode = 'contain-blur' } = params;
 
   if (verbose) console.log('Loading', path)
 
@@ -58,10 +57,14 @@ async function imageFrameSource({verbose, params, width, height}) {
   async function onRender(progress, canvas) {
     const img = createImg()
 
-    const scaleFactor = getZoomParams({progress, zoomDirection, zoomAmount})
+    const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
+    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
+
 
     const ratioW = width / img.width
     const ratioH = height / img.height
+
+    img.left = width / 2 + translationParams;
 
     if (['contain', 'contain-blur'].includes(resizeMode)) {
       if (ratioW > ratioH) {
@@ -94,8 +97,8 @@ async function imageFrameSource({verbose, params, width, height}) {
   return {onRender, onClose}
 }
 
-async function fillColorFrameSource({params, width, height}) {
-  const {color} = params
+export async function fillColorFrameSource({ params, width, height }) {
+  const { color } = params;
 
   const randomColor = getRandomColors(1)[0]
 
@@ -125,8 +128,8 @@ function getRekt(width, height) {
   })
 }
 
-async function radialGradientFrameSource({width, height, params}) {
-  const {colors: inColors} = params
+export async function radialGradientFrameSource({ width, height, params }) {
+  const { colors: inColors } = params;
 
   const randomColors = getRandomGradient()
 
@@ -170,8 +173,8 @@ async function radialGradientFrameSource({width, height, params}) {
   return {onRender}
 }
 
-async function linearGradientFrameSource({width, height, params}) {
-  const {colors: inColors} = params
+export async function linearGradientFrameSource({ width, height, params }) {
+  const { colors: inColors } = params;
 
   const randomColors = getRandomGradient()
   const colors = inColors && inColors.length === 2 ? inColors : randomColors
@@ -202,16 +205,8 @@ async function linearGradientFrameSource({width, height, params}) {
   return {onRender}
 }
 
-async function subtitleFrameSource({width, height, params}) {
-  const {
-    text,
-    textColor = '#ffffff',
-    backgroundColor = 'rgba(0,0,0,0.3)',
-    fontFamily = defaultFontFamily,
-    delay = 0,
-    speed = 1,
-    fontSize,
-  } = params
+export async function subtitleFrameSource({ width, height, params }) {
+  const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
 
   async function onRender(progress, canvas) {
     const easedProgress = easeOutExpo(
@@ -252,15 +247,8 @@ async function subtitleFrameSource({width, height, params}) {
   return {onRender}
 }
 
-async function imageOverlayFrameSource({params, width, height}) {
-  const {
-    path,
-    position,
-    width: relWidth,
-    height: relHeight,
-    zoomDirection,
-    zoomAmount = 0.1,
-  } = params
+export async function imageOverlayFrameSource({ params, width, height }) {
+  const { path, position, width: relWidth, height: relHeight, zoomDirection, zoomAmount = 0.1 } = params;
 
   const imgData = await loadImage(path)
 
@@ -280,6 +268,9 @@ async function imageOverlayFrameSource({params, width, height}) {
   async function onRender(progress, canvas) {
     const scaleFactor = getZoomParams({progress, zoomDirection, zoomAmount})
 
+    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
+    img.left = width / 2 + translationParams;
+
     if (relWidth != null) {
       img.scaleToWidth(relWidth * width * scaleFactor)
     } else if (relHeight != null) {
@@ -295,17 +286,9 @@ async function imageOverlayFrameSource({params, width, height}) {
   return {onRender}
 }
 
-async function titleFrameSource({width, height, params}) {
-  // console.log(params)
-  const {
-    text,
-    textColor = '#ffffff',
-    fontFamily = defaultFontFamily,
-    position = 'center',
-    zoomDirection = 'in',
-    zoomAmount = 0.2,
-    fontSize = 0.1,
-  } = params
+export async function titleFrameSource({ width, height, params }) {
+  const { text, textColor = '#ffffff', fontFamily = defaultFontFamily, position = 'center', zoomDirection = 'in', zoomAmount = 0.2 } = params;
+
   async function onRender(progress, canvas) {
     // console.log('progress', progress);
 
@@ -315,6 +298,8 @@ async function titleFrameSource({width, height, params}) {
     // console.log('FontSizeAbs: ', fontSizeAbs)
 
     const scaleFactor = getZoomParams({progress, zoomDirection, zoomAmount})
+
+    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
 
     const textBox = new fabric.Textbox(text, {
       fill: textColor,
@@ -336,7 +321,7 @@ async function titleFrameSource({width, height, params}) {
     textImage.set({
       originX,
       originY,
-      left,
+      left: left + translationParams,
       top,
       scaleX: scaleFactor,
       scaleY: scaleFactor,
@@ -347,16 +332,8 @@ async function titleFrameSource({width, height, params}) {
   return {onRender}
 }
 
-async function newsTitleFrameSource({width, height, params}) {
-  const {
-    text,
-    textColor = '#ffffff',
-    backgroundColor = '#d02a42',
-    fontFamily = defaultFontFamily,
-    delay = 0,
-    speed = 1,
-    fontSize = 0.05,
-  } = params
+export async function newsTitleFrameSource({ width, height, params }) {
+  const { text, textColor = '#ffffff', backgroundColor = '#d02a42', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
 
   async function onRender(progress, canvas) {
     const min = Math.min(width, height)
@@ -449,18 +426,7 @@ async function getFadedObject({object, progress}) {
   return fadedImage
 }
 
-async function slideInTextFrameSource({
-  width,
-  height,
-  params: {
-    position,
-    text,
-    fontSize = 0.05,
-    charSpacing = 0.1,
-    color = '#ffffff',
-    fontFamily = defaultFontFamily,
-  } = {},
-}) {
+export async function slideInTextFrameSource({ width, height, params: { position, text, fontSize = 0.05, charSpacing = 0.1, color = '#ffffff', fontFamily = defaultFontFamily } = {} }) {
   async function onRender(progress, canvas) {
     const fontSizeAbs = Math.round(width * fontSize)
 
@@ -505,19 +471,6 @@ async function slideInTextFrameSource({
   return {onRender}
 }
 
-async function customFabricFrameSource({canvas, width, height, params}) {
-  return params.func({width, height, fabric, canvas, params})
-}
-
-module.exports = {
-  customFabricFrameSource,
-  subtitleFrameSource,
-  titleFrameSource,
-  newsTitleFrameSource,
-  fillColorFrameSource,
-  radialGradientFrameSource,
-  linearGradientFrameSource,
-  imageFrameSource,
-  imageOverlayFrameSource,
-  slideInTextFrameSource,
+export async function customFabricFrameSource({ canvas, width, height, params }) {
+  return params.func(({ width, height, fabric, canvas, params }));
 }

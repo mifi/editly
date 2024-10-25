@@ -1,4 +1,4 @@
-const editly = require('..');
+import editly from '..';
 
 async function func({ canvas }) {
   async function onRender(progress) {

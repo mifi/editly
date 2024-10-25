@@ -1,12 +1,12 @@
-const pMap = require('p-map');
-const { join, basename, resolve } = require('path');
-const execa = require('execa');
-const flatMap = require('lodash/flatMap');
+import pMap from 'p-map';
+import { join, basename, resolve } from 'path';
+import { execa } from 'execa';
+import flatMap from 'lodash-es/flatMap.js';
 
-const { getFfmpegCommonArgs, getCutFromArgs } = require('./ffmpeg');
-const { readFileStreams } = require('./util');
+import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg.js';
+import { readFileStreams } from './util.js';
 
-module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) => {
+export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) => {
   async function createMixedAudioClips({ clips, keepSourceAudio }) {
     return pMap(clips, async (clip, i) => {
       const { duration, layers, transition } = clip;
@@ -197,7 +197,6 @@ module.exports = ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir })
 
     return mixedAudioPath;
   }
-
 
   async function editAudio({ keepSourceAudio, clips, arbitraryAudio, clipsAudioVolume, audioNorm, outputVolume }) {
     // We need clips to process audio, because we need to know duration
