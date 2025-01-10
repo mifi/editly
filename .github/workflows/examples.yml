@@ -1,0 +1,61 @@
+name: Examples
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  list-examples:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set-matrix
+        run: echo "::set-output name=matrix::$(cd examples && ls *.{ts,json5} | jq -R -s -c 'split("\n")[:-1]')"
+  examples:
+    needs: list-examples
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        example: ${{ fromJson(needs.list-examples.outputs.matrix) }}
+      fail-fast: false
+    name: ${{ matrix.example }}
+    env:
+      DISPLAY: :0
+    steps:
+      - run: |
+          sudo apt-get update && sudo apt-get install -y \
+            build-essential \
+            ffmpeg \
+            libcairo2-dev \
+            libgif-dev \
+            libglew-dev \
+            libglu1-mesa-dev \
+            libjpeg-dev \
+            libpango1.0-dev \
+            librsvg2-dev \
+            libxi-dev \
+            pkg-config
+      - run: sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: mifi/editly-assets
+          path: examples/assets
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "yarn"
+          cache-dependency-path: ./package.json
+      - run: yarn install
+      - run: |
+          cd examples
+          ./run "${{ matrix.example }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.example }}
+          path: "*.{png,gif,mp4}"
+          compression-level: 0
+          if-no-files-found: error
