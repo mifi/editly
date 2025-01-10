@@ -1,7 +1,8 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric/node';
 import { createCanvas, ImageData } from 'canvas';
-
 import { boxBlurImage } from '../BoxBlur.js';
+
+export { registerFont } from 'canvas';
 
 // Fabric is used as a fundament for compositing layers in editly
 
@@ -23,14 +24,8 @@ export function canvasToRgba(ctx) {
   return Buffer.from(imageData.data);
 }
 
-export function getNodeCanvasFromFabricCanvas(fabricCanvas) {
-  // https://github.com/fabricjs/fabric.js/blob/26e1a5b55cbeeffb59845337ced3f3f91d533d7d/src/static_canvas.class.js
-  // https://github.com/fabricjs/fabric.js/issues/3885
-  return fabric.util.getNodeCanvas(fabricCanvas.lowerCanvasEl);
-}
-
 export function fabricCanvasToRgba(fabricCanvas) {
-  const internalCanvas = getNodeCanvasFromFabricCanvas(fabricCanvas);
+  const internalCanvas = fabricCanvas.getNodeCanvas();
   const ctx = internalCanvas.getContext('2d');
 
   // require('fs').writeFileSync(`${Math.floor(Math.random() * 1e12)}.png`, internalCanvas.toBuffer('image/png'));
@@ -64,19 +59,19 @@ export function toUint8ClampedArray(buffer) {
   return data;
 }
 
-export function fabricCanvasToFabricImage(fabricCanvas) {
-  const canvas = getNodeCanvasFromFabricCanvas(fabricCanvas);
-  return new fabric.Image(canvas);
-}
-
 export async function rgbaToFabricImage({ width, height, rgba }) {
   const canvas = createCanvas(width, height);
+
+  // FIXME: Fabric tries to add a class to this, but DOM is not defined. Because node?
+  // https://github.com/fabricjs/fabric.js/issues/10032
+  canvas.classList = new Set();
+
   const ctx = canvas.getContext('2d');
   // https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData
   ctx.putImageData(new ImageData(toUint8ClampedArray(rgba), width, height), 0, 0);
   // https://stackoverflow.com/questions/58209996/unable-to-render-tiff-images-and-add-it-as-a-fabric-object
-  return new fabric.Image(canvas);
+  return new fabric.FabricImage(canvas);
 }
 
 export async function createFabricFrameSource(func, { width, height, ...rest }) {
@@ -111,23 +106,15 @@ export async function createCustomCanvasFrameSource({ width, height, params }) {
   };
 }
 
-export function registerFont(...args) {
-  fabric.nodeCanvas.registerFont(...args);
-}
-
 export async function blurImage({ mutableImg, width, height }) {
   mutableImg.setOptions({ scaleX: width / mutableImg.width, scaleY: height / mutableImg.height });
 
-  const fabricCanvas = createFabricCanvas({ width, height });
-  fabricCanvas.add(mutableImg);
-  fabricCanvas.renderAll();
-
-  const internalCanvas = getNodeCanvasFromFabricCanvas(fabricCanvas);
-  const ctx = internalCanvas.getContext('2d');
+  const canvas = mutableImg.toCanvasElement();
+  const ctx = canvas.getContext('2d');
 
   const blurAmount = Math.min(100, Math.max(width, height) / 10); // More than 100 seems to cause issues
   const passes = 1;
   boxBlurImage(ctx, width, height, blurAmount, false, passes);
 
-  return new fabric.Image(internalCanvas);
+  return new fabric.FabricImage(canvas);
 }

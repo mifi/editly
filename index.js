@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid';
 
 import { testFf } from './ffmpeg.js';
 import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util.js';
-import { createFabricCanvas, rgbaToFabricImage, getNodeCanvasFromFabricCanvas } from './sources/fabric.js';
+import { createFabricCanvas, rgbaToFabricImage } from './sources/fabric.js';
 import { createFrameSource } from './sources/frameSource.js';
 import parseConfig from './parseConfig.js';
 import GlTransitions from './glTransitions.js';
@@ -434,7 +434,7 @@ async function renderSingleFrame({
   const fabricImage = await rgbaToFabricImage({ width, height, rgba });
   canvas.add(fabricImage);
   canvas.renderAll();
-  const internalCanvas = getNodeCanvasFromFabricCanvas(canvas);
+  const internalCanvas = canvas.getNodeCanvas();
   await fsExtra.writeFile(outPath, internalCanvas.toBuffer('image/png'));
   canvas.clear();
   canvas.dispose();

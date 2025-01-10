@@ -1,6 +1,6 @@
 import { execa } from 'execa';
 import assert from 'assert';
-import { fabric } from 'fabric';
+import * as fabric from 'fabric/node';
 
 import { getFfmpegCommonArgs } from '../ffmpeg.js';
 import { readFileStreams } from '../util.js';
@@ -217,7 +217,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     });
 
     if (resizeMode === 'contain-blur') {
-      const mutableImg = await new Promise((r) => img.cloneAsImage(r));
+      const mutableImg = img.cloneAsImage();
       const blurredImg = await blurImage({ mutableImg, width: requestedWidth, height: requestedHeight });
       blurredImg.setOptions({
         left,
