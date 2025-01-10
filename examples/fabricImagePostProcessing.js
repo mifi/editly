@@ -7,10 +7,10 @@ editly({
   clips: [{
     duration: 4,
     layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0, cutTo: 4 },
+      { type: 'video', path: './assets/kohlipe1.mp4', cutFrom: 0, cutTo: 4 },
       {
         type: 'video',
-        path: './assets/hiking.mp4',
+        path: './assets/kohlipe2.mp4',
         cutFrom: 0,
         cutTo: 4,
         resizeMode: 'cover',
