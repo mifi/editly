@@ -33,6 +33,7 @@
     "p-map": "^7.0.2"
   },
   "scripts": {
+    "prepare": "tsc -b",
     "test": "node test.js",
     "lint": "eslint ."
   },
@@ -44,10 +45,11 @@
     "editly": "cli.js"
   },
   "devDependencies": {
-    "@types/fabric": "^5.2.4",
+    "@tsconfig/node-lts": "^22.0.1",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-import-exports-imports-resolver": "^1.0.1"
+    "eslint-plugin-import-exports-imports-resolver": "^1.0.1",
+    "typescript": "^5.7.3"
   }
 }
