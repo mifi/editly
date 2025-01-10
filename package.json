@@ -46,10 +46,13 @@
   },
   "devDependencies": {
     "@tsconfig/node-lts": "^22.0.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/lodash-es": "^4.17.12",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-import-exports-imports-resolver": "^1.0.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }
 }
