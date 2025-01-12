@@ -5,23 +5,19 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: macos-latest
-
     steps:
-      - uses: FedericoCarboni/setup-ffmpeg@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: FedericoCarboni/setup-ffmpeg@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 16
-          cache: 'yarn'
+          cache: "yarn"
 
       - run: yarn install --frozen-lockfile
       - run: npm run lint
       - run: npm run test
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: video
           path: editly-out.mp4
