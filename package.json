@@ -47,6 +47,7 @@
     "@types/fabric": "^5.2.4",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.29.1"
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-import-exports-imports-resolver": "^1.0.1"
   }
 }
