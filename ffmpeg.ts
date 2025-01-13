@@ -8,7 +8,7 @@ export function getFfmpegCommonArgs({ enableFfmpegLog }: { enableFfmpegLog?: boo
 }
 
 export function getCutFromArgs({ cutFrom }: { cutFrom?: number }) {
-  return cutFrom ? ['-ss', cutFrom] : [];
+  return cutFrom ? ['-ss', cutFrom.toString()] : [];
 }
 
 export function getCutToArgs({ cutTo, cutFrom, speedFactor }: { cutTo?: number; cutFrom?: number; speedFactor: number }) {
