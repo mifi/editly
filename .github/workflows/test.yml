@@ -16,7 +16,18 @@ jobs:
       DISPLAY: :0
     steps:
       - if: runner.os == 'macOS'
-        run: brew install ffmpeg
+        run: |
+          brew install \
+            cairo \
+            ffmpeg \
+            giflib \
+            jpeg \
+            libpng \
+            librsvg \
+            pango \
+            pixman \
+            pkg-config \
+            python-setuptools
       - if: runner.os == 'Linux'
         run: |
           sudo apt-get update && sudo apt-get install -y \
@@ -37,12 +48,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "yarn"
+          cache: "npm"
           cache-dependency-path: ./package.json
-      - run: yarn install
+      - run: npm install --build-from-source
       - run: npm run lint
       - run: npm run test
       - uses: actions/upload-artifact@v4
         with:
-          name: video
+          name: video-${{ runner.os }}
           path: editly-out.mp4
