@@ -13,15 +13,9 @@ declare namespace Editly {
 	/** Little utility */
 	type OptionalPromise<T> = Promise<T> | T;
 
-	type OriginX =
-		'left' |
-		'center' |
-		'right';
+	type OriginX = Fabric.TOriginX;
 
-	type OriginY =
-		'top' |
-		'center' |
-		'bottom';
+	type OriginY = Fabric.TOriginY;
 
 	/**
 	 * How to fit image to screen. Can be one of:
@@ -553,6 +547,8 @@ declare namespace Editly {
 		 */
 		backgroundColor?: string;
 
+		delay: number;
+		speed: number;
 	}
 
 	/**
@@ -591,6 +587,8 @@ declare namespace Editly {
 		 */
 		position?: Position;
 
+		delay: number;
+		speed: number;
 	}
 
 	interface SlideInTextLayer extends TextLayer {

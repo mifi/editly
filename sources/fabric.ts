@@ -4,7 +4,8 @@ import { boxBlurImage } from '../BoxBlur.js';
 import type { CreateFrameSourceOptions } from '../types.js';
 import type { CanvasLayer, CustomFabricFunctionCallbacks, Layer } from '../index.js';
 
-export type FabricFrameSourceCallback<T> = (options: CreateFrameSourceOptions<T> & { fabric: typeof fabric }) => CustomFabricFunctionCallbacks;
+export type FabricFrameSourceOptions<T> = CreateFrameSourceOptions<T> & { fabric: typeof fabric };
+export type FabricFrameSourceCallback<T> = (options: FabricFrameSourceOptions<T>) => CustomFabricFunctionCallbacks;
 
 // Fabric is used as a fundament for compositing layers in editly
 

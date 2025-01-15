@@ -5,6 +5,7 @@ import { pathExists } from 'fs-extra';
 
 import type { Keyframe, Stream } from './types.js';
 import type { Position, PositionObject, Transition } from './index.js';
+import type { TOriginX, TOriginY } from 'fabric';
 
 export function parseFps(fps?: string) {
   const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
@@ -78,9 +79,9 @@ export function toArrayInteger(buffer: Buffer) {
 // x264 requires multiple of 2
 export const multipleOf2 = (x: number) => Math.round(x / 2) * 2;
 
-export function getPositionProps({ position, width, height }: { position: Position | PositionObject, width: number, height: number }) {
-  let originY = 'center';
-  let originX = 'center';
+export function getPositionProps({ position, width, height }: { position?: Position | PositionObject, width: number, height: number }) {
+  let originY: TOriginY = 'center';
+  let originX: TOriginX = 'center';
   let top = height / 2;
   let left = width / 2;
   const margin = 0.05;
