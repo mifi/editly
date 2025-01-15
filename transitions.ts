@@ -33,7 +33,7 @@ const TransitionAliases: Record<string, Partial<Transition>> = {
   'directional-up': { name: 'directional', params: { direction: [0, -1] } },
 }
 
-export function calcTransition(defaults: Transition | undefined, transition: Transition, isLastClip: boolean) {
+export function calcTransition(defaults: Transition | null | undefined, transition: Transition | null | undefined, isLastClip: boolean) {
   if (transition === null || isLastClip) return { duration: 0 };
 
   let transitionOrDefault: Transition = { ...defaults, ...transition }

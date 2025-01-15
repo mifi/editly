@@ -2,8 +2,6 @@ import * as fabric from 'fabric/node';
 import { createCanvas, ImageData } from 'canvas';
 import { boxBlurImage } from '../BoxBlur.js';
 
-export { registerFont } from 'canvas';
-
 // Fabric is used as a fundament for compositing layers in editly
 
 export function canvasToRgba(ctx) {

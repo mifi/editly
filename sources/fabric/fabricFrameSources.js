@@ -379,14 +379,18 @@ async function getFadedObject({ object, progress }) {
   return fadedImage;
 }
 
-export async function slideInTextFrameSource({ width, height, params: { position, text, fontSize = 0.05, charSpacing = 0.1, color = '#ffffff', fontFamily = defaultFontFamily } = {} }) {
+export async function slideInTextFrameSource({ width, height, params: { position, text, fontSize = 0.05, charSpacing = 0.1, textColor = '#ffffff', color = undefined, fontFamily = defaultFontFamily } = {} }) {
+  if (color) {
+    console.warn('slide-in-text: color is deprecated, use textColor.');
+  }
+
   async function onRender(progress, canvas) {
     const fontSizeAbs = Math.round(width * fontSize);
 
     const { left, top, originX, originY } = getPositionProps({ position, width, height });
 
     const textBox = new fabric.FabricText(text, {
-      fill: color,
+      fill: color ?? textColor,
       fontFamily,
       fontSize: fontSizeAbs,
       charSpacing: width * charSpacing,

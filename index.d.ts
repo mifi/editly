@@ -281,6 +281,32 @@ declare namespace Editly {
 
 	}
 
+	interface TextLayer extends BaseLayer {
+		/**
+		 * Subtitle text to show.
+		 */
+		text: string;
+
+		/**
+		 * Text color.
+		 * Defaults to '#ffffff'.
+		 */
+		textColor?: string;
+
+		/**
+		 * Set font (`.ttf`).
+		 * Defaults to system font.
+		 */
+		fontPath?: string;
+
+		/**
+		 * WARNING: Undocumented feature!
+		 * The font family to use. Must already be registered using `fontPath`.
+		 * If `fontPath` is also provided, this will be ignored.
+		 */
+		fontFamily?: string;
+	}
+
 	interface VideoPostProcessingFunctionArgs {
 		canvas: Fabric.Canvas;
 		image: Fabric.FabricImage;
@@ -500,29 +526,12 @@ declare namespace Editly {
 
 	}
 
-	interface TitleLayer extends BaseLayer, KenBurns {
+	interface TitleLayer extends TextLayer, KenBurns {
 
 		/**
 		 * Layer type.
 		 */
 		type: 'title';
-
-		/**
-		 * Title text to show, keep it short.
-		 */
-		text: string;
-
-		/**
-		 * Text color.
-		 * Defaults to '#ffffff'.
-		 */
-		textColor?: string;
-
-		/**
-		 * Set font (`.ttf`).
-		 * Defaults to system font.
-		 */
-		fontPath?: string;
 
 		/**
 		 * Position.
@@ -531,29 +540,12 @@ declare namespace Editly {
 
 	}
 
-	interface SubtitleLayer extends BaseLayer {
+	interface SubtitleLayer extends TextLayer {
 
 		/**
 		 * Layer type.
 		 */
 		type: 'subtitle';
-
-		/**
-		 * Subtitle text to show.
-		 */
-		text: string;
-
-		/**
-		 * Text color.
-		 * Defaults to '#ffffff'.
-		 */
-		textColor?: string;
-
-		/**
-		 * Set font (`.ttf`).
-		 * Defaults to system font.
-		 */
-		fontPath?: string;
 
 		/**
 		 * WARNING: Undocumented feature!
@@ -565,29 +557,12 @@ declare namespace Editly {
 	/**
 	 * Title with background.
 	 */
-	interface TitleBackgroundLayer extends BaseLayer {
+	interface TitleBackgroundLayer extends TextLayer {
 
 		/**
 		 * Layer type.
 		 */
 		type: 'title-background';
-
-		/**
-		 * Title text to show, keep it short.
-		 */
-		text: string;
-
-		/**
-		 * Text color.
-		 * Defaults to '#ffffff'.
-		 */
-		textColor?: string;
-
-		/**
-		 * Set font (`.ttf`).
-		 * Defaults to system font.
-		 */
-		fontPath?: string;
 
 		/**
 		 * Background layer.
@@ -597,29 +572,12 @@ declare namespace Editly {
 
 	}
 
-	interface NewsTitleLayer extends BaseLayer {
+	interface NewsTitleLayer extends TextLayer {
 
 		/**
 		 * Layer type.
 		 */
 		type: 'news-title';
-
-		/**
-		 * Title text to show, keep it short.
-		 */
-		text: string;
-
-		/**
-		 * Text color.
-		 * Defaults to '#ffffff'.
-		 */
-		textColor?: string;
-
-		/**
-		 * Set font (`.ttf`).
-		 * Defaults to system font.
-		 */
-		fontPath?: string;
 
 		/**
 		 * Background color.
@@ -634,23 +592,12 @@ declare namespace Editly {
 
 	}
 
-	interface SlideInTextLayer extends BaseLayer {
+	interface SlideInTextLayer extends TextLayer {
 
 		/**
 		 * Layer type.
 		 */
 		type: 'slide-in-text';
-
-		/**
-		 * Title text to show, keep it short.
-		 */
-		text: string;
-
-		/**
-		 * Set font (`.ttf`).
-		 * Defaults to system font.
-		 */
-		fontPath?: string;
 
 		/**
 		 * Font size.
@@ -664,6 +611,7 @@ declare namespace Editly {
 
 		/**
 		 * Color.
+		 * @deprecated use `fontColor` instead.
 		 */
 		color?: string;
 
@@ -715,7 +663,7 @@ declare namespace Editly {
 		 * Array of two colors.
 		 * Defaults to random colors.
 		 */
-		colors?: [ string, string ];
+		colors?: [string, string];
 
 	}
 
@@ -730,7 +678,7 @@ declare namespace Editly {
 		 * Array of two colors.
 		 * Defaults to random colors.
 		 */
-		colors?: [ string, string ];
+		colors?: [string, string];
 
 	}
 
@@ -831,6 +779,11 @@ declare namespace Editly {
 		 */
 		type: 'editly-banner';
 
+		/**
+		 * Set font (`.ttf`).
+		 * Defaults to system font.
+		 */
+		fontPath?: string;
 	}
 
 	/**

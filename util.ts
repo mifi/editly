@@ -35,7 +35,9 @@ export async function readVideoFileInfo(ffprobePath: string, p: string) {
   const streams = await readFileStreams(ffprobePath, p);
   const stream = streams.find((s) => s.codec_type === 'video'); // TODO
 
-  if (!stream) return; // TODO[ts]: what's the right thing to do here?
+  if (!stream) {
+    throw new Error(`Could not find a video stream in ${p}`);
+  }
 
   const duration = await readDuration(ffprobePath, p);
 
@@ -167,7 +169,7 @@ export function getFrameByKeyFrames(keyframes: Keyframe[], progress: number) {
 
 export const isUrl = (path: string) => /^https?:\/\//.test(path);
 
-export const assertFileValid = async (path: string, allowRemoteRequests: boolean) => {
+export const assertFileValid = async (path: string, allowRemoteRequests?: boolean) => {
   if (isUrl(path)) {
     assert(allowRemoteRequests, 'Remote requests are not allowed');
     return;
@@ -176,6 +178,6 @@ export const assertFileValid = async (path: string, allowRemoteRequests: boolean
 };
 
 // See #16
-export function checkTransition(transition?: Transition) {
+export function checkTransition(transition?: Transition | null) {
   assert(transition == null || typeof transition === 'object', 'Transition must be an object');
 }
