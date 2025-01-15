@@ -1,4 +1,5 @@
 import type * as Fabric from 'fabric/node';
+import type { Canvas } from "canvas"
 
 /**
  * Edit and render videos.
@@ -691,21 +692,23 @@ declare namespace Editly {
 
 	}
 
-	type OnRenderCallback = (progress: number, canvas: Fabric.Canvas) => OptionalPromise<void>;
-	type OnCloseCallback = () => OptionalPromise<void>;
-
-	interface CustomFunctionCallbacks {
-		onRender: OnRenderCallback;
-		onClose?: OnCloseCallback;
+	interface CustomFabricFunctionCallbacks {
+		onRender: (progress: number, canvas: Fabric.Canvas) => OptionalPromise<void>;
+		onClose?: () => OptionalPromise<void>;
 	}
 
 	interface CustomCanvasFunctionArgs {
 		width: number;
 		height: number;
-		canvas: Fabric.Canvas;
+		canvas: Canvas;
 	}
 
-	type CustomCanvasFunction = (args: CustomCanvasFunctionArgs) => OptionalPromise<CustomFunctionCallbacks>;
+	interface CustomCanvasFunctionCallbacks {
+		onRender: (progress: number) => OptionalPromise<void>;
+		onClose?: () => OptionalPromise<void>;
+	}
+
+	type CustomCanvasFunction = (args: CustomCanvasFunctionArgs) => OptionalPromise<CustomCanvasFunctionCallbacks>;
 
 	interface CanvasLayer extends BaseLayer {
 
@@ -729,7 +732,7 @@ declare namespace Editly {
 		params: any;
 	}
 
-	type CustomFabricFunction = (args: CustomFabricFunctionArgs) => OptionalPromise<CustomFunctionCallbacks>;
+	type CustomFabricFunction = (args: CustomFabricFunctionArgs) => OptionalPromise<CustomFabricFunctionCallbacks>;
 
 	interface FabricLayer extends BaseLayer {
 
@@ -767,6 +770,8 @@ declare namespace Editly {
 		 */
 		speed?: number;
 
+		vertexSrc?: string;
+		fragmentSrc?: string;
 	}
 
 	/**

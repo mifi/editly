@@ -1,23 +1,12 @@
 import GL from 'gl';
 import createShader from 'gl-shader';
 import { readFile } from 'node:fs/promises';
+import type { CreateFrameSourceOptions } from '../types.js';
+import type { GlLayer } from '../index.js';
 
 // I have no idea what I'm doing but it works ¯\_(ツ)_/¯
 
-export type CreateGlFrameSourceOptions = {
-  width: number;
-  height: number;
-  channels: number;
-  params: {
-    vertexPath?: string;
-    fragmentPath?: string;
-    vertexSrc?: string;
-    fragmentSrc?: string;
-    speed?: number;
-  };
-}
-
-export default async function createGlFrameSource({ width, height, channels, params }: CreateGlFrameSourceOptions) {
+export default async function createGlFrameSource({ width, height, channels, params }: CreateFrameSourceOptions<GlLayer>) {
   const gl = GL(width, height);
 
   const defaultVertexSrc = `
