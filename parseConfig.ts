@@ -12,20 +12,8 @@ import {
 } from './util.js';
 import { registerFont } from 'canvas';
 import { calcTransition } from './transitions.js';
-import type { AudioTrack, CanvasLayer, Config, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, VideoLayer } from './index.js';
-
-type LayerDuration<T> = T & {
-  layerDuration: number;
-}
-
-type ProcessedVideoLayer = LayerDuration<VideoLayer> & {
-  framerateStr: string;
-  inputWidth: number;
-  inputHeight: number;
-  speedFactor: number;
-}
-
-type ProcessedLayer = LayerDuration<Exclude<Layer, { type: "video" }>> | ProcessedVideoLayer;
+import type { AudioTrack, CanvasLayer, Config, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer } from './index.js';
+import type { ProcessedVideoLayer, LayerDuration } from "./types.js"
 
 const dirname = fileURLToPath(new URL('.', import.meta.url));
 

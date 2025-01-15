@@ -1,10 +1,11 @@
 // Types used internally and not exposed through any external interfaces.
 // TODO[ts]: Move these elsewhere
 
-import { Layer } from "./index.js";
+import { Layer, VideoLayer } from "./index.js";
 
 export type Stream = {
   codec_type: string;
+  codec_name: string;
   r_frame_rate: string;
   width?: number;
   height?: number;
@@ -33,4 +34,17 @@ export type CreateFrameSourceOptions<T> = {
   enableFfmpegLog: boolean,
   framerateStr: string,
   params: T,
-}
+};
+
+export type LayerDuration<T> = T & {
+  layerDuration: number;
+};
+
+export type ProcessedLayer = LayerDuration<Exclude<Layer, { type: "video" }>> | ProcessedVideoLayer;
+
+export type ProcessedVideoLayer = LayerDuration<VideoLayer> & {
+  framerateStr: string;
+  inputWidth: number;
+  inputHeight: number;
+  speedFactor: number;
+};
