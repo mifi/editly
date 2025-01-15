@@ -125,7 +125,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     return null;
   }
 
-  async function readNextFrame(progress: number, canvas: fabric.Canvas, time: number) {
+  async function readNextFrame(progress: number, canvas: fabric.StaticCanvas, time: number) {
     const rgba = await new Promise<Buffer<ArrayBuffer> | void>((resolve, reject) => {
       const frame = getNextFrame();
       if (frame) {

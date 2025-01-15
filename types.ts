@@ -1,7 +1,8 @@
 // Types used internally and not exposed through any external interfaces.
 // TODO[ts]: Move these elsewhere
 
-import { Layer, VideoLayer } from "./index.js";
+import type { Layer, OptionalPromise, VideoLayer } from "./index.js";
+import { StaticCanvas } from 'fabric/node';
 
 export type Stream = {
   codec_type: string;
@@ -22,6 +23,11 @@ export type Keyframe = {
   props: Record<string, any>;
 };
 
+export interface FrameSource {
+  readNextFrame(progress: number, canvas: StaticCanvas, offsetTime: number): OptionalPromise<Buffer | void>;
+  close?(): OptionalPromise<void | undefined>;
+}
+
 export type CreateFrameSourceOptions<T> = {
   ffmpegPath: string;
   ffprobePath: string;
@@ -33,8 +39,10 @@ export type CreateFrameSourceOptions<T> = {
   logTimes: boolean,
   enableFfmpegLog: boolean,
   framerateStr: string,
-  params: T,
+  params: Omit<T, "type">,
 };
+
+export type CreateFrameSource<T> = (options: CreateFrameSourceOptions<T>) => Promise<FrameSource>;
 
 export type LayerDuration<T> = T & {
   layerDuration: number;

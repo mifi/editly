@@ -303,7 +303,7 @@ declare namespace Editly {
 	}
 
 	interface VideoPostProcessingFunctionArgs {
-		canvas: Fabric.Canvas;
+		canvas: Fabric.StaticCanvas;
 		image: Fabric.FabricImage;
 		fabric: typeof Fabric,
 		progress: number;
@@ -691,7 +691,7 @@ declare namespace Editly {
 	}
 
 	interface CustomFabricFunctionCallbacks {
-		onRender: (progress: number, canvas: Fabric.Canvas) => OptionalPromise<void>;
+		onRender: (progress: number, canvas: Fabric.StaticCanvas) => OptionalPromise<void>;
 		onClose?: () => OptionalPromise<void>;
 	}
 
@@ -726,7 +726,6 @@ declare namespace Editly {
 		width: number;
 		height: number;
 		fabric: typeof Fabric;
-		canvas: Fabric.Canvas;
 		params: any;
 	}
 

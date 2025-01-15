@@ -7,6 +7,7 @@ import {
   createFabricFrameSource,
   createFabricCanvas,
   renderFabricCanvas,
+  type FabricFrameSourceCallback,
 } from './fabric.js';
 import {
   customFabricFrameSource,
@@ -22,8 +23,10 @@ import {
 } from './fabric/fabricFrameSources.js';
 import createVideoFrameSource from './videoFrameSource.js';
 import createGlFrameSource from './glFrameSource.js';
+import type { CreateFrameSource, CreateFrameSourceOptions, LayerDuration } from '../types.js';
+import type { Clip, Layer } from '../index.js';
 
-const fabricFrameSources = {
+const fabricFrameSources: Record<string, FabricFrameSourceCallback<any /* FIXME[ts] */>> = {
   fabric: customFabricFrameSource,
   image: imageFrameSource,
   'image-overlay': imageOverlayFrameSource,
@@ -36,39 +39,56 @@ const fabricFrameSources = {
   'slide-in-text': slideInTextFrameSource,
 };
 
-export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
+const frameSources: Record<string, CreateFrameSource<any>> = {
+  video: createVideoFrameSource,
+  gl: createGlFrameSource,
+  canvas: createCustomCanvasFrameSource,
+};
+
+type FrameSourceOptions = {
+  clip: Clip;
+  clipIndex: number;
+  ffmpegPath: string;
+  ffprobePath: string;
+  width: number,
+  height: number,
+  duration: number,
+  channels: number,
+  verbose: boolean,
+  logTimes: boolean,
+  enableFfmpegLog: boolean,
+  framerateStr: string,
+}
+
+export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }: FrameSourceOptions) {
   const { layers, duration } = clip;
 
-  const visualLayers = layers.filter((layer) => layer.type !== 'audio');
+  const visualLayers = (layers as LayerDuration<Layer>[]).filter((layer) => layer.type !== 'audio');
 
   const layerFrameSources = await pMap(visualLayers, async (layer, layerIndex) => {
     const { type, ...params } = layer;
     if (verbose) console.log('createFrameSource', type, 'clip', clipIndex, 'layer', layerIndex);
 
-    let createFrameSourceFunc;
+    let createFrameSourceFunc: CreateFrameSource<typeof layer>;
     if (fabricFrameSources[type]) {
-      createFrameSourceFunc = async (opts) => createFabricFrameSource(fabricFrameSources[type], opts);
+      createFrameSourceFunc = async (opts: CreateFrameSourceOptions<any>) => createFabricFrameSource(fabricFrameSources[type], opts);
     } else {
-      createFrameSourceFunc = {
-        video: createVideoFrameSource,
-        gl: createGlFrameSource,
-        canvas: createCustomCanvasFrameSource,
-      }[type];
+      createFrameSourceFunc = frameSources[type];
     }
 
     assert(createFrameSourceFunc, `Invalid type ${type}`);
 
-    const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration, channels, verbose, logTimes, enableFfmpegLog, framerateStr, params });
+    const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration: duration!, channels, verbose, logTimes, enableFfmpegLog, framerateStr, params });
     return { layer, frameSource };
   }, { concurrency: 1 });
 
-  async function readNextFrame({ time }) {
+  async function readNextFrame({ time }: { time: number }) {
     const canvas = createFabricCanvas({ width, height });
 
     // eslint-disable-next-line no-restricted-syntax
     for (const { frameSource, layer } of layerFrameSources) {
       // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });
-      const offsetTime = time - layer.start;
+      const offsetTime = time - (layer?.start ?? 0);
       const offsetProgress = offsetTime / layer.layerDuration;
       // console.log({ offsetProgress });
       const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
@@ -102,7 +122,7 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
   }
 
   async function close() {
-    await pMap(layerFrameSources, async ({ frameSource }) => frameSource.close());
+    await pMap(layerFrameSources, async ({ frameSource }) => frameSource.close?.());
   }
 
   return {

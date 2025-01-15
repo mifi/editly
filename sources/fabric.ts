@@ -1,11 +1,11 @@
 import * as fabric from 'fabric/node';
 import { type CanvasRenderingContext2D, createCanvas, ImageData } from 'canvas';
 import { boxBlurImage } from '../BoxBlur.js';
-import type { CreateFrameSourceOptions } from '../types.js';
+import type { CreateFrameSourceOptions, FrameSource } from '../types.js';
 import type { CanvasLayer, CustomFabricFunctionCallbacks, Layer } from '../index.js';
 
 export type FabricFrameSourceOptions<T> = CreateFrameSourceOptions<T> & { fabric: typeof fabric };
-export type FabricFrameSourceCallback<T> = (options: FabricFrameSourceOptions<T>) => CustomFabricFunctionCallbacks;
+export type FabricFrameSourceCallback<T> = (options: FabricFrameSourceOptions<T>) => Promise<CustomFabricFunctionCallbacks>;
 
 // Fabric is used as a fundament for compositing layers in editly
 
@@ -17,7 +17,7 @@ export function canvasToRgba(ctx: CanvasRenderingContext2D) {
   return Buffer.from(imageData.data);
 }
 
-export function fabricCanvasToRgba(fabricCanvas: fabric.Canvas) {
+export function fabricCanvasToRgba(fabricCanvas: fabric.StaticCanvas) {
   const internalCanvas = fabricCanvas.getNodeCanvas();
   const ctx = internalCanvas.getContext('2d');
 
@@ -31,7 +31,7 @@ export function createFabricCanvas({ width, height }: { width: number, height: n
   return new fabric.StaticCanvas(null, { width, height });
 }
 
-export async function renderFabricCanvas(canvas: fabric.Canvas) {
+export async function renderFabricCanvas(canvas: fabric.StaticCanvas) {
   // console.time('canvas.renderAll');
   canvas.renderAll();
   // console.timeEnd('canvas.renderAll');
@@ -70,10 +70,8 @@ export async function rgbaToFabricImage({ width, height, rgba }: { width: number
 export async function createFabricFrameSource<T extends Layer>(
   func: FabricFrameSourceCallback<T>,
   options: CreateFrameSourceOptions<T>
-) {
-  const onInit = async () => func(({ fabric, ...options }));
-
-  const { onRender = () => { }, onClose = () => { } } = await onInit() || {};
+): Promise<FrameSource> {
+  const { onRender = () => { }, onClose = () => { } } = await func({ fabric, ...options }) || {};
 
   return {
     readNextFrame: onRender,
@@ -81,12 +79,7 @@ export async function createFabricFrameSource<T extends Layer>(
   };
 }
 
-interface FrameSource {
-  readNextFrame(progress: number): Promise<Buffer>;
-  close(): Promise<void>;
-}
-
-export async function createCustomCanvasFrameSource({ width, height, params }: Pick<CreateFrameSourceOptions<CanvasLayer>, "width" | "height" | "params">) {
+export async function createCustomCanvasFrameSource({ width, height, params }: Pick<CreateFrameSourceOptions<CanvasLayer>, "width" | "height" | "params">): Promise<FrameSource> {
   const canvas = createCanvas(width, height);
   const context = canvas.getContext('2d');
 
