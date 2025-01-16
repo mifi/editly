@@ -4,11 +4,11 @@ import { getRandomGradient } from '../colors.js';
 import { easeOutExpo, easeInOutCubic } from '../transitions.js';
 import { getFrameByKeyFrames, getPositionProps, loadImage } from '../util.js';
 import { type FabricFrameSourceOptions } from './fabric.js';
-import type { FabricLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../types.js';
+import type { FabricLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, TitleLayer } from '../types.js';
 
 // http://fabricjs.com/kitchensink
 
-const defaultFontFamily = 'sans-serif';
+export const defaultFontFamily = 'sans-serif';
 
 export function getZoomParams({ progress, zoomDirection, zoomAmount = 0.1 }: KenBurns & { progress: number }) {
   let scaleFactor = 1;
@@ -99,45 +99,6 @@ export async function linearGradientFrameSource({ width, height, params }: Fabri
 
     rect.rotate(progress * 30);
     canvas.add(rect);
-  }
-
-  return { onRender };
-}
-
-export async function subtitleFrameSource({ width, height, params }: FabricFrameSourceOptions<SubtitleLayer>) {
-  const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
-  async function onRender(progress: number, canvas: fabric.StaticCanvas) {
-    const easedProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed, 1)));
-
-    const min = Math.min(width, height);
-    const padding = 0.05 * min;
-
-    const textBox = new fabric.Textbox(text, {
-      fill: textColor,
-      fontFamily,
-
-      fontSize: min / 20,
-      textAlign: 'left',
-      width: width - padding * 2,
-      originX: 'center',
-      originY: 'bottom',
-      left: (width / 2) + (-1 + easedProgress) * padding,
-      top: height - padding,
-      opacity: easedProgress,
-    });
-
-    const rect = new fabric.Rect({
-      left: 0,
-      width,
-      height: textBox.height + padding * 2,
-      top: height,
-      originY: 'bottom',
-      fill: backgroundColor,
-      opacity: easedProgress,
-    });
-
-    canvas.add(rect);
-    canvas.add(textBox);
   }
 
   return { onRender };
