@@ -98,7 +98,7 @@ export async function fillColorFrameSource({ params, width, height }: FabricFram
 
   const randomColor = getRandomColors(1)[0];
 
-  async function onRender(progress: number, canvas: fabric.StaticCanvas) {
+  async function onRender(_: number, canvas: fabric.StaticCanvas) {
     const rect = new fabric.Rect({
       left: 0,
       right: 0,

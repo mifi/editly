@@ -23,7 +23,7 @@ import {
 } from './fabric/fabricFrameSources.js';
 import createVideoFrameSource from './videoFrameSource.js';
 import createGlFrameSource from './glFrameSource.js';
-import type { CreateFrameSource, CreateFrameSourceOptions, Clip, DebugOptions } from '../types.js';
+import type { CreateFrameSource, CreateFrameSourceOptions, DebugOptions } from '../types.js';
 import { ProcessedClip } from '../parseConfig.js';
 
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any /* FIXME[ts] */>> = {

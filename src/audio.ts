@@ -6,7 +6,7 @@ import { flatMap } from 'lodash-es';
 import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg.js';
 import { readFileStreams } from './util.js';
 
-import type { AudioLayer, AudioNormalizationOptions, AudioTrack, Clip, Config, Layer, Transition, VideoLayer } from './types.js'
+import type { AudioLayer, AudioNormalizationOptions, AudioTrack, Clip, Config, Transition, VideoLayer } from './types.js'
 
 export type AudioOptions = {
   ffmpegPath: string;
@@ -193,7 +193,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
 
     const volumeArg = outputVolume != null ? `,volume=${outputVolume}` : '';
     const audioNormArg = enableAudioNorm ? `,dynaudnorm=g=${gaussSize}:maxgain=${maxGain}` : '';
-    filterComplex += `;${streams.map((s, i) => `[a${i}]`).join('')}amix=inputs=${streams.length}:duration=first:dropout_transition=0:weights=${streams.map((s) => (s.mixVolume != null ? s.mixVolume : 1)).join(' ')}${audioNormArg}${volumeArg}`;
+    filterComplex += `;${streams.map((_, i) => `[a${i}]`).join('')}amix=inputs=${streams.length}:duration=first:dropout_transition=0:weights=${streams.map((s) => (s.mixVolume != null ? s.mixVolume : 1)).join(' ')}${audioNormArg}${volumeArg}`;
 
     const mixedAudioPath = join(tmpDir, 'audio-mixed.flac');
 

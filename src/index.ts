@@ -12,7 +12,7 @@ import { createFrameSource } from './sources/frameSource.js';
 import parseConfig, { ProcessedClip } from './parseConfig.js';
 import GlTransitions, { type RunTransitionOptions } from './glTransitions.js';
 import Audio from './audio.js';
-import type { Clip, Config, Layer, RenderSingleFrameConfig } from './types.js';
+import type { Config, RenderSingleFrameConfig } from './types.js';
 
 const channels = 4;
 

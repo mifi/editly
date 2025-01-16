@@ -12,7 +12,7 @@ import {
 } from './util.js';
 import { registerFont } from 'canvas';
 import { calcTransition, type CalculatedTransition } from './transitions.js';
-import type { AudioTrack, CanvasLayer, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, DefaultOptions, Clip, Transition, VideoLayer } from './types.js';
+import type { AudioTrack, CanvasLayer, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, DefaultOptions, Clip, VideoLayer } from './types.js';
 
 export type ProcessedClip = {
   layers: Layer[];
