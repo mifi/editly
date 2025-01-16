@@ -1,19 +1,16 @@
 import * as fabric from 'fabric/node';
-import fileUrl from 'file-url';
 
 import { getRandomGradient, getRandomColors } from '../../colors.js';
 import { easeOutExpo, easeInOutCubic } from '../../transitions.js';
-import { getPositionProps, getFrameByKeyFrames, isUrl } from '../../util.js';
-import { blurImage, type FabricFrameSourceOptions } from '../fabric.js';
-import type { FabricLayer, FillColorLayer, ImageLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../../types.js';
+import { getFrameByKeyFrames, getPositionProps, loadImage } from '../../util.js';
+import { type FabricFrameSourceOptions } from '../fabric.js';
+import type { FabricLayer, FillColorLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../../types.js';
 
 // http://fabricjs.com/kitchensink
 
 const defaultFontFamily = 'sans-serif';
 
-const loadImage = (pathOrUrl: string) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl));
-
-function getZoomParams({ progress, zoomDirection, zoomAmount = 0.1 }: KenBurns & { progress: number }) {
+export function getZoomParams({ progress, zoomDirection, zoomAmount = 0.1 }: KenBurns & { progress: number }) {
   let scaleFactor = 1;
   if (zoomDirection === 'left' || zoomDirection === 'right') return 1.3 + zoomAmount;
   if (zoomDirection === 'in') scaleFactor = (1 + zoomAmount * progress);
@@ -21,7 +18,7 @@ function getZoomParams({ progress, zoomDirection, zoomAmount = 0.1 }: KenBurns &
   return scaleFactor;
 }
 
-function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1 }: KenBurns & { progress: number }) {
+export function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1 }: KenBurns & { progress: number }) {
   let translation = 0;
   const range = zoomAmount * 1000;
 
@@ -29,68 +26,6 @@ function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1 }: Ken
   else if (zoomDirection === 'left') translation = -((progress) * range - range / 2);
 
   return translation;
-}
-
-export async function imageFrameSource({ verbose, params, width, height }: FabricFrameSourceOptions<ImageLayer>) {
-  const { path, zoomDirection = 'in', zoomAmount = 0.1, resizeMode = 'contain-blur' } = params;
-
-  if (verbose) console.log('Loading', path);
-
-  const imgData = await loadImage(path);
-
-  const createImg = () => new fabric.FabricImage(imgData, {
-    originX: 'center',
-    originY: 'center',
-    left: width / 2,
-    top: height / 2,
-  });
-
-  let blurredImg: fabric.FabricImage;
-  // Blurred version
-  if (resizeMode === 'contain-blur') {
-    // If we dispose mutableImg, seems to cause issues with the rendering of blurredImg
-    const mutableImg = createImg();
-    if (verbose) console.log('Blurring background');
-    blurredImg = await blurImage({ mutableImg, width, height });
-  }
-
-  async function onRender(progress: number, canvas: fabric.StaticCanvas) {
-    const img = createImg();
-
-    const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
-    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
-
-    const ratioW = width / img.width;
-    const ratioH = height / img.height;
-
-    img.left = width / 2 + translationParams;
-
-    if (['contain', 'contain-blur'].includes(resizeMode)) {
-      if (ratioW > ratioH) {
-        img.scaleToHeight(height * scaleFactor);
-      } else {
-        img.scaleToWidth(width * scaleFactor);
-      }
-    } else if (resizeMode === 'cover') {
-      if (ratioW > ratioH) {
-        img.scaleToWidth(width * scaleFactor);
-      } else {
-        img.scaleToHeight(height * scaleFactor);
-      }
-    } else if (resizeMode === 'stretch') {
-      img.set({ scaleX: (width / img.width) * scaleFactor, scaleY: (height / img.height) * scaleFactor });
-    }
-
-    if (blurredImg) canvas.add(blurredImg);
-    canvas.add(img);
-  }
-
-  function onClose() {
-    if (blurredImg) blurredImg.dispose();
-    // imgData.dispose();
-  }
-
-  return { onRender, onClose };
 }
 
 export async function fillColorFrameSource({ params, width, height }: FabricFrameSourceOptions<FillColorLayer>) {

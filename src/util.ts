@@ -6,6 +6,8 @@ import { pathExists } from 'fs-extra';
 import type { Keyframe, Stream } from './types.js';
 import type { Position, PositionObject, Transition } from './types.js';
 import type { TOriginX, TOriginY } from 'fabric';
+import * as fabric from 'fabric/node';
+import fileUrl from 'file-url';
 
 export function parseFps(fps?: string) {
   const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
@@ -181,3 +183,5 @@ export const assertFileValid = async (path: string, allowRemoteRequests?: boolea
 export function checkTransition(transition?: Transition | null) {
   assert(transition == null || typeof transition === 'object', 'Transition must be an object');
 }
+
+export const loadImage = (pathOrUrl: string) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl));
