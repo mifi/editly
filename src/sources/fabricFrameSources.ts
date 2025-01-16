@@ -1,10 +1,9 @@
 import * as fabric from 'fabric/node';
 
-import { getRandomGradient } from '../colors.js';
 import { easeOutExpo, easeInOutCubic } from '../transitions.js';
 import { getFrameByKeyFrames, getPositionProps } from '../util.js';
 import { type FabricFrameSourceOptions } from './fabric.js';
-import type { FabricLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, TitleLayer } from '../types.js';
+import type { FabricLayer, KenBurns, NewsTitleLayer, SlideInTextLayer, TitleLayer } from '../types.js';
 
 // http://fabricjs.com/kitchensink
 
@@ -31,35 +30,6 @@ export function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1
 export function getRekt(width: number, height: number) {
   // width and height with room to rotate
   return new fabric.Rect({ originX: 'center', originY: 'center', left: width / 2, top: height / 2, width: width * 2, height: height * 2 });
-}
-
-export async function linearGradientFrameSource({ width, height, params }: FabricFrameSourceOptions<LinearGradientLayer>) {
-  const { colors: inColors } = params;
-
-  const randomColors = getRandomGradient();
-  const colors = inColors && inColors.length === 2 ? inColors : randomColors;
-
-  async function onRender(progress: number, canvas: fabric.StaticCanvas) {
-    const rect = getRekt(width, height);
-
-    rect.set('fill', new fabric.Gradient({
-      coords: {
-        x1: 0,
-        y1: 0,
-        x2: width,
-        y2: height,
-      },
-      colorStops: [
-        { offset: 0, color: colors[0] },
-        { offset: 1, color: colors[1] },
-      ],
-    }));
-
-    rect.rotate(progress * 30);
-    canvas.add(rect);
-  }
-
-  return { onRender };
 }
 
 export async function titleFrameSource({ width, height, params }: FabricFrameSourceOptions<TitleLayer>) {
