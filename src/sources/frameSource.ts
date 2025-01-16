@@ -11,9 +11,9 @@ import {
 } from './fabric.js';
 import {
   customFabricFrameSource,
-  newsTitleFrameSource,
   slideInTextFrameSource,
 } from './fabricFrameSources.js';
+import newsTitleFrameSource from './news-title.js';
 import titleFrameSource from './title.js';
 
 import fillColorFrameSource from './fill-color.js';
@@ -32,23 +32,23 @@ import { ProcessedClip } from '../parseConfig.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
-  'news-title': newsTitleFrameSource,
   'slide-in-text': slideInTextFrameSource,
 };
 
 // FIXME[ts]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const frameSources: Record<string, CreateFrameSource<any>> = {
+  'canvas': createCustomCanvasFrameSource,
   'fill-color': fillColorFrameSource,
+  'gl': glFrameSource,
   'image-overlay': imageOverlayFrameSource,
+  'image': imageFrameSource,
   'linear-gradient': linearGradientFrameSource,
+  'news-title': newsTitleFrameSource,
   'radial-gradient': radialGradientFrameSource,
-  canvas: createCustomCanvasFrameSource,
-  gl: glFrameSource,
-  image: imageFrameSource,
-  subtitle: subtitleFrameSource,
-  video: videoFrameSource,
-  title: titleFrameSource,
+  'subtitle': subtitleFrameSource,
+  'title': titleFrameSource,
+  'video': videoFrameSource,
 };
 
 type FrameSourceOptions = DebugOptions & {

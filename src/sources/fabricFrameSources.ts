@@ -1,9 +1,9 @@
 import * as fabric from 'fabric/node';
 
-import { easeOutExpo, easeInOutCubic } from '../transitions.js';
+import { easeInOutCubic } from '../transitions.js';
 import { getFrameByKeyFrames, getPositionProps } from '../util.js';
 import { type FabricFrameSourceOptions } from './fabric.js';
-import type { FabricLayer, KenBurns, NewsTitleLayer, SlideInTextLayer } from '../types.js';
+import type { FabricLayer, KenBurns, SlideInTextLayer } from '../types.js';
 
 // http://fabricjs.com/kitchensink
 
@@ -30,49 +30,6 @@ export function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1
 export function getRekt(width: number, height: number) {
   // width and height with room to rotate
   return new fabric.Rect({ originX: 'center', originY: 'center', left: width / 2, top: height / 2, width: width * 2, height: height * 2 });
-}
-
-export async function newsTitleFrameSource({ width, height, params }: FabricFrameSourceOptions<NewsTitleLayer>) {
-  const { text, textColor = '#ffffff', backgroundColor = '#d02a42', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
-
-  async function onRender(progress: number, canvas: fabric.StaticCanvas) {
-    const min = Math.min(width, height);
-
-    const fontSize = Math.round(min * 0.05);
-
-    const easedBgProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed * 3, 1)));
-    const easedTextProgress = easeOutExpo(Math.max(0, Math.min((progress - delay - 0.02) * speed * 4, 1)));
-    const easedTextOpacityProgress = easeOutExpo(Math.max(0, Math.min((progress - delay - 0.07) * speed * 4, 1)));
-
-    const top = height * 0.08;
-
-    const paddingV = 0.07 * min;
-    const paddingH = 0.03 * min;
-
-    const textBox = new fabric.FabricText(text, {
-      top,
-      left: paddingV + (easedTextProgress - 1) * width,
-      fill: textColor,
-      opacity: easedTextOpacityProgress,
-      fontFamily,
-      fontSize,
-      charSpacing: width * 0.1,
-    });
-
-    const bgWidth = textBox.width + (paddingV * 2);
-    const rect = new fabric.Rect({
-      top: top - paddingH,
-      left: (easedBgProgress - 1) * bgWidth,
-      width: bgWidth,
-      height: textBox.height + (paddingH * 2),
-      fill: backgroundColor,
-    });
-
-    canvas.add(rect);
-    canvas.add(textBox);
-  }
-
-  return { onRender };
 }
 
 async function getFadedObject<T extends fabric.FabricObject>({ object, progress }: { object: T, progress: number }) {
