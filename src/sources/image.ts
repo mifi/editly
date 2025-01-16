@@ -1,6 +1,6 @@
 import { FabricImage, type StaticCanvas } from 'fabric/node';
 import { blurImage } from './fabric.js';
-import { getZoomParams, getTranslationParams } from './fabric/fabricFrameSources.js';
+import { getZoomParams, getTranslationParams } from './fabricFrameSources.js';
 import { loadImage } from '../util.js';
 import type { CreateFrameSourceOptions, FrameSource, ImageLayer } from '../types.js';
 
