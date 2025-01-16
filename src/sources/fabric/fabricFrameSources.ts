@@ -1,10 +1,10 @@
 import * as fabric from 'fabric/node';
 
-import { getRandomGradient, getRandomColors } from '../../colors.js';
+import { getRandomGradient } from '../../colors.js';
 import { easeOutExpo, easeInOutCubic } from '../../transitions.js';
 import { getFrameByKeyFrames, getPositionProps, loadImage } from '../../util.js';
 import { type FabricFrameSourceOptions } from '../fabric.js';
-import type { FabricLayer, FillColorLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../../types.js';
+import type { FabricLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../../types.js';
 
 // http://fabricjs.com/kitchensink
 
@@ -26,25 +26,6 @@ export function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1
   else if (zoomDirection === 'left') translation = -((progress) * range - range / 2);
 
   return translation;
-}
-
-export async function fillColorFrameSource({ params, width, height }: FabricFrameSourceOptions<FillColorLayer>) {
-  const { color } = params;
-
-  const randomColor = getRandomColors(1)[0];
-
-  async function onRender(_: number, canvas: fabric.StaticCanvas) {
-    const rect = new fabric.Rect({
-      left: 0,
-      right: 0,
-      width,
-      height,
-      fill: color || randomColor,
-    });
-    canvas.add(rect);
-  }
-
-  return { onRender };
 }
 
 function getRekt(width: number, height: number) {

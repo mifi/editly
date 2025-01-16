@@ -14,16 +14,17 @@ import {
   subtitleFrameSource,
   titleFrameSource,
   newsTitleFrameSource,
-  fillColorFrameSource,
   radialGradientFrameSource,
   linearGradientFrameSource,
   imageOverlayFrameSource,
   slideInTextFrameSource,
 } from './fabric/fabricFrameSources.js';
 
-import imageFrameSource from './image.js';
-import createVideoFrameSource from './video.js';
 import createGlFrameSource from './gl.js';
+import createVideoFrameSource from './video.js';
+import fillColorFrameSource from './fill-color.js';
+import imageFrameSource from './image.js';
+
 import type { CreateFrameSource, CreateFrameSourceOptions, DebugOptions } from '../types.js';
 import { ProcessedClip } from '../parseConfig.js';
 
@@ -36,7 +37,6 @@ const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   subtitle: subtitleFrameSource,
   'linear-gradient': linearGradientFrameSource,
   'radial-gradient': radialGradientFrameSource,
-  'fill-color': fillColorFrameSource,
   'news-title': newsTitleFrameSource,
   'slide-in-text': slideInTextFrameSource,
 };
@@ -48,6 +48,7 @@ const frameSources: Record<string, CreateFrameSource<any>> = {
   image: imageFrameSource,
   gl: createGlFrameSource,
   canvas: createCustomCanvasFrameSource,
+  'fill-color': fillColorFrameSource,
 };
 
 type FrameSourceOptions = DebugOptions & {
