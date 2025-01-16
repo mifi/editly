@@ -13,17 +13,17 @@ import {
   customFabricFrameSource,
   titleFrameSource,
   newsTitleFrameSource,
-  linearGradientFrameSource,
   slideInTextFrameSource,
 } from './fabricFrameSources.js';
-import radialGradientFrameSource from './radial-gradient.js';
-import imageOverlayFrameSource from './image-overlay.js';
 
-import createGlFrameSource from './gl.js';
-import createVideoFrameSource from './video.js';
 import fillColorFrameSource from './fill-color.js';
+import glFrameSource from './gl.js';
 import imageFrameSource from './image.js';
+import imageOverlayFrameSource from './image-overlay.js';
+import linearGradientFrameSource from './linear-gradient.js';
+import radialGradientFrameSource from './radial-gradient.js';
 import subtitleFrameSource from './subtitle.js';
+import videoFrameSource from './video.js';
 
 import type { CreateFrameSource, CreateFrameSourceOptions, DebugOptions } from '../types.js';
 import { ProcessedClip } from '../parseConfig.js';
@@ -33,7 +33,6 @@ import { ProcessedClip } from '../parseConfig.js';
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
   title: titleFrameSource,
-  'linear-gradient': linearGradientFrameSource,
   'news-title': newsTitleFrameSource,
   'slide-in-text': slideInTextFrameSource,
 };
@@ -41,14 +40,15 @@ const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
 // FIXME[ts]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const frameSources: Record<string, CreateFrameSource<any>> = {
-  video: createVideoFrameSource,
-  image: imageFrameSource,
-  'image-overlay': imageOverlayFrameSource,
-  gl: createGlFrameSource,
-  canvas: createCustomCanvasFrameSource,
   'fill-color': fillColorFrameSource,
+  'image-overlay': imageOverlayFrameSource,
+  'linear-gradient': linearGradientFrameSource,
   'radial-gradient': radialGradientFrameSource,
+  canvas: createCustomCanvasFrameSource,
+  gl: glFrameSource,
+  image: imageFrameSource,
   subtitle: subtitleFrameSource,
+  video: videoFrameSource,
 };
 
 type FrameSourceOptions = DebugOptions & {
