@@ -18,7 +18,7 @@ import {
   linearGradientFrameSource,
   imageOverlayFrameSource,
   slideInTextFrameSource,
-} from './fabric/fabricFrameSources.js';
+} from './fabricFrameSources.js';
 
 import createGlFrameSource from './gl.js';
 import createVideoFrameSource from './video.js';

@@ -1,10 +1,10 @@
 import * as fabric from 'fabric/node';
 
-import { getRandomGradient } from '../../colors.js';
-import { easeOutExpo, easeInOutCubic } from '../../transitions.js';
-import { getFrameByKeyFrames, getPositionProps, loadImage } from '../../util.js';
-import { type FabricFrameSourceOptions } from '../fabric.js';
-import type { FabricLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../../types.js';
+import { getRandomGradient } from '../colors.js';
+import { easeOutExpo, easeInOutCubic } from '../transitions.js';
+import { getFrameByKeyFrames, getPositionProps, loadImage } from '../util.js';
+import { type FabricFrameSourceOptions } from './fabric.js';
+import type { FabricLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../types.js';
 
 // http://fabricjs.com/kitchensink
 
