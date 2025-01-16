@@ -3,7 +3,6 @@ import pMap from 'p-map';
 
 import {
   rgbaToFabricImage,
-  createCustomCanvasFrameSource,
   createFabricFrameSource,
   createFabricCanvas,
   renderFabricCanvas,
@@ -12,17 +11,17 @@ import {
 import {
   customFabricFrameSource,
 } from './fabricFrameSources.js';
-import slideInTextFrameSource from './slide-in-text.js';
-import newsTitleFrameSource from './news-title.js';
-import titleFrameSource from './title.js';
-
+import canvasFrameSource from './canvas.js';
 import fillColorFrameSource from './fill-color.js';
 import glFrameSource from './gl.js';
 import imageFrameSource from './image.js';
 import imageOverlayFrameSource from './image-overlay.js';
 import linearGradientFrameSource from './linear-gradient.js';
+import newsTitleFrameSource from './news-title.js';
 import radialGradientFrameSource from './radial-gradient.js';
+import slideInTextFrameSource from './slide-in-text.js';
 import subtitleFrameSource from './subtitle.js';
+import titleFrameSource from './title.js';
 import videoFrameSource from './video.js';
 
 import type { CreateFrameSource, CreateFrameSourceOptions, DebugOptions } from '../types.js';
@@ -37,7 +36,7 @@ const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
 // FIXME[ts]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const frameSources: Record<string, CreateFrameSource<any>> = {
-  'canvas': createCustomCanvasFrameSource,
+  'canvas': canvasFrameSource,
   'fill-color': fillColorFrameSource,
   'gl': glFrameSource,
   'image-overlay': imageOverlayFrameSource,
