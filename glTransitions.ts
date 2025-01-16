@@ -7,11 +7,11 @@ import createTexture from 'gl-texture2d';
 
 const { default: createTransition } = glTransition;
 
-type RunTransitionOptions = {
+export type RunTransitionOptions = {
   fromFrame: Buffer;
   toFrame: Buffer;
   progress: number;
-  transitionName: string;
+  transitionName?: string;
   transitionParams?: any;
 }
 
@@ -40,7 +40,7 @@ export default ({ width, height, channels }: { width: number, height: number, ch
     try {
       const resizeMode = 'stretch';
 
-      const transitionSource = glTransitions.find((t) => t.name.toLowerCase() === transitionName.toLowerCase());
+      const transitionSource = glTransitions.find((t) => t.name.toLowerCase() === transitionName?.toLowerCase());
 
       transition = createTransition(gl, transitionSource, { resizeMode });
 

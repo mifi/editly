@@ -266,6 +266,11 @@ export interface BaseLayer {
    */
   stop?: number;
 
+  /**
+   * FIXME[ts]: This is used internally and should be removed after some refactoring.
+   * @private
+   */
+  layerDuration?: number;
 }
 
 export interface TextLayer extends BaseLayer {
@@ -397,6 +402,12 @@ export interface VideoLayer extends BaseLayer {
    * Post-processing function after calling rgbaToFabricImage but before adding it to StaticCanvas.
    */
   fabricImagePostProcessing?: (data: VideoPostProcessingFunctionArgs) => Promise<void>;
+
+  // FIXME[TS]: Used internally, but should be removed after refactoring
+  framerateStr?: string;
+  inputWidth?: number;
+  inputHeight?: number;
+  speedFactor?: number;
 }
 
 /**
@@ -818,14 +829,14 @@ export interface Clip {
   /**
    * List of layers within the current clip that will be overlaid in their natural order (final layer on top).
    */
-  layers: Layer[] | Layer;
+  layers: Layer[];
 
   /**
    * Clip duration.
    * If unset, the clip duration will be that of the first video layer.
    * Defaults to `defaults.duration`.
    */
-  duration?: number;
+  duration: number;
 
   /**
    * Specify transition at the end of this clip.
@@ -925,7 +936,13 @@ export interface AudioNormalizationOptions {
 
 }
 
-export interface Config {
+export interface DebugOptions {
+  enableFfmpegLog?: boolean;
+  verbose?: boolean;
+  logTimes?: boolean;
+}
+
+export interface Config extends DebugOptions {
   /**
    * Output path (`.mp4` or `.mkv`, can also be a `.gif`).
    */
@@ -1059,24 +1076,8 @@ export interface Config {
   /**
    * WARNING: Undocumented feature!
    */
-  enableFfmpegLog?: boolean;
-
-  /**
-   * WARNING: Undocumented feature!
-   */
-  verbose?: boolean;
-
-  /**
-   * WARNING: Undocumented feature!
-   */
-  logTimes?: boolean;
-
-  /**
-   * WARNING: Undocumented feature!
-   */
   keepTmp?: boolean;
-
-}
+};
 
 export interface RenderSingleFrameConfig extends Config {
 
@@ -1118,31 +1119,15 @@ export interface FrameSource {
   close?(): OptionalPromise<void | undefined>;
 }
 
-export type CreateFrameSourceOptions<T> = {
+export type CreateFrameSourceOptions<T> = DebugOptions & {
   ffmpegPath: string;
   ffprobePath: string;
   width: number,
   height: number,
   duration: number,
   channels: number,
-  verbose: boolean,
-  logTimes: boolean,
-  enableFfmpegLog: boolean,
   framerateStr: string,
   params: Omit<T, "type">,
 };
 
 export type CreateFrameSource<T> = (options: CreateFrameSourceOptions<T>) => Promise<FrameSource>;
-
-export type LayerDuration<T> = T & {
-  layerDuration: number;
-};
-
-export type ProcessedLayer = LayerDuration<Exclude<Layer, { type: "video" }>> | ProcessedVideoLayer;
-
-export type ProcessedVideoLayer = LayerDuration<VideoLayer> & {
-  framerateStr: string;
-  inputWidth: number;
-  inputHeight: number;
-  speedFactor: number;
-};

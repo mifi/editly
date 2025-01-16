@@ -11,8 +11,14 @@ import {
   checkTransition,
 } from './util.js';
 import { registerFont } from 'canvas';
-import { calcTransition } from './transitions.js';
-import type { AudioTrack, CanvasLayer, Config, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, ProcessedVideoLayer, LayerDuration } from './types.js';
+import { calcTransition, type CalculatedTransition } from './transitions.js';
+import type { AudioTrack, CanvasLayer, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, DefaultOptions, Clip, Transition, VideoLayer } from './types.js';
+
+export type ProcessedClip = {
+  layers: Layer[];
+  duration: number;
+  transition: CalculatedTransition;
+}
 
 const dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -35,9 +41,15 @@ async function validateArbitraryAudio(audio: AudioTrack[] | undefined, allowRemo
   }
 }
 
-type ParseConfigOptions = Required<Pick<Config, 'defaults' | 'clips' | 'backgroundAudioVolume' | 'loopAudio' | 'allowRemoteRequests' | 'ffprobePath'>> & {
-  arbitraryAudio: AudioTrack[];
+type ParseConfigOptions = {
+  defaults: DefaultOptions;
+  clips: Clip[];
+  backgroundAudioVolume?: string | number;
   backgroundAudioPath?: string;
+  loopAudio?: boolean;
+  allowRemoteRequests?: boolean;
+  ffprobePath: string;
+  arbitraryAudio: AudioTrack[];
 };
 
 export default async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests, ffprobePath }: ParseConfigOptions) {
@@ -123,7 +135,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
 
   const detachedAudioByClip: Record<number, AudioTrack[]> = {};
 
-  let clipsOut = await pMap(clips, async (clip, clipIndex) => {
+  let clipsOut: ProcessedClip[] = await pMap(clips, async (clip, clipIndex) => {
     assert(typeof clip === 'object', '"clips" must contain objects with one or more layers');
     const { transition: userTransition, duration: userClipDuration, layers: layersIn } = clip;
 
@@ -142,7 +154,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
 
     const transition = calcTransition(defaults.transition, userTransition, clipIndex === clips.length - 1);
 
-    let layersOut: Layer[] = flatMap(await pMap(layers, async <T extends Layer>(layerIn: T) => {
+    let layersOut = flatMap(await pMap(layers, async <T extends Layer>(layerIn: T) => {
       const globalLayerDefaults = defaults.layer || {};
       const thisLayerDefaults = (defaults.layerType || {})[layerIn.type];
 
@@ -166,7 +178,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
         const inputWidth = isRotated ? heightIn : widthIn;
         const inputHeight = isRotated ? widthIn : heightIn;
 
-        return { ...layer, cutFrom, cutTo, layerDuration, framerateStr, inputWidth, inputHeight } as ProcessedVideoLayer;
+        return { ...layer, cutFrom, cutTo, layerDuration, framerateStr, inputWidth, inputHeight } as T;
       }
 
       // Audio is handled later
@@ -177,8 +189,8 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
 
     let clipDuration = userClipDurationOrDefault;
 
-    const firstVideoLayer = layersOut.find((layer): layer is ProcessedVideoLayer => layer.type === 'video');
-    if (firstVideoLayer && !userClipDuration) clipDuration = firstVideoLayer.layerDuration;
+    const firstVideoLayer = layersOut.find((layer): layer is VideoLayer => layer.type === 'video');
+    if (firstVideoLayer && !userClipDuration) clipDuration = firstVideoLayer.layerDuration!;
     assert(clipDuration);
 
     // We need to map again, because for audio, we need to know the correct clipDuration
@@ -191,7 +203,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
       // TODO Also need to handle video layers (speedFactor etc)
       // TODO handle audio in case of start/stop
 
-      const layer: LayerDuration<T> = { ...layerIn, layerDuration };
+      const layer: T = { ...layerIn, layerDuration };
 
       if (layer.type === 'audio') {
         const { duration: fileDuration } = await readAudioFileInfo(ffprobePath, layer.path);
@@ -263,7 +275,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
     let safeTransitionDuration = 0;
     if (nextClip) {
       // Each clip can have two transitions, make sure we leave enough room:
-      safeTransitionDuration = Math.min(clip.duration / 2, nextClip.duration / 2, clip.transition.duration);
+      safeTransitionDuration = Math.min(clip.duration / 2, nextClip.duration / 2, clip.transition!.duration!);
     }
 
     // We now know all clip durations so we can calculate the offset for detached audio tracks

@@ -23,7 +23,7 @@ import {
 } from './fabric/fabricFrameSources.js';
 import createVideoFrameSource from './videoFrameSource.js';
 import createGlFrameSource from './glFrameSource.js';
-import type { CreateFrameSource, CreateFrameSourceOptions, LayerDuration, Clip, Layer } from '../types.js';
+import type { CreateFrameSource, CreateFrameSourceOptions, Clip, DebugOptions } from '../types.js';
 
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any /* FIXME[ts] */>> = {
   fabric: customFabricFrameSource,
@@ -44,25 +44,21 @@ const frameSources: Record<string, CreateFrameSource<any>> = {
   canvas: createCustomCanvasFrameSource,
 };
 
-type FrameSourceOptions = {
+type FrameSourceOptions = DebugOptions & {
   clip: Clip;
   clipIndex: number;
   ffmpegPath: string;
   ffprobePath: string;
   width: number,
   height: number,
-  duration: number,
   channels: number,
-  verbose: boolean,
-  logTimes: boolean,
-  enableFfmpegLog: boolean,
   framerateStr: string,
 }
 
 export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }: FrameSourceOptions) {
   const { layers, duration } = clip;
 
-  const visualLayers = (layers as LayerDuration<Layer>[]).filter((layer) => layer.type !== 'audio');
+  const visualLayers = layers.filter((layer) => layer.type !== 'audio');
 
   const layerFrameSources = await pMap(visualLayers, async (layer, layerIndex) => {
     const { type, ...params } = layer;
@@ -77,7 +73,7 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
 
     assert(createFrameSourceFunc, `Invalid type ${type}`);
 
-    const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration: duration!, channels, verbose, logTimes, enableFfmpegLog, framerateStr, params });
+    const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration, channels, verbose, logTimes, enableFfmpegLog, framerateStr, params });
     return { layer, frameSource };
   }, { concurrency: 1 });
 
@@ -88,7 +84,7 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
     for (const { frameSource, layer } of layerFrameSources) {
       // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });
       const offsetTime = time - (layer?.start ?? 0);
-      const offsetProgress = offsetTime / layer.layerDuration;
+      const offsetProgress = offsetTime / layer.layerDuration!;
       // console.log({ offsetProgress });
       const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
 

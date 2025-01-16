@@ -8,9 +8,9 @@ import {
   rgbaToFabricImage,
   blurImage,
 } from './fabric.js';
-import type { CreateFrameSourceOptions, ProcessedVideoLayer } from '../types.js';
+import type { CreateFrameSourceOptions, VideoLayer } from '../types.js';
 
-export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }: CreateFrameSourceOptions<ProcessedVideoLayer>) => {
+export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }: CreateFrameSourceOptions<VideoLayer>) => {
   const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null } = params;
 
   const requestedWidth = requestedWidthRel ? Math.round(requestedWidthRel * canvasWidth) : canvasWidth;
@@ -19,9 +19,9 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
   const left = leftRel * canvasWidth;
   const top = topRel * canvasHeight;
 
-  const ratioW = requestedWidth / inputWidth;
-  const ratioH = requestedHeight / inputHeight;
-  const inputAspectRatio = inputWidth / inputHeight;
+  const ratioW = requestedWidth / inputWidth!;
+  const ratioH = requestedHeight / inputHeight!;
+  const inputAspectRatio = inputWidth! / inputHeight!;
 
   let targetWidth = requestedWidth;
   let targetHeight = requestedHeight;
@@ -89,7 +89,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     ...(inputCodec ? ['-vcodec', inputCodec] : []),
     ...(cutFrom ? ['-ss', cutFrom.toString()] : []),
     '-i', path,
-    ...(cutTo ? ['-t', ((cutTo - cutFrom!) * speedFactor).toString()] : []),
+    ...(cutTo ? ['-t', ((cutTo - cutFrom!) * speedFactor!).toString()] : []),
     '-vf', `${ptsFilter}fps=${framerateStr},${scaleFilter}`,
     '-map', 'v:0',
     '-vcodec', 'rawvideo',

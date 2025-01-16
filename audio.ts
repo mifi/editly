@@ -16,14 +16,14 @@ export type AudioOptions = {
   tmpDir: string;
 }
 
-export type EditAudioOptions = Required<Pick<Config, "keepSourceAudio" | "clips" | "clipsAudioVolume" | "audioNorm" | "outputVolume">> & {
+export type EditAudioOptions = Pick<Config, "keepSourceAudio" | "clips" | "clipsAudioVolume" | "audioNorm" | "outputVolume"> & {
   arbitraryAudio: AudioTrack[]
 };
 
 type LayerWithAudio = (AudioLayer | VideoLayer) & { speedFactor: number };
 
 export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: AudioOptions) => {
-  async function createMixedAudioClips({ clips, keepSourceAudio }: { clips: Clip[], keepSourceAudio: boolean }) {
+  async function createMixedAudioClips({ clips, keepSourceAudio }: { clips: Clip[], keepSourceAudio?: boolean }) {
     return pMap(clips, async (clip, i) => {
       const { duration, layers, transition } = clip;
 
@@ -36,7 +36,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
             '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
             '-sample_fmt', 's32',
             '-ar', '48000',
-            '-t', duration!.toString(),
+            '-t', duration.toString(),
             '-c:a', 'flac',
             '-y',
             clipAudioPath,
@@ -50,7 +50,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
         if (!keepSourceAudio) return createSilence();
 
         // TODO:[ts]: Layers is always an array once config is parsed. Fix this in types
-        const audioLayers = (layers as Layer[]).filter(({ type, start, stop }) => (
+        const audioLayers = layers.filter(({ type, start, stop }) => (
           ['audio', 'video'].includes(type)
           // TODO: We don't support audio for start/stop layers
           && !start && stop == null)) as LayerWithAudio[];
@@ -174,7 +174,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
   }
 
   // FIXME[ts]: parseConfig sets `loop` on arbitrary audio tracks. Should that be part of the `AudioTrack` interface?
-  async function mixArbitraryAudio({ streams, audioNorm, outputVolume }: { streams: (AudioTrack & { loop?: number })[], audioNorm: AudioNormalizationOptions, outputVolume: number | string }) {
+  async function mixArbitraryAudio({ streams, audioNorm, outputVolume }: { streams: (AudioTrack & { loop?: number })[], audioNorm?: AudioNormalizationOptions, outputVolume?: number | string }) {
     let maxGain = 30;
     let gaussSize = 5;
     if (audioNorm) {

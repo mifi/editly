@@ -1,6 +1,13 @@
 import assert from 'assert';
 import type { Transition } from './types.js';
 
+export type EasingFunction = (progress: number) => number;
+
+export type CalculatedTransition = Transition & {
+  duration: number;
+  easingFunction: EasingFunction;
+}
+
 const randomTransitionsSet = ['fade', 'fadegrayscale', 'directionalwarp', 'crosswarp', 'dreamyzoom', 'burn', 'crosszoom', 'simplezoom', 'linearblur', 'directional-left', 'directional-right', 'directional-up', 'directional-down'];
 
 function getRandomTransition() {
@@ -17,13 +24,17 @@ export function easeInOutCubic(x: number) {
   return x < 0.5 ? 4 * x * x * x : 1 - ((-2 * x + 2) ** 3) / 2;
 }
 
-function getTransitionEasingFunction(easing: string | null | undefined, transitionName?: string) {
+export function linear(x: number) {
+  return x;
+}
+
+function getTransitionEasingFunction(easing: string | null | undefined, transitionName?: string): EasingFunction {
   if (easing !== null) {
     // FIXME[TS]: `easing` always appears to be null or undefined, so this never gets called
-    if (easing) return { easeOutExpo }[easing];
+    if (easing) return { easeOutExpo }[easing] || linear;
     if (transitionName === 'directional') return easeOutExpo;
   }
-  return (progress: number) => progress;
+  return linear;
 }
 
 const TransitionAliases: Record<string, Partial<Transition>> = {
@@ -33,8 +44,8 @@ const TransitionAliases: Record<string, Partial<Transition>> = {
   'directional-up': { name: 'directional', params: { direction: [0, -1] } },
 }
 
-export function calcTransition(defaults: Transition | null | undefined, transition: Transition | null | undefined, isLastClip: boolean) {
-  if (transition === null || isLastClip) return { duration: 0 };
+export function calcTransition(defaults: Transition | null | undefined, transition: Transition | null | undefined, isLastClip: boolean): CalculatedTransition {
+  if (transition === null || isLastClip) return { duration: 0, easingFunction: linear };
 
   let transitionOrDefault: Transition = { ...defaults, ...transition }
 
