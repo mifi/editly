@@ -1,7 +1,7 @@
 import { Gradient } from 'fabric/node';
 import { getRandomGradient } from '../colors.js';
 import type { LinearGradientLayer } from '../types.js';
-import { getRekt } from './fabricFrameSources.js';
+import { getRekt } from '../util.js';
 import { defineFrameSource } from './index.js';
 
 export default defineFrameSource<LinearGradientLayer>(async ({ width, height, params }) => {

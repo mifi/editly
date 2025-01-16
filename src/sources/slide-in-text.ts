@@ -1,8 +1,7 @@
 import * as fabric from 'fabric/node';
 import { easeInOutCubic } from '../transitions.js';
 import type { SlideInTextLayer } from '../types.js';
-import { getPositionProps, getFrameByKeyFrames } from '../util.js';
-import { defaultFontFamily } from './fabricFrameSources.js';
+import { getPositionProps, getFrameByKeyFrames, defaultFontFamily } from '../util.js';
 import { defineFrameSource } from './index.js';
 
 export default defineFrameSource<SlideInTextLayer>(async ({ width, height, params }) => {
@@ -12,12 +11,12 @@ export default defineFrameSource<SlideInTextLayer>(async ({ width, height, param
     console.warn('slide-in-text: color is deprecated, use textColor.');
   }
 
+  const fontSizeAbs = Math.round(width * fontSize);
+
+  const { left, top, originX, originY } = getPositionProps({ position, width, height });
+
   return {
     async readNextFrame(progress, canvas) {
-      const fontSizeAbs = Math.round(width * fontSize);
-
-      const { left, top, originX, originY } = getPositionProps({ position, width, height });
-
       const textBox = new fabric.FabricText(text, {
         fill: color ?? textColor,
         fontFamily,

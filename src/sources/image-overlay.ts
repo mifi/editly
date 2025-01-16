@@ -1,7 +1,6 @@
 import * as fabric from 'fabric/node';
 import type { ImageOverlayLayer } from '../types.js';
-import { loadImage, getPositionProps } from '../util.js';
-import { getZoomParams, getTranslationParams } from './fabricFrameSources.js';
+import { loadImage, getPositionProps, getZoomParams, getTranslationParams } from '../util.js';
 import { defineFrameSource } from './index.js';
 
 export default defineFrameSource<ImageOverlayLayer>(async ({ params, width, height }) => {
@@ -9,14 +8,8 @@ export default defineFrameSource<ImageOverlayLayer>(async ({ params, width, heig
 
   const imgData = await loadImage(path);
 
-  const { left, top, originX, originY } = getPositionProps({ position, width, height });
 
-  const img = new fabric.FabricImage(imgData, {
-    originX,
-    originY,
-    left,
-    top,
-  });
+  const img = new fabric.FabricImage(imgData, getPositionProps({ position, width, height }));
 
   return {
     async readNextFrame(progress, canvas) {

@@ -1,10 +1,8 @@
 import * as fabric from 'fabric/node';
 import { type CanvasRenderingContext2D, createCanvas, ImageData } from 'canvas';
 import { boxBlurImage } from '../BoxBlur.js';
-import type { CreateFrameSourceOptions, FrameSource, CustomFabricFunctionCallbacks, Layer, OptionalPromise } from '../types.js';
-
-export type FabricFrameSourceOptions<T> = CreateFrameSourceOptions<T> & { fabric: typeof fabric };
-export type FabricFrameSourceCallback<T> = (options: FabricFrameSourceOptions<T>) => OptionalPromise<CustomFabricFunctionCallbacks>;
+import { defineFrameSource } from './index.js';
+import type { FabricLayer } from '../types.js';
 
 // Fabric is used as a fundament for compositing layers in editly
 
@@ -67,18 +65,6 @@ export async function rgbaToFabricImage({ width, height, rgba }: { width: number
   return new fabric.FabricImage(canvas);
 }
 
-export async function createFabricFrameSource<T extends Layer>(
-  func: FabricFrameSourceCallback<T>,
-  options: CreateFrameSourceOptions<T>
-): Promise<FrameSource> {
-  const { onRender = () => { }, onClose = () => { } } = await func({ fabric, ...options }) || {};
-
-  return {
-    readNextFrame: onRender,
-    close: onClose,
-  };
-}
-
 export type BlurImageOptions = {
   mutableImg: fabric.FabricImage,
   width: number,
@@ -96,4 +82,13 @@ export async function blurImage({ mutableImg, width, height }: BlurImageOptions)
   boxBlurImage(ctx, width, height, blurAmount, false, passes);
 
   return new fabric.FabricImage(canvas);
-}
+}// http://fabricjs.com/kitchensink
+
+export default defineFrameSource<FabricLayer>(async ({ width, height, params }) => {
+  const { onRender, onClose } = await params.func(({ width, height, fabric, params }));
+
+  return {
+    readNextFrame: onRender,
+    close: onClose
+  }
+})
