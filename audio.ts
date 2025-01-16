@@ -36,7 +36,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
             '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
             '-sample_fmt', 's32',
             '-ar', '48000',
-            '-t', duration.toString(),
+            '-t', duration!.toString(),
             '-c:a', 'flac',
             '-y',
             clipAudioPath,

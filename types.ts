@@ -836,7 +836,7 @@ export interface Clip {
    * If unset, the clip duration will be that of the first video layer.
    * Defaults to `defaults.duration`.
    */
-  duration: number;
+  duration?: number;
 
   /**
    * Specify transition at the end of this clip.

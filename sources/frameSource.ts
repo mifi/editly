@@ -24,6 +24,7 @@ import {
 import createVideoFrameSource from './videoFrameSource.js';
 import createGlFrameSource from './glFrameSource.js';
 import type { CreateFrameSource, CreateFrameSourceOptions, Clip, DebugOptions } from '../types.js';
+import { ProcessedClip } from '../parseConfig.js';
 
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any /* FIXME[ts] */>> = {
   fabric: customFabricFrameSource,
@@ -45,7 +46,7 @@ const frameSources: Record<string, CreateFrameSource<any>> = {
 };
 
 type FrameSourceOptions = DebugOptions & {
-  clip: Clip;
+  clip: ProcessedClip;
   clipIndex: number;
   ffmpegPath: string;
   ffprobePath: string;
