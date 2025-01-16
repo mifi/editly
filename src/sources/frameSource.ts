@@ -11,10 +11,10 @@ import {
 } from './fabric.js';
 import {
   customFabricFrameSource,
-  titleFrameSource,
   newsTitleFrameSource,
   slideInTextFrameSource,
 } from './fabricFrameSources.js';
+import titleFrameSource from './title.js';
 
 import fillColorFrameSource from './fill-color.js';
 import glFrameSource from './gl.js';
@@ -32,7 +32,6 @@ import { ProcessedClip } from '../parseConfig.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
-  title: titleFrameSource,
   'news-title': newsTitleFrameSource,
   'slide-in-text': slideInTextFrameSource,
 };
@@ -49,6 +48,7 @@ const frameSources: Record<string, CreateFrameSource<any>> = {
   image: imageFrameSource,
   subtitle: subtitleFrameSource,
   video: videoFrameSource,
+  title: titleFrameSource,
 };
 
 type FrameSourceOptions = DebugOptions & {

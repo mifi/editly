@@ -3,7 +3,7 @@ import * as fabric from 'fabric/node';
 import { easeOutExpo, easeInOutCubic } from '../transitions.js';
 import { getFrameByKeyFrames, getPositionProps } from '../util.js';
 import { type FabricFrameSourceOptions } from './fabric.js';
-import type { FabricLayer, KenBurns, NewsTitleLayer, SlideInTextLayer, TitleLayer } from '../types.js';
+import type { FabricLayer, KenBurns, NewsTitleLayer, SlideInTextLayer } from '../types.js';
 
 // http://fabricjs.com/kitchensink
 
@@ -30,47 +30,6 @@ export function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1
 export function getRekt(width: number, height: number) {
   // width and height with room to rotate
   return new fabric.Rect({ originX: 'center', originY: 'center', left: width / 2, top: height / 2, width: width * 2, height: height * 2 });
-}
-
-export async function titleFrameSource({ width, height, params }: FabricFrameSourceOptions<TitleLayer>) {
-  const { text, textColor = '#ffffff', fontFamily = defaultFontFamily, position = 'center', zoomDirection = 'in', zoomAmount = 0.2 } = params;
-
-  async function onRender(progress: number, canvas: fabric.StaticCanvas) {
-    // console.log('progress', progress);
-
-    const min = Math.min(width, height);
-
-    const fontSize = Math.round(min * 0.1);
-
-    const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
-
-    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
-
-    const textBox = new fabric.Textbox(text, {
-      fill: textColor,
-      fontFamily,
-      fontSize,
-      textAlign: 'center',
-      width: width * 0.8,
-    });
-
-    // We need the text as an image in order to scale it
-    const textImage = textBox.cloneAsImage({});
-
-    const { left, top, originX, originY } = getPositionProps({ position, width, height });
-
-    textImage.set({
-      originX,
-      originY,
-      left: left + translationParams,
-      top,
-      scaleX: scaleFactor,
-      scaleY: scaleFactor,
-    });
-    canvas.add(textImage);
-  }
-
-  return { onRender };
 }
 
 export async function newsTitleFrameSource({ width, height, params }: FabricFrameSourceOptions<NewsTitleLayer>) {
