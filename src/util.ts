@@ -156,7 +156,6 @@ export function getFrameByKeyFrames(keyframes: Keyframe[], progress: number) {
   if (invalidKeyframe) throw new Error('Invalid keyframe');
 
   let prevKeyframe = [...sortedKeyframes].reverse().find((k) => k.t < progress);
-  // eslint-disable-next-line prefer-destructuring
   if (!prevKeyframe) prevKeyframe = sortedKeyframes[0];
 
   let nextKeyframe = sortedKeyframes.find((k) => k.t >= progress);

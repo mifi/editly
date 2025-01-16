@@ -1,7 +1,5 @@
 import JSON from 'json5';
 import fsExtra from 'fs-extra';
-
-// eslint-disable-next-line import/named
 import { renderSingleFrame } from 'editly';
 
 (async () => {

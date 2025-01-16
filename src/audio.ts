@@ -113,7 +113,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
         if (processedAudioLayers.length === 1) return { clipAudioPath: processedAudioLayers[0][0], silent: false };
 
         // Merge/mix all layers' audio
-        const weights = processedAudioLayers.map(([_, { mixVolume }]) => mixVolume ?? 1);
+        const weights = processedAudioLayers.map(([, { mixVolume }]) => mixVolume ?? 1);
         const args = [
           ...getFfmpegCommonArgs({ enableFfmpegLog }),
           ...flatMap(processedAudioLayers, ([layerAudioPath]) => ['-i', layerAudioPath]),

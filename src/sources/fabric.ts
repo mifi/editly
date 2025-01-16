@@ -2,9 +2,10 @@ import * as fabric from 'fabric/node';
 import { type CanvasRenderingContext2D, createCanvas, ImageData } from 'canvas';
 import { boxBlurImage } from '../BoxBlur.js';
 import type { CreateFrameSourceOptions, FrameSource, CanvasLayer, CustomFabricFunctionCallbacks, Layer } from '../types.js';
+import { OptionalPromise } from '../../dist/index.js';
 
 export type FabricFrameSourceOptions<T> = CreateFrameSourceOptions<T> & { fabric: typeof fabric };
-export type FabricFrameSourceCallback<T> = (options: FabricFrameSourceOptions<T>) => Promise<CustomFabricFunctionCallbacks>;
+export type FabricFrameSourceCallback<T> = (options: FabricFrameSourceOptions<T>) => OptionalPromise<CustomFabricFunctionCallbacks>;
 
 // Fabric is used as a fundament for compositing layers in editly
 
@@ -56,6 +57,7 @@ export async function rgbaToFabricImage({ width, height, rgba }: { width: number
 
   // FIXME: Fabric tries to add a class to this, but DOM is not defined. Because node?
   // https://github.com/fabricjs/fabric.js/issues/10032
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (canvas as any).classList = new Set();
 
   const ctx = canvas.getContext('2d');

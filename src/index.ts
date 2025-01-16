@@ -276,8 +276,7 @@ async function Editly(config: Config): Promise<void> {
       frameSource1 = await getTransitionFromSource();
       frameSource2 = await getTransitionToSource();
 
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
+      while (!outProcessError) {
         const transitionToClip = getTransitionToClip();
         const transitionFromClip = getTransitionFromClip();
         const fromClipNumFrames = Math.round(transitionFromClip.duration * fps);
@@ -323,7 +322,6 @@ async function Editly(config: Config): Promise<void> {
           fromClipFrameAt = transitionLastFrameIndex;
           toClipFrameAt = 0;
 
-          // eslint-disable-next-line no-continue
           continue;
         }
 
@@ -397,6 +395,7 @@ async function Editly(config: Config): Promise<void> {
       if (verbose) console.log('Waiting for output ffmpeg process to finish');
       await outProcess;
     } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (outProcessExitCode !== 0 && !(err as any).killed) throw err;
     }
   } finally {

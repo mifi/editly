@@ -146,7 +146,6 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
 
       function cleanup() {
         stream.pause();
-        // eslint-disable-next-line no-use-before-define
         stream.removeListener('data', handleChunk);
         stream.removeListener('end', onEnd);
         stream.removeListener('error', reject);

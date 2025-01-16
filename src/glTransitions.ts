@@ -4,6 +4,7 @@ import createBuffer from 'gl-buffer';
 import glTransitions from 'gl-transitions';
 import glTransition from 'gl-transition';
 import createTexture from 'gl-texture2d';
+import { TransitionParams } from './types.js';
 
 const { default: createTransition } = glTransition;
 
@@ -12,7 +13,7 @@ export type RunTransitionOptions = {
   toFrame: Buffer;
   progress: number;
   transitionName?: string;
-  transitionParams?: any;
+  transitionParams?: TransitionParams;
 }
 
 export default ({ width, height, channels }: { width: number, height: number, channels: number }) => {
@@ -42,7 +43,7 @@ export default ({ width, height, channels }: { width: number, height: number, ch
 
       const transitionSource = glTransitions.find((t) => t.name.toLowerCase() === transitionName?.toLowerCase());
 
-      transition = createTransition(gl, transitionSource, { resizeMode });
+      transition = createTransition(gl, transitionSource!, { resizeMode });
 
       gl.clear(gl.COLOR_BUFFER_BIT);
 

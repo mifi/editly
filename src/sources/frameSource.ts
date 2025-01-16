@@ -26,7 +26,9 @@ import createGlFrameSource from './glFrameSource.js';
 import type { CreateFrameSource, CreateFrameSourceOptions, DebugOptions } from '../types.js';
 import { ProcessedClip } from '../parseConfig.js';
 
-const fabricFrameSources: Record<string, FabricFrameSourceCallback<any /* FIXME[ts] */>> = {
+// FIXME[ts]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
   image: imageFrameSource,
   'image-overlay': imageOverlayFrameSource,
@@ -39,6 +41,8 @@ const fabricFrameSources: Record<string, FabricFrameSourceCallback<any /* FIXME[
   'slide-in-text': slideInTextFrameSource,
 };
 
+// FIXME[ts]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const frameSources: Record<string, CreateFrameSource<any>> = {
   video: createVideoFrameSource,
   gl: createGlFrameSource,
@@ -67,6 +71,8 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
 
     let createFrameSourceFunc: CreateFrameSource<typeof layer>;
     if (fabricFrameSources[type]) {
+      // FIXME[TS]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       createFrameSourceFunc = async (opts: CreateFrameSourceOptions<any>) => createFabricFrameSource(fabricFrameSources[type], opts);
     } else {
       createFrameSourceFunc = frameSources[type];
@@ -81,7 +87,7 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
   async function readNextFrame({ time }: { time: number }) {
     const canvas = createFabricCanvas({ width, height });
 
-    // eslint-disable-next-line no-restricted-syntax
+
     for (const { frameSource, layer } of layerFrameSources) {
       // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });
       const offsetTime = time - (layer?.start ?? 0);

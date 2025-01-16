@@ -29,7 +29,6 @@ async function validateArbitraryAudio(audio: AudioTrack[] | undefined, allowRemo
   assert(audio === undefined || Array.isArray(audio));
 
   if (audio) {
-    // eslint-disable-next-line no-restricted-syntax
     for (const { path, cutFrom, cutTo, start } of audio) {
       await assertFileValid(path, allowRemoteRequests);
 
@@ -121,7 +120,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
 
       let { fontFamily } = rest;
       if (fontPath) {
-        const fontFamily = Buffer.from(basename(fontPath)).toString('base64');
+        fontFamily = Buffer.from(basename(fontPath)).toString('base64');
         if (!loadedFonts.includes(fontFamily)) {
           registerFont(fontPath, { family: fontFamily, weight: 'regular', style: 'normal' });
           loadedFonts.push(fontFamily);
@@ -279,7 +278,6 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
     }
 
     // We now know all clip durations so we can calculate the offset for detached audio tracks
-    // eslint-disable-next-line no-restricted-syntax
     for (const { start, ...rest } of (detachedAudioByClip[i] || [])) {
       clipDetachedAudio.push({ ...rest, start: totalClipDuration + (start || 0) });
     }

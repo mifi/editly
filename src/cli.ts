@@ -70,7 +70,6 @@ const cli = meow(`
 
 (async () => {
   let { json } = cli.flags;
-  // eslint-disable-next-line prefer-destructuring
   if (cli.input.length === 1 && /\.(json|json5|js)$/.test(cli.input[0].toLowerCase())) json = cli.input[0];
 
   let params: Partial<Config> = {

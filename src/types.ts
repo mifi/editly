@@ -729,7 +729,7 @@ export interface CustomFabricFunctionArgs {
   width: number;
   height: number;
   fabric: typeof Fabric;
-  params: any;
+  params: unknown;
 }
 
 export type CustomFabricFunction = (args: CustomFabricFunctionArgs) => OptionalPromise<CustomFabricFunctionCallbacks>;
@@ -858,7 +858,8 @@ export interface DefaultLayerOptions {
   /**
    * Set any layer parameter that all layers will inherit.
    */
-  [key: string]: any;
+  // FIXME[ts]: Define a type for this
+  [key: string]: unknown;
 
 }
 
@@ -869,9 +870,6 @@ export type DefaultLayerTypeOptions = {
    */
   [P in LayerType]?: Partial<Omit<Extract<Layer, { type: P }>, 'type'>>;
 
-}
-
-export interface DefaultTransitionOptions extends Transition {
 }
 
 export interface DefaultOptions {
@@ -897,7 +895,7 @@ export interface DefaultOptions {
    * An object describing the default transition.
    * Set to `null` to disable transitions.
    */
-  transition?: DefaultTransitionOptions | null;
+  transition?: Transition | null;
 
 }
 
@@ -1111,7 +1109,7 @@ export type Stream = {
 
 export type Keyframe = {
   t: number;
-  props: Record<string, any>;
+  props: { [key: string]: number };
 };
 
 export interface FrameSource {
