@@ -11,8 +11,8 @@ import {
 } from './fabric.js';
 import {
   customFabricFrameSource,
-  slideInTextFrameSource,
 } from './fabricFrameSources.js';
+import slideInTextFrameSource from './slide-in-text.js';
 import newsTitleFrameSource from './news-title.js';
 import titleFrameSource from './title.js';
 
@@ -32,7 +32,6 @@ import { ProcessedClip } from '../parseConfig.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
-  'slide-in-text': slideInTextFrameSource,
 };
 
 // FIXME[ts]
@@ -46,6 +45,7 @@ const frameSources: Record<string, CreateFrameSource<any>> = {
   'linear-gradient': linearGradientFrameSource,
   'news-title': newsTitleFrameSource,
   'radial-gradient': radialGradientFrameSource,
+  'slide-in-text': slideInTextFrameSource,
   'subtitle': subtitleFrameSource,
   'title': titleFrameSource,
   'video': videoFrameSource,
