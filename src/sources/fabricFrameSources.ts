@@ -2,9 +2,9 @@ import * as fabric from 'fabric/node';
 
 import { getRandomGradient } from '../colors.js';
 import { easeOutExpo, easeInOutCubic } from '../transitions.js';
-import { getFrameByKeyFrames, getPositionProps, loadImage } from '../util.js';
+import { getFrameByKeyFrames, getPositionProps } from '../util.js';
 import { type FabricFrameSourceOptions } from './fabric.js';
-import type { FabricLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, TitleLayer } from '../types.js';
+import type { FabricLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, TitleLayer } from '../types.js';
 
 // http://fabricjs.com/kitchensink
 
@@ -99,41 +99,6 @@ export async function linearGradientFrameSource({ width, height, params }: Fabri
 
     rect.rotate(progress * 30);
     canvas.add(rect);
-  }
-
-  return { onRender };
-}
-
-export async function imageOverlayFrameSource({ params, width, height }: FabricFrameSourceOptions<ImageOverlayLayer>) {
-  const { path, position, width: relWidth, height: relHeight, zoomDirection, zoomAmount = 0.1 } = params;
-
-  const imgData = await loadImage(path);
-
-  const { left, top, originX, originY } = getPositionProps({ position, width, height });
-
-  const img = new fabric.FabricImage(imgData, {
-    originX,
-    originY,
-    left,
-    top,
-  });
-
-  async function onRender(progress: number, canvas: fabric.StaticCanvas) {
-    const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });
-
-    const translationParams = getTranslationParams({ progress, zoomDirection, zoomAmount });
-    img.left = width / 2 + translationParams;
-
-    if (relWidth != null) {
-      img.scaleToWidth(relWidth * width * scaleFactor);
-    } else if (relHeight != null) {
-      img.scaleToHeight(relHeight * height * scaleFactor);
-    } else {
-      // Default to screen width
-      img.scaleToWidth(width * scaleFactor);
-    }
-
-    canvas.add(img);
   }
 
   return { onRender };

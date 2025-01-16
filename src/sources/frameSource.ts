@@ -15,9 +15,9 @@ import {
   newsTitleFrameSource,
   radialGradientFrameSource,
   linearGradientFrameSource,
-  imageOverlayFrameSource,
   slideInTextFrameSource,
 } from './fabricFrameSources.js';
+import imageOverlayFrameSource from './image-overlay.js';
 
 import createGlFrameSource from './gl.js';
 import createVideoFrameSource from './video.js';
@@ -32,7 +32,6 @@ import { ProcessedClip } from '../parseConfig.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
-  'image-overlay': imageOverlayFrameSource,
   title: titleFrameSource,
   'linear-gradient': linearGradientFrameSource,
   'radial-gradient': radialGradientFrameSource,
@@ -45,6 +44,7 @@ const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
 const frameSources: Record<string, CreateFrameSource<any>> = {
   video: createVideoFrameSource,
   image: imageFrameSource,
+  'image-overlay': imageOverlayFrameSource,
   gl: createGlFrameSource,
   canvas: createCustomCanvasFrameSource,
   'fill-color': fillColorFrameSource,
