@@ -1,16 +1,13 @@
 import { execa } from 'execa';
 import assert from 'assert';
 import * as fabric from 'fabric/node';
-
 import { getFfmpegCommonArgs } from '../ffmpeg.js';
 import { readFileStreams } from '../util.js';
-import {
-  rgbaToFabricImage,
-  blurImage,
-} from './fabric.js';
-import type { CreateFrameSourceOptions, VideoLayer } from '../types.js';
+import { rgbaToFabricImage, blurImage } from './fabric.js';
+import { defineFrameSource } from './index.js';
+import type { VideoLayer } from '../types.js';
 
-export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }: CreateFrameSourceOptions<VideoLayer>) => {
+export default defineFrameSource<VideoLayer>(async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
   const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null } = params;
 
   const requestedWidth = requestedWidthRel ? Math.round(requestedWidthRel * canvasWidth) : canvasWidth;
@@ -244,4 +241,4 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     readNextFrame,
     close,
   };
-};
+});

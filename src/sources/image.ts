@@ -2,9 +2,10 @@ import { FabricImage, type StaticCanvas } from 'fabric/node';
 import { blurImage } from './fabric.js';
 import { getZoomParams, getTranslationParams } from './fabricFrameSources.js';
 import { loadImage } from '../util.js';
-import type { CreateFrameSourceOptions, FrameSource, ImageLayer } from '../types.js';
+import type { ImageLayer } from '../types.js';
+import { defineFrameSource } from './index.js';
 
-export default async function imageFrameSource({ verbose, params, width, height }: CreateFrameSourceOptions<ImageLayer>): Promise<FrameSource> {
+export default defineFrameSource<ImageLayer>(async ({ verbose, params, width, height }) => {
   const { path, zoomDirection = 'in', zoomAmount = 0.1, resizeMode = 'contain-blur' } = params;
 
   if (verbose) console.log('Loading', path);
@@ -64,4 +65,4 @@ export default async function imageFrameSource({ verbose, params, width, height 
       // imgData.dispose();
     }
   };
-}
+});
