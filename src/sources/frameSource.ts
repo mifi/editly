@@ -17,12 +17,13 @@ import {
   fillColorFrameSource,
   radialGradientFrameSource,
   linearGradientFrameSource,
-  imageFrameSource,
   imageOverlayFrameSource,
   slideInTextFrameSource,
 } from './fabric/fabricFrameSources.js';
-import createVideoFrameSource from './videoFrameSource.js';
-import createGlFrameSource from './glFrameSource.js';
+
+import imageFrameSource from './image.js';
+import createVideoFrameSource from './video.js';
+import createGlFrameSource from './gl.js';
 import type { CreateFrameSource, CreateFrameSourceOptions, DebugOptions } from '../types.js';
 import { ProcessedClip } from '../parseConfig.js';
 
@@ -30,7 +31,6 @@ import { ProcessedClip } from '../parseConfig.js';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
-  image: imageFrameSource,
   'image-overlay': imageOverlayFrameSource,
   title: titleFrameSource,
   subtitle: subtitleFrameSource,
@@ -45,6 +45,7 @@ const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const frameSources: Record<string, CreateFrameSource<any>> = {
   video: createVideoFrameSource,
+  image: imageFrameSource,
   gl: createGlFrameSource,
   canvas: createCustomCanvasFrameSource,
 };
