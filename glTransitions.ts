@@ -7,15 +7,23 @@ import createTexture from 'gl-texture2d';
 
 const { default: createTransition } = glTransition;
 
-export default ({ width, height, channels }) => {
+type RunTransitionOptions = {
+  fromFrame: Buffer;
+  toFrame: Buffer;
+  progress: number;
+  transitionName: string;
+  transitionParams?: any;
+}
+
+export default ({ width, height, channels }: { width: number, height: number, channels: number }) => {
   const gl = GL(width, height);
 
   if (!gl) {
     throw new Error('gl returned null, this probably means that some dependencies are not installed. See README.');
   }
 
-  function runTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams = {} }) {
-    function convertFrame(buf) {
+  function runTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams = {} }: RunTransitionOptions) {
+    function convertFrame(buf: Buffer) {
       // @see https://github.com/stackgl/gl-texture2d/issues/16
       return ndarray(buf, [width, height, channels], [channels, width * channels, 1]);
     }
