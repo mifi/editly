@@ -13,10 +13,10 @@ import {
   customFabricFrameSource,
   titleFrameSource,
   newsTitleFrameSource,
-  radialGradientFrameSource,
   linearGradientFrameSource,
   slideInTextFrameSource,
 } from './fabricFrameSources.js';
+import radialGradientFrameSource from './radial-gradient.js';
 import imageOverlayFrameSource from './image-overlay.js';
 
 import createGlFrameSource from './gl.js';
@@ -34,7 +34,6 @@ const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
   title: titleFrameSource,
   'linear-gradient': linearGradientFrameSource,
-  'radial-gradient': radialGradientFrameSource,
   'news-title': newsTitleFrameSource,
   'slide-in-text': slideInTextFrameSource,
 };
@@ -48,6 +47,7 @@ const frameSources: Record<string, CreateFrameSource<any>> = {
   gl: createGlFrameSource,
   canvas: createCustomCanvasFrameSource,
   'fill-color': fillColorFrameSource,
+  'radial-gradient': radialGradientFrameSource,
   subtitle: subtitleFrameSource,
 };
 

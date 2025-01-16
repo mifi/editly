@@ -4,7 +4,7 @@ import { getRandomGradient } from '../colors.js';
 import { easeOutExpo, easeInOutCubic } from '../transitions.js';
 import { getFrameByKeyFrames, getPositionProps } from '../util.js';
 import { type FabricFrameSourceOptions } from './fabric.js';
-import type { FabricLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, TitleLayer } from '../types.js';
+import type { FabricLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, TitleLayer } from '../types.js';
 
 // http://fabricjs.com/kitchensink
 
@@ -28,51 +28,9 @@ export function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1
   return translation;
 }
 
-function getRekt(width: number, height: number) {
+export function getRekt(width: number, height: number) {
   // width and height with room to rotate
   return new fabric.Rect({ originX: 'center', originY: 'center', left: width / 2, top: height / 2, width: width * 2, height: height * 2 });
-}
-
-export async function radialGradientFrameSource({ width, height, params }: FabricFrameSourceOptions<RadialGradientLayer>) {
-  const { colors: inColors } = params;
-
-  const randomColors = getRandomGradient();
-
-  async function onRender(progress: number, canvas: fabric.StaticCanvas) {
-    // console.log('progress', progress);
-
-    const max = Math.max(width, height);
-
-    const colors = inColors && inColors.length === 2 ? inColors : randomColors;
-
-    const r1 = 0;
-    const r2 = max * (1 + progress) * 0.6;
-
-    const rect = getRekt(width, height);
-
-    const cx = 0.5 * rect.width;
-    const cy = 0.5 * rect.height;
-
-    rect.set('fill', new fabric.Gradient({
-      type: 'radial',
-      coords: {
-        r1,
-        r2,
-        x1: cx,
-        y1: cy,
-        x2: cx,
-        y2: cy,
-      },
-      colorStops: [
-        { offset: 0, color: colors[0] },
-        { offset: 1, color: colors[1] },
-      ],
-    }));
-
-    canvas.add(rect);
-  }
-
-  return { onRender };
 }
 
 export async function linearGradientFrameSource({ width, height, params }: FabricFrameSourceOptions<LinearGradientLayer>) {

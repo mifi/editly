@@ -1,4 +1,4 @@
-import * as fabric from 'fabric/node';
+import { Rect } from 'fabric/node';
 import { getRandomColors } from '../colors.js';
 import type { FillColorLayer } from '../types.js';
 import { defineFrameSource } from './index.js';
@@ -9,8 +9,8 @@ export default defineFrameSource<FillColorLayer>(async ({ params, width, height 
   const randomColor = getRandomColors(1)[0];
 
   return {
-    async readNextFrame(_: number, canvas: fabric.StaticCanvas) {
-      const rect = new fabric.Rect({
+    async readNextFrame(_, canvas) {
+      const rect = new Rect({
         left: 0,
         right: 0,
         width,
