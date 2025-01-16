@@ -1,7 +1,7 @@
 import { Textbox } from 'fabric/node';
 import type { TitleLayer } from '../types.js';
 import { getPositionProps } from '../util.js';
-import { defaultFontFamily, getZoomParams, getTranslationParams } from './fabricFrameSources.js';
+import { defaultFontFamily, getZoomParams, getTranslationParams } from '../util.js';
 import { defineFrameSource } from './index.js';
 
 export default defineFrameSource<TitleLayer>(async ({ width, height, params }) => {

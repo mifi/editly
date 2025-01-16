@@ -1,7 +1,7 @@
 import { Rect, Textbox } from 'fabric/node';
 import { easeOutExpo } from '../transitions.js';
 import type { SubtitleLayer } from '../types.js';
-import { defaultFontFamily } from './fabricFrameSources.js';
+import { defaultFontFamily } from '../util.js';
 import { defineFrameSource } from './index.js';
 
 export default defineFrameSource<SubtitleLayer>(async ({ width, height, params }) => {

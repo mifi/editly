@@ -3,14 +3,10 @@ import pMap from 'p-map';
 
 import {
   rgbaToFabricImage,
-  createFabricFrameSource,
   createFabricCanvas,
   renderFabricCanvas,
-  type FabricFrameSourceCallback,
 } from './fabric.js';
-import {
-  customFabricFrameSource,
-} from './fabricFrameSources.js';
+import customFabricFrameSource from './fabric.js';
 import canvasFrameSource from './canvas.js';
 import fillColorFrameSource from './fill-color.js';
 import glFrameSource from './gl.js';
@@ -24,19 +20,14 @@ import subtitleFrameSource from './subtitle.js';
 import titleFrameSource from './title.js';
 import videoFrameSource from './video.js';
 
-import type { CreateFrameSource, CreateFrameSourceOptions, DebugOptions } from '../types.js';
+import type { CreateFrameSource, DebugOptions } from '../types.js';
 import { ProcessedClip } from '../parseConfig.js';
-
-// FIXME[ts]
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
-  fabric: customFabricFrameSource,
-};
 
 // FIXME[ts]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const frameSources: Record<string, CreateFrameSource<any>> = {
   'canvas': canvasFrameSource,
+  'fabric': customFabricFrameSource,
   'fill-color': fillColorFrameSource,
   'gl': glFrameSource,
   'image-overlay': imageOverlayFrameSource,
@@ -68,17 +59,8 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
     const { type, ...params } = layer;
     if (verbose) console.log('createFrameSource', type, 'clip', clipIndex, 'layer', layerIndex);
 
-    let createFrameSourceFunc: CreateFrameSource<typeof layer>;
-    if (fabricFrameSources[type]) {
-      // FIXME[TS]
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      createFrameSourceFunc = async (opts: CreateFrameSourceOptions<any>) => createFabricFrameSource(fabricFrameSources[type], opts);
-    } else {
-      createFrameSourceFunc = frameSources[type];
-    }
-
+    const createFrameSourceFunc: CreateFrameSource<typeof layer> = frameSources[type];
     assert(createFrameSourceFunc, `Invalid type ${type}`);
-
     const frameSource = await createFrameSourceFunc({ width, height, duration, channels, verbose, logTimes, framerateStr, params });
     return { layer, frameSource };
   }, { concurrency: 1 });

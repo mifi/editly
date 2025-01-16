@@ -1,12 +1,10 @@
 import assert from 'assert';
 import { sortBy } from 'lodash-es';
 import { pathExists } from 'fs-extra';
-
-import type { Keyframe } from './types.js';
-import type { Position, PositionObject, Transition } from './types.js';
-import type { TOriginX, TOriginY } from 'fabric';
 import * as fabric from 'fabric/node';
 import fileUrl from 'file-url';
+import type { KenBurns, Keyframe, Position, PositionObject, Transition } from './types.js';
+import type { TOriginX, TOriginY } from 'fabric';
 
 export function toArrayInteger(buffer: Buffer) {
   if (buffer.length > 0) {
@@ -125,4 +123,27 @@ export function checkTransition(transition?: Transition | null) {
   assert(transition == null || typeof transition === 'object', 'Transition must be an object');
 }
 
-export const loadImage = (pathOrUrl: string) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl));
+export const loadImage = (pathOrUrl: string) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl)); export const defaultFontFamily = 'sans-serif';
+
+export function getZoomParams({ progress, zoomDirection, zoomAmount = 0.1 }: KenBurns & { progress: number; }) {
+  let scaleFactor = 1;
+  if (zoomDirection === 'left' || zoomDirection === 'right') return 1.3 + zoomAmount;
+  if (zoomDirection === 'in') scaleFactor = (1 + zoomAmount * progress);
+  else if (zoomDirection === 'out') scaleFactor = (1 + zoomAmount * (1 - progress));
+  return scaleFactor;
+}
+
+export function getTranslationParams({ progress, zoomDirection, zoomAmount = 0.1 }: KenBurns & { progress: number; }) {
+  let translation = 0;
+  const range = zoomAmount * 1000;
+
+  if (zoomDirection === 'right') translation = (progress) * range - range / 2;
+  else if (zoomDirection === 'left') translation = -((progress) * range - range / 2);
+
+  return translation;
+}
+
+export function getRekt(width: number, height: number) {
+  // width and height with room to rotate
+  return new fabric.Rect({ originX: 'center', originY: 'center', left: width / 2, top: height / 2, width: width * 2, height: height * 2 });
+}
