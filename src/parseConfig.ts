@@ -20,7 +20,7 @@ export type ProcessedClip = {
   transition: CalculatedTransition;
 }
 
-const dirname = fileURLToPath(new URL('.', import.meta.url));
+const dirname = fileURLToPath(new URL('..', import.meta.url));
 
 // Cache
 const loadedFonts: string[] = [];

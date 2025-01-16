@@ -9,7 +9,7 @@ import { testFf } from './ffmpeg.js';
 import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util.js';
 import { createFabricCanvas, rgbaToFabricImage } from './sources/fabric.js';
 import { createFrameSource } from './sources/frameSource.js';
-import parseConfig from './parseConfig.js';
+import parseConfig, { ProcessedClip } from './parseConfig.js';
 import GlTransitions, { type RunTransitionOptions } from './glTransitions.js';
 import Audio from './audio.js';
 import type { Clip, Config, Layer, RenderSingleFrameConfig } from './types.js';
@@ -252,7 +252,7 @@ async function Editly(config: Config): Promise<void> {
   const getTransitionFromClip = () => clips[transitionFromClipId];
   const getTransitionToClip = () => clips[getTransitionToClipId()];
 
-  const getSource = async (clip: Clip, clipIndex: number) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
+  const getSource = async (clip: ProcessedClip, clipIndex: number) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
   const getTransitionFromSource = async () => getSource(getTransitionFromClip(), transitionFromClipId);
   const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
 

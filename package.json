@@ -2,8 +2,11 @@
   "name": "editly",
   "description": "Simple, sexy, declarative video editing",
   "version": "0.14.2",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "module": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "author": "Mikael Finstad <finstaden@gmail.com>",
   "contributors": [
     "Patrick Connolly <patrick.c.connolly@gmail.com> (https://github.com/patcon)",
@@ -33,8 +36,8 @@
     "p-map": "^7.0.2"
   },
   "scripts": {
-    "prepare": "tsc -b",
-    "test": "node test.js",
+    "prepare": "pkgroll --clean-dist --sourcemap",
+    "test": "tsx test/index.ts",
     "lint": "eslint ."
   },
   "repository": {
@@ -42,7 +45,7 @@
     "url": "git+https://github.com/mifi/editly.git"
   },
   "bin": {
-    "editly": "cli.js"
+    "editly": "dist/cli.js"
   },
   "devDependencies": {
     "@tsconfig/node-lts": "^22.0.1",
@@ -50,11 +53,13 @@
     "@types/gl": "^6.0.5",
     "@types/gl-shader": "^4.2.5",
     "@types/lodash-es": "^4.17.12",
+    "@types/ndarray": "^1.0.14",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-import-exports-imports-resolver": "^1.0.1",
-    "ts-node": "^10.9.2",
+    "pkgroll": "^2.6.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   }
 }

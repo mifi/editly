@@ -1,8 +1,9 @@
 import { execa } from 'execa';
 
 // todo use jest
-await execa('node', [
-  'cli.js',
+await execa('npx', [
+  'tsx',
+  'src/cli.ts',
   '--allow-remote-requests',
   "title:'My video'",
   'https://raw.githubusercontent.com/mifi/editly-assets/main/overlay.svg',
