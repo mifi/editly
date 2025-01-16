@@ -1,8 +1,7 @@
 import GL from 'gl';
 import createShader from 'gl-shader';
 import { readFile } from 'node:fs/promises';
-import type { CreateFrameSourceOptions, FrameSource } from '../types.js';
-import type { GlLayer } from '../index.js';
+import type { GlLayer, CreateFrameSourceOptions, FrameSource } from '../types.js';
 
 // I have no idea what I'm doing but it works ¯\_(ツ)_/¯
 

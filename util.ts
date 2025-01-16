@@ -4,7 +4,7 @@ import { sortBy } from 'lodash-es';
 import { pathExists } from 'fs-extra';
 
 import type { Keyframe, Stream } from './types.js';
-import type { Position, PositionObject, Transition } from './index.js';
+import type { Position, PositionObject, Transition } from './types.js';
 import type { TOriginX, TOriginY } from 'fabric';
 
 export function parseFps(fps?: string) {

@@ -23,8 +23,7 @@ import {
 } from './fabric/fabricFrameSources.js';
 import createVideoFrameSource from './videoFrameSource.js';
 import createGlFrameSource from './glFrameSource.js';
-import type { CreateFrameSource, CreateFrameSourceOptions, LayerDuration } from '../types.js';
-import type { Clip, Layer } from '../index.js';
+import type { CreateFrameSource, CreateFrameSourceOptions, LayerDuration, Clip, Layer } from '../types.js';
 
 const fabricFrameSources: Record<string, FabricFrameSourceCallback<any /* FIXME[ts] */>> = {
   fabric: customFabricFrameSource,

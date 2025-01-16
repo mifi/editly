@@ -6,7 +6,7 @@ import { flatMap } from 'lodash-es';
 import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg.js';
 import { readFileStreams } from './util.js';
 
-import type { AudioLayer, AudioNormalizationOptions, AudioTrack, Clip, Config, Layer, Transition, VideoLayer } from './index.js'
+import type { AudioLayer, AudioNormalizationOptions, AudioTrack, Clip, Config, Layer, Transition, VideoLayer } from './types.js'
 
 export type AudioOptions = {
   ffmpegPath: string;

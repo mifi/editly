@@ -5,7 +5,7 @@ import { getRandomGradient, getRandomColors } from '../../colors.js';
 import { easeOutExpo, easeInOutCubic } from '../../transitions.js';
 import { getPositionProps, getFrameByKeyFrames, isUrl } from '../../util.js';
 import { blurImage, type FabricFrameSourceOptions } from '../fabric.js';
-import type { FabricLayer, FillColorLayer, ImageLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../../index.js';
+import type { FabricLayer, FillColorLayer, ImageLayer, ImageOverlayLayer, KenBurns, LinearGradientLayer, NewsTitleLayer, RadialGradientLayer, SlideInTextLayer, SubtitleLayer, TitleLayer } from '../../types.js';
 
 // http://fabricjs.com/kitchensink
 

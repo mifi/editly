@@ -12,8 +12,7 @@ import {
 } from './util.js';
 import { registerFont } from 'canvas';
 import { calcTransition } from './transitions.js';
-import type { AudioTrack, CanvasLayer, Config, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer } from './index.js';
-import type { ProcessedVideoLayer, LayerDuration } from "./types.js"
+import type { AudioTrack, CanvasLayer, Config, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, ProcessedVideoLayer, LayerDuration } from './types.js';
 
 const dirname = fileURLToPath(new URL('.', import.meta.url));
 

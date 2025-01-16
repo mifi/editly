@@ -1,5 +1,5 @@
 import assert from 'assert';
-import type { Transition } from './index.js';
+import type { Transition } from './types.js';
 
 const randomTransitionsSet = ['fade', 'fadegrayscale', 'directionalwarp', 'crosswarp', 'dreamyzoom', 'burn', 'crosszoom', 'simplezoom', 'linearblur', 'directional-left', 'directional-right', 'directional-up', 'directional-down'];
 

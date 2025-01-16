@@ -1,8 +1,7 @@
 import * as fabric from 'fabric/node';
 import { type CanvasRenderingContext2D, createCanvas, ImageData } from 'canvas';
 import { boxBlurImage } from '../BoxBlur.js';
-import type { CreateFrameSourceOptions, FrameSource } from '../types.js';
-import type { CanvasLayer, CustomFabricFunctionCallbacks, Layer } from '../index.js';
+import type { CreateFrameSourceOptions, FrameSource, CanvasLayer, CustomFabricFunctionCallbacks, Layer } from '../types.js';
 
 export type FabricFrameSourceOptions<T> = CreateFrameSourceOptions<T> & { fabric: typeof fabric };
 export type FabricFrameSourceCallback<T> = (options: FabricFrameSourceOptions<T>) => Promise<CustomFabricFunctionCallbacks>;
