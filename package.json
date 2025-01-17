@@ -44,7 +44,7 @@
     "editly": "cli.js"
   },
   "devDependencies": {
-    "@types/fabric": "^4.5.11",
+    "@types/fabric": "^5.3.9",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0"
