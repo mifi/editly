@@ -1,4 +1,4 @@
-import { FabricImage, type StaticCanvas } from 'fabric/node';
+import { FabricImage } from 'fabric/node';
 import { blurImage } from './fabric.js';
 import { getZoomParams, getTranslationParams, loadImage } from '../util.js';
 import { defineFrameSource } from './index.js';
@@ -28,7 +28,7 @@ export default defineFrameSource<ImageLayer>(async ({ verbose, params, width, he
   }
 
   return {
-    async readNextFrame(progress: number, canvas: StaticCanvas) {
+    async readNextFrame(progress, canvas) {
       const img = createImg();
 
       const scaleFactor = getZoomParams({ progress, zoomDirection, zoomAmount });

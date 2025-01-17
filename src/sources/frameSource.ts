@@ -1,12 +1,7 @@
 import assert from 'assert';
 import pMap from 'p-map';
 
-import {
-  rgbaToFabricImage,
-  createFabricCanvas,
-  renderFabricCanvas,
-} from './fabric.js';
-import customFabricFrameSource from './fabric.js';
+import customFabricFrameSource, { rgbaToFabricImage, createFabricCanvas, renderFabricCanvas } from './fabric.js';
 import canvasFrameSource from './canvas.js';
 import fillColorFrameSource from './fill-color.js';
 import glFrameSource from './gl.js';
@@ -21,7 +16,7 @@ import titleFrameSource from './title.js';
 import videoFrameSource from './video.js';
 
 import type { CreateFrameSource, DebugOptions } from '../types.js';
-import { ProcessedClip } from '../parseConfig.js';
+import type { ProcessedClip } from '../parseConfig.js';
 
 // FIXME[ts]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,7 +62,6 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
 
   async function readNextFrame({ time }: { time: number }) {
     const canvas = createFabricCanvas({ width, height });
-
 
     for (const { frameSource, layer } of layerFrameSources) {
       // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });

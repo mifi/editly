@@ -18,9 +18,6 @@ export function fabricCanvasToRgba(fabricCanvas: fabric.StaticCanvas) {
   const internalCanvas = fabricCanvas.getNodeCanvas();
   const ctx = internalCanvas.getContext('2d');
 
-  // require('fs').writeFileSync(`${Math.floor(Math.random() * 1e12)}.png`, internalCanvas.toBuffer('image/png'));
-  // throw new Error('abort');
-
   return canvasToRgba(ctx);
 }
 
