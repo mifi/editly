@@ -1,27 +1,59 @@
 name: Test
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   test:
-    runs-on: macos-latest
-
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      DISPLAY: :0
     steps:
-      - uses: FedericoCarboni/setup-ffmpeg@v1
+      - if: runner.os == 'macOS'
+        run: |
+          brew install \
+            cairo \
+            ffmpeg \
+            giflib \
+            jpeg \
+            libpng \
+            librsvg \
+            pango \
+            pixman \
+            pkg-config \
+            python-setuptools
+      - if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+            build-essential \
+            ffmpeg \
+            libcairo2-dev \
+            libgif-dev \
+            libglew-dev \
+            libglu1-mesa-dev \
+            libjpeg-dev \
+            libpango1.0-dev \
+            librsvg2-dev \
+            libxi-dev \
+            pkg-config
+      - if: runner.os == 'Linux'
+        run: sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'yarn'
-
-      - run: yarn install --frozen-lockfile
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: ./package.json
+      - run: npm install --build-from-source
       - run: npm run lint
       - run: npm run test
-
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: video
+          name: video-${{ runner.os }}
           path: editly-out.mp4
