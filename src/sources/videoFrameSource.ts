@@ -8,8 +8,9 @@ import {
   rgbaToFabricImage,
   blurImage,
 } from './fabric.js';
+import type { CreateFrameSourceOptions, VideoLayer } from '../types.js';
 
-export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }) => {
+export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }: CreateFrameSourceOptions<VideoLayer>) => {
   const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null } = params;
 
   const requestedWidth = requestedWidthRel ? Math.round(requestedWidthRel * canvasWidth) : canvasWidth;
@@ -18,9 +19,9 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
   const left = leftRel * canvasWidth;
   const top = topRel * canvasHeight;
 
-  const ratioW = requestedWidth / inputWidth;
-  const ratioH = requestedHeight / inputHeight;
-  const inputAspectRatio = inputWidth / inputHeight;
+  const ratioW = requestedWidth / inputWidth!;
+  const ratioH = requestedHeight / inputHeight!;
+  const inputAspectRatio = inputWidth! / inputHeight!;
 
   let targetWidth = requestedWidth;
   let targetHeight = requestedHeight;
@@ -77,8 +78,8 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
   // https://superuser.com/a/1116905/658247
 
   let inputCodec;
-  if (firstVideoStream.codec_name === 'vp8') inputCodec = 'libvpx';
-  else if (firstVideoStream.codec_name === 'vp9') inputCodec = 'libvpx-vp9';
+  if (firstVideoStream?.codec_name === 'vp8') inputCodec = 'libvpx';
+  else if (firstVideoStream?.codec_name === 'vp9') inputCodec = 'libvpx-vp9';
 
   // http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
@@ -86,9 +87,9 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
   const args = [
     ...getFfmpegCommonArgs({ enableFfmpegLog }),
     ...(inputCodec ? ['-vcodec', inputCodec] : []),
-    ...(cutFrom ? ['-ss', cutFrom] : []),
+    ...(cutFrom ? ['-ss', cutFrom.toString()] : []),
     '-i', path,
-    ...(cutTo ? ['-t', (cutTo - cutFrom) * speedFactor] : []),
+    ...(cutTo ? ['-t', ((cutTo - cutFrom!) * speedFactor!).toString()] : []),
     '-vf', `${ptsFilter}fps=${framerateStr},${scaleFilter}`,
     '-map', 'v:0',
     '-vcodec', 'rawvideo',
@@ -100,9 +101,9 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
 
   const ps = execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'ignore', stdout: 'pipe', stderr: process.stderr });
 
-  const stream = ps.stdout;
+  const stream = ps.stdout!;
 
-  let timeout;
+  let timeout: NodeJS.Timeout;
   let ended = false;
 
   stream.once('end', () => {
@@ -124,8 +125,8 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     return null;
   }
 
-  async function readNextFrame(progress, canvas, time) {
-    const rgba = await new Promise((resolve, reject) => {
+  async function readNextFrame(progress: number, canvas: fabric.StaticCanvas, time: number) {
+    const rgba = await new Promise<Buffer<ArrayBuffer> | void>((resolve, reject) => {
       const frame = getNextFrame();
       if (frame) {
         resolve(frame);
@@ -145,13 +146,12 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
 
       function cleanup() {
         stream.pause();
-        // eslint-disable-next-line no-use-before-define
         stream.removeListener('data', handleChunk);
         stream.removeListener('end', onEnd);
         stream.removeListener('error', reject);
       }
 
-      function handleChunk(chunk) {
+      function handleChunk(chunk: Buffer) {
         const nCopied = Math.min(buf.length - length, chunk.length);
         chunk.copy(buf, length, 0, nCopied);
         length += nCopied;
@@ -197,7 +197,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     const img = await rgbaToFabricImage({ width: targetWidth, height: targetHeight, rgba });
     if (logTimes) console.timeEnd('rgbaToFabricImage');
 
-    img.setOptions({
+    img.set({
       originX,
       originY,
     });
@@ -211,15 +211,15 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
       centerOffsetY = (dirY * (requestedHeight - targetHeight)) / 2;
     }
 
-    img.setOptions({
+    img.set({
       left: left + centerOffsetX,
       top: top + centerOffsetY,
     });
 
     if (resizeMode === 'contain-blur') {
-      const mutableImg = img.cloneAsImage();
+      const mutableImg = img.cloneAsImage({});
       const blurredImg = await blurImage({ mutableImg, width: requestedWidth, height: requestedHeight });
-      blurredImg.setOptions({
+      blurredImg.set({
         left,
         top,
         originX,

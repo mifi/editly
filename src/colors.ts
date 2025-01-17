@@ -178,7 +178,7 @@ export function getRandomColor(colors = allColors) {
   return { remainingColors, color: colors[index] || allColors[0] };
 }
 
-export function getRandomColors(num) {
+export function getRandomColors(num: number) {
   let colors = allColors;
   const out = [];
   for (let i = 0; i < Math.min(num, allColors.length); i += 1) {

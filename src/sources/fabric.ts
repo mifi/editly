@@ -1,22 +1,15 @@
 import * as fabric from 'fabric/node';
-import { createCanvas, ImageData } from 'canvas';
+import { type CanvasRenderingContext2D, createCanvas, ImageData } from 'canvas';
 import { boxBlurImage } from '../BoxBlur.js';
+import type { CreateFrameSourceOptions, FrameSource, CanvasLayer, CustomFabricFunctionCallbacks, Layer } from '../types.js';
+import { OptionalPromise } from '../../dist/index.js';
 
-export { registerFont } from 'canvas';
+export type FabricFrameSourceOptions<T> = CreateFrameSourceOptions<T> & { fabric: typeof fabric };
+export type FabricFrameSourceCallback<T> = (options: FabricFrameSourceOptions<T>) => OptionalPromise<CustomFabricFunctionCallbacks>;
 
 // Fabric is used as a fundament for compositing layers in editly
 
-export function canvasToRgba(ctx) {
-  // const bgra = canvas.toBuffer('raw');
-
-  /* const rgba = Buffer.allocUnsafe(bgra.length);
-  for (let i = 0; i < bgra.length; i += 4) {
-    rgba[i + 0] = bgra[i + 2];
-    rgba[i + 1] = bgra[i + 1];
-    rgba[i + 2] = bgra[i + 0];
-    rgba[i + 3] = bgra[i + 3];
-  } */
-
+export function canvasToRgba(ctx: CanvasRenderingContext2D) {
   // We cannot use toBuffer('raw') because it returns pre-multiplied alpha data (a different format)
   // https://gamedev.stackexchange.com/questions/138813/whats-the-difference-between-alpha-and-premulalpha
   // https://github.com/Automattic/node-canvas#image-pixel-formats-experimental
@@ -24,7 +17,7 @@ export function canvasToRgba(ctx) {
   return Buffer.from(imageData.data);
 }
 
-export function fabricCanvasToRgba(fabricCanvas) {
+export function fabricCanvasToRgba(fabricCanvas: fabric.StaticCanvas) {
   const internalCanvas = fabricCanvas.getNodeCanvas();
   const ctx = internalCanvas.getContext('2d');
 
@@ -34,11 +27,11 @@ export function fabricCanvasToRgba(fabricCanvas) {
   return canvasToRgba(ctx);
 }
 
-export function createFabricCanvas({ width, height }) {
+export function createFabricCanvas({ width, height }: { width: number, height: number }) {
   return new fabric.StaticCanvas(null, { width, height });
 }
 
-export async function renderFabricCanvas(canvas) {
+export async function renderFabricCanvas(canvas: fabric.StaticCanvas) {
   // console.time('canvas.renderAll');
   canvas.renderAll();
   // console.timeEnd('canvas.renderAll');
@@ -48,7 +41,7 @@ export async function renderFabricCanvas(canvas) {
   return rgba;
 }
 
-export function toUint8ClampedArray(buffer) {
+export function toUint8ClampedArray(buffer: Buffer) {
   // return Uint8ClampedArray.from(buffer);
   // Some people are finding that manual copying is orders of magnitude faster than Uint8ClampedArray.from
   // Since I'm getting similar times for both methods, then why not:
@@ -59,12 +52,13 @@ export function toUint8ClampedArray(buffer) {
   return data;
 }
 
-export async function rgbaToFabricImage({ width, height, rgba }) {
+export async function rgbaToFabricImage({ width, height, rgba }: { width: number, height: number, rgba: Buffer }) {
   const canvas = createCanvas(width, height);
 
   // FIXME: Fabric tries to add a class to this, but DOM is not defined. Because node?
   // https://github.com/fabricjs/fabric.js/issues/10032
-  canvas.classList = new Set();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (canvas as any).classList = new Set();
 
   const ctx = canvas.getContext('2d');
   // https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData
@@ -74,10 +68,11 @@ export async function rgbaToFabricImage({ width, height, rgba }) {
   return new fabric.FabricImage(canvas);
 }
 
-export async function createFabricFrameSource(func, { width, height, ...rest }) {
-  const onInit = async () => func(({ width, height, fabric, ...rest }));
-
-  const { onRender = () => {}, onClose = () => {} } = await onInit() || {};
+export async function createFabricFrameSource<T extends Layer>(
+  func: FabricFrameSourceCallback<T>,
+  options: CreateFrameSourceOptions<T>
+): Promise<FrameSource> {
+  const { onRender = () => { }, onClose = () => { } } = await func({ fabric, ...options }) || {};
 
   return {
     readNextFrame: onRender,
@@ -85,13 +80,13 @@ export async function createFabricFrameSource(func, { width, height, ...rest }) 
   };
 }
 
-export async function createCustomCanvasFrameSource({ width, height, params }) {
+export async function createCustomCanvasFrameSource({ width, height, params }: Pick<CreateFrameSourceOptions<CanvasLayer>, "width" | "height" | "params">): Promise<FrameSource> {
   const canvas = createCanvas(width, height);
   const context = canvas.getContext('2d');
 
   const { onClose, onRender } = await params.func(({ width, height, canvas }));
 
-  async function readNextFrame(progress) {
+  async function readNextFrame(progress: number) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     await onRender(progress);
     // require('fs').writeFileSync(`${new Date().getTime()}.png`, canvas.toBuffer('image/png'));
@@ -105,9 +100,14 @@ export async function createCustomCanvasFrameSource({ width, height, params }) {
     close: onClose,
   };
 }
+export type BlurImageOptions = {
+  mutableImg: fabric.FabricImage,
+  width: number,
+  height: number,
+}
 
-export async function blurImage({ mutableImg, width, height }) {
-  mutableImg.setOptions({ scaleX: width / mutableImg.width, scaleY: height / mutableImg.height });
+export async function blurImage({ mutableImg, width, height }: BlurImageOptions) {
+  mutableImg.set({ scaleX: width / mutableImg.width, scaleY: height / mutableImg.height });
 
   const canvas = mutableImg.toCanvasElement();
   const ctx = canvas.getContext('2d');

@@ -1,8 +1,8 @@
-import editly from '../index.js';
+import editly from 'editly';
 
 // See https://github.com/mifi/editly/pull/222
 
-editly({
+await editly({
   outPath: './fabricImagePostProcessing.mp4',
   clips: [{
     duration: 4,
@@ -21,14 +21,14 @@ editly({
         width: 0.5,
         height: 0.5,
         fabricImagePostProcessing: async ({ image, fabric, canvas }) => {
-          const circleArgs = {
+          const circleArgs: ConstructorParameters<typeof fabric.Circle>[0] = {
             radius: Math.min(image.width, image.height) * 0.4,
             originX: 'center',
             originY: 'center',
             stroke: 'white',
             strokeWidth: 22,
           };
-          image.setOptions({ clipPath: new fabric.Circle(circleArgs) });
+          image.set({ clipPath: new fabric.Circle(circleArgs) });
           canvas.add(new fabric.Circle({
             ...circleArgs,
             left: image.getCenterPoint().x,
@@ -36,6 +36,7 @@ editly({
           }));
         },
       },
-    ] },
+    ]
+  },
   ],
-}).catch(console.error);
+});

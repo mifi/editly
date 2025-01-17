@@ -1,10 +1,11 @@
 import GL from 'gl';
 import createShader from 'gl-shader';
-import fsExtra from 'fs-extra';
+import { readFile } from 'node:fs/promises';
+import type { GlLayer, CreateFrameSourceOptions, FrameSource } from '../types.js';
 
 // I have no idea what I'm doing but it works ¯\_(ツ)_/¯
 
-export default async function createGlFrameSource({ width, height, channels, params }) {
+export default async function createGlFrameSource({ width, height, channels, params }: CreateFrameSourceOptions<GlLayer>): Promise<FrameSource> {
   const gl = GL(width, height);
 
   const defaultVertexSrc = `
@@ -13,24 +14,30 @@ export default async function createGlFrameSource({ width, height, channels, par
       gl_Position = vec4(position, 0.0, 1.0 );
     }
   `;
-  const { vertexPath, fragmentPath, vertexSrc: vertexSrcIn, fragmentSrc: fragmentSrcIn, speed = 1 } = params;
+  const {
+    vertexPath,
+    fragmentPath,
+    vertexSrc: vertexSrcIn,
+    fragmentSrc: fragmentSrcIn,
+    speed = 1
+  } = params;
 
   let fragmentSrc = fragmentSrcIn;
   let vertexSrc = vertexSrcIn;
 
-  if (fragmentPath) fragmentSrc = await fsExtra.readFile(fragmentPath);
-  if (vertexPath) vertexSrc = await fsExtra.readFile(vertexPath);
+  if (fragmentPath) fragmentSrc = (await readFile(fragmentPath)).toString();
+  if (vertexPath) vertexSrc = (await readFile(vertexPath)).toString();
 
   if (!vertexSrc) vertexSrc = defaultVertexSrc;
 
-  const shader = createShader(gl, vertexSrc, fragmentSrc);
+  const shader = createShader(gl, vertexSrc, fragmentSrc ?? '');
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   // https://blog.mayflower.de/4584-Playing-around-with-pixel-shaders-in-WebGL.html
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, 1, 1, -1, 1]), gl.STATIC_DRAW);
 
-  async function readNextFrame(progress) {
+  async function readNextFrame(progress: number) {
     shader.bind();
 
     shader.attributes.position.pointer();
@@ -56,6 +63,6 @@ export default async function createGlFrameSource({ width, height, channels, par
 
   return {
     readNextFrame,
-    close: () => {},
+    close: () => { },
   };
 }

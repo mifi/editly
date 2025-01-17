@@ -1,4 +1,4 @@
-import { execa } from 'execa';
+import { execa, ExecaChildProcess } from 'execa';
 import assert from 'assert';
 import { join, dirname } from 'path';
 import JSON5 from 'json5';
@@ -9,20 +9,28 @@ import { testFf } from './ffmpeg.js';
 import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util.js';
 import { createFabricCanvas, rgbaToFabricImage } from './sources/fabric.js';
 import { createFrameSource } from './sources/frameSource.js';
-import parseConfig from './parseConfig.js';
-import GlTransitions from './glTransitions.js';
+import parseConfig, { ProcessedClip } from './parseConfig.js';
+import GlTransitions, { type RunTransitionOptions } from './glTransitions.js';
 import Audio from './audio.js';
+import type { Config, RenderSingleFrameConfig } from './types.js';
 
 const channels = 4;
 
-async function Editly(config = {}) {
+export type * from './types.js';
+
+/**
+ * Edit and render videos.
+ *
+ * @param config - Config.
+ */
+async function Editly(config: Config): Promise<void> {
   const {
     // Testing options:
     enableFfmpegLog = false,
     verbose = false,
     logTimes = false,
     keepTmp = false,
-    fast,
+    fast = false,
 
     outPath,
     clips: clipsIn,
@@ -87,15 +95,15 @@ async function Editly(config = {}) {
     return false;
   }));
 
-  let width;
-  let height;
+  let width: number;
+  let height: number;
 
   let desiredWidth;
 
   if (requestedWidth) desiredWidth = requestedWidth;
   else if (isGif) desiredWidth = 320;
 
-  const roundDimension = (val) => (isGif ? Math.round(val) : multipleOf2(val));
+  const roundDimension = (val: number) => (isGif ? Math.round(val) : multipleOf2(val));
 
   if (firstVideoWidth && firstVideoHeight) {
     if (desiredWidth) {
@@ -138,8 +146,8 @@ async function Editly(config = {}) {
     height = Math.max(2, height);
   }
 
-  let fps;
-  let framerateStr;
+  let fps: number;
+  let framerateStr: string;
 
   if (fast) {
     fps = 15;
@@ -151,7 +159,7 @@ async function Editly(config = {}) {
     fps = 10;
     framerateStr = String(fps);
   } else if (firstVideoFramerateStr) {
-    fps = parseFps(firstVideoFramerateStr);
+    fps = parseFps(firstVideoFramerateStr) ?? 25;
     framerateStr = firstVideoFramerateStr;
   } else {
     fps = 25;
@@ -170,7 +178,7 @@ async function Editly(config = {}) {
 
   const { runTransitionOnFrame: runGlTransitionOnFrame } = GlTransitions({ width, height, channels });
 
-  function runTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams }) {
+  function runTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams }: RunTransitionOptions) {
     // A dummy transition can be used to have an audio transition without a video transition
     // (Note: You will lose a portion from both clips due to overlap)
     if (transitionName === 'dummy') return progress > 0.5 ? toFrame : fromFrame;
@@ -186,7 +194,7 @@ async function Editly(config = {}) {
     // https://superuser.com/questions/556029/how-do-i-convert-a-video-to-gif-using-ffmpeg-with-reasonable-quality
     const videoOutputArgs = isGif ? [
       '-vf', `format=rgb24,fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
-      '-loop', 0,
+      '-loop', '0',
     ] : [
       '-vf', 'format=yuv420p',
       '-vcodec', 'libx264',
@@ -226,7 +234,7 @@ async function Editly(config = {}) {
     return execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'pipe', stdout: process.stdout, stderr: process.stderr });
   }
 
-  let outProcess;
+  let outProcess: ExecaChildProcess<Buffer<ArrayBufferLike>> | undefined = undefined;
   let outProcessExitCode;
 
   let frameSource1;
@@ -244,7 +252,7 @@ async function Editly(config = {}) {
   const getTransitionFromClip = () => clips[transitionFromClipId];
   const getTransitionToClip = () => clips[getTransitionToClipId()];
 
-  const getSource = async (clip, clipIndex) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
+  const getSource = async (clip: ProcessedClip, clipIndex: number) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
   const getTransitionFromSource = async () => getSource(getTransitionFromClip(), transitionFromClipId);
   const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
 
@@ -268,8 +276,7 @@ async function Editly(config = {}) {
       frameSource1 = await getTransitionFromSource();
       frameSource2 = await getTransitionToSource();
 
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
+      while (!outProcessError) {
         const transitionToClip = getTransitionToClip();
         const transitionFromClip = getTransitionFromClip();
         const fromClipNumFrames = Math.round(transitionFromClip.duration * fps);
@@ -279,9 +286,9 @@ async function Editly(config = {}) {
         const fromClipTime = transitionFromClip.duration * fromClipProgress;
         const toClipTime = transitionToClip && transitionToClip.duration * toClipProgress;
 
-        const currentTransition = transitionFromClip.transition;
+        const currentTransition = transitionFromClip.transition!;
 
-        const transitionNumFrames = Math.round(currentTransition.duration * fps);
+        const transitionNumFrames = Math.round(currentTransition.duration! * fps);
 
         // Each clip has two transitions, make sure we leave enough room:
         const transitionNumFramesSafe = Math.floor(Math.min(Math.min(fromClipNumFrames, toClipNumFrames != null ? toClipNumFrames : Number.MAX_SAFE_INTEGER) / 2, transitionNumFrames));
@@ -315,7 +322,6 @@ async function Editly(config = {}) {
           fromClipFrameAt = transitionLastFrameIndex;
           toClipFrameAt = 0;
 
-          // eslint-disable-next-line no-continue
           continue;
         }
 
@@ -341,7 +347,7 @@ async function Editly(config = {}) {
             const easedProgress = currentTransition.easingFunction(progress);
 
             if (logTimes) console.time('runTransitionOnFrame');
-            outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data, toFrame: frameSource2Data, progress: easedProgress, transitionName: currentTransition.name, transitionParams: currentTransition.params });
+            outFrameData = runTransitionOnFrame({ fromFrame: frameSource1Data!, toFrame: frameSource2Data, progress: easedProgress, transitionName: currentTransition.name, transitionParams: currentTransition.params });
             if (logTimes) console.timeEnd('runTransitionOnFrame');
           } else {
             console.warn('Got no frame data from transitionToClip!');
@@ -364,7 +370,7 @@ async function Editly(config = {}) {
         if (logTimes) console.time('outProcess.write');
 
         // If we don't wait, then we get EINVAL when dealing with high resolution files (big writes)
-        if (!nullOutput) await new Promise((r) => outProcess.stdin.write(outFrameData, r));
+        if (!nullOutput) await new Promise((r) => outProcess?.stdin?.write(outFrameData, r));
 
         if (logTimes) console.timeEnd('outProcess.write');
 
@@ -375,9 +381,9 @@ async function Editly(config = {}) {
         if (isInTransition) toClipFrameAt += 1;
       } // End while loop
 
-      outProcess.stdin.end();
+      outProcess.stdin?.end();
     } catch (err) {
-      outProcess.kill();
+      outProcess?.kill();
       throw err;
     } finally {
       if (verbose) console.log('Cleanup');
@@ -389,7 +395,8 @@ async function Editly(config = {}) {
       if (verbose) console.log('Waiting for output ffmpeg process to finish');
       await outProcess;
     } catch (err) {
-      if (outProcessExitCode !== 0 && !err.killed) throw err;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (outProcessExitCode !== 0 && !(err as any).killed) throw err;
     }
   } finally {
     if (!keepTmp) await fsExtra.remove(tmpDir);
@@ -400,24 +407,30 @@ async function Editly(config = {}) {
   console.log(outPath);
 }
 
-// Pure function to get a frame at a certain time
-// TODO I think this does not respect transition durations
-async function renderSingleFrame({
-  time = 0,
-  defaults,
-  width = 800,
-  height = 600,
-  clips: clipsIn,
+/**
+ * Pure function to get a frame at a certain time.
+ * TODO: I think this does not respect transition durations
+ *
+ * @param config - Config.
+ */
+export async function renderSingleFrame(config: RenderSingleFrameConfig): Promise<void> {
+  const {
+    time = 0,
+    defaults = {},
+    width = 800,
+    height = 600,
+    clips: clipsIn,
 
-  verbose,
-  logTimes,
-  enableFfmpegLog,
-  allowRemoteRequests,
-  ffprobePath = 'ffprobe',
-  ffmpegPath = 'ffmpeg',
-  outPath = `${Math.floor(Math.random() * 1e12)}.png`,
-}) {
-  const clips = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: [], allowRemoteRequests, ffprobePath });
+    verbose,
+    logTimes,
+    enableFfmpegLog,
+    allowRemoteRequests,
+    ffprobePath = 'ffprobe',
+    ffmpegPath = 'ffmpeg',
+    outPath = `${Math.floor(Math.random() * 1e12)}.png`,
+  } = config;
+
+  const { clips } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: [], allowRemoteRequests, ffprobePath });
   let clipStartTime = 0;
   const clip = clips.find((c) => {
     if (clipStartTime <= time && clipStartTime + c.duration > time) return true;

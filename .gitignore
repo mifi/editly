@@ -108,6 +108,7 @@ dist
 editly-tmp-*/
 *.mp4
 *.gif
+*.png
 
 # Other
 .idea

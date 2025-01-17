@@ -1,17 +1,33 @@
 import pMap from 'p-map';
 import { join, basename, resolve } from 'path';
 import { execa } from 'execa';
-import flatMap from 'lodash-es/flatMap.js';
+import { flatMap } from 'lodash-es';
 
 import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg.js';
 import { readFileStreams } from './util.js';
 
-export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) => {
-  async function createMixedAudioClips({ clips, keepSourceAudio }) {
+import type { AudioLayer, AudioNormalizationOptions, AudioTrack, Clip, Config, Transition, VideoLayer } from './types.js'
+
+export type AudioOptions = {
+  ffmpegPath: string;
+  ffprobePath: string;
+  enableFfmpegLog: boolean;
+  verbose: boolean;
+  tmpDir: string;
+}
+
+export type EditAudioOptions = Pick<Config, "keepSourceAudio" | "clips" | "clipsAudioVolume" | "audioNorm" | "outputVolume"> & {
+  arbitraryAudio: AudioTrack[]
+};
+
+type LayerWithAudio = (AudioLayer | VideoLayer) & { speedFactor: number };
+
+export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: AudioOptions) => {
+  async function createMixedAudioClips({ clips, keepSourceAudio }: { clips: Clip[], keepSourceAudio?: boolean }) {
     return pMap(clips, async (clip, i) => {
       const { duration, layers, transition } = clip;
 
-      async function runInner() {
+      async function runInner(): Promise<{ clipAudioPath: string, silent: boolean }> {
         const clipAudioPath = join(tmpDir, `clip${i}-audio.flac`);
 
         async function createSilence() {
@@ -20,7 +36,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
             '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
             '-sample_fmt', 's32',
             '-ar', '48000',
-            '-t', duration,
+            '-t', duration!.toString(),
             '-c:a', 'flac',
             '-y',
             clipAudioPath,
@@ -33,10 +49,11 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
         // Has user enabled keep source audio?
         if (!keepSourceAudio) return createSilence();
 
+        // TODO:[ts]: Layers is always an array once config is parsed. Fix this in types
         const audioLayers = layers.filter(({ type, start, stop }) => (
           ['audio', 'video'].includes(type)
           // TODO: We don't support audio for start/stop layers
-          && !start && stop == null));
+          && !start && stop == null)) as LayerWithAudio[];
 
         if (audioLayers.length === 0) return createSilence();
 
@@ -60,13 +77,13 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
               atempoFilter = `atempo=${atempo}`;
             }
 
-            const cutToArg = (cutTo - cutFrom) * speedFactor;
+            const cutToArg = (cutTo! - cutFrom!) * speedFactor;
 
             const args = [
               ...getFfmpegCommonArgs({ enableFfmpegLog }),
               ...getCutFromArgs({ cutFrom }),
               '-i', path,
-              '-t', cutToArg,
+              '-t', cutToArg!.toString(),
               '-sample_fmt', 's32',
               '-ar', '48000',
               '-map', 'a:0', '-c:a', 'flac',
@@ -78,10 +95,10 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
             // console.log(args);
             await execa(ffmpegPath, args);
 
-            return {
+            return [
               layerAudioPath,
               audioLayer,
-            };
+            ];
           } catch (err) {
             if (verbose) console.error('Cannot extract audio from video', path, err);
             // Fall back to silence
@@ -89,17 +106,17 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
           }
         }, { concurrency: 4 });
 
-        const processedAudioLayers = processedAudioLayersRaw.filter((p) => p);
+        const processedAudioLayers = processedAudioLayersRaw.filter((r): r is [string, LayerWithAudio] => r !== undefined);
 
         if (processedAudioLayers.length < 1) return createSilence();
 
-        if (processedAudioLayers.length === 1) return { clipAudioPath: processedAudioLayers[0].layerAudioPath };
+        if (processedAudioLayers.length === 1) return { clipAudioPath: processedAudioLayers[0][0], silent: false };
 
         // Merge/mix all layers' audio
-        const weights = processedAudioLayers.map(({ audioLayer }) => (audioLayer.mixVolume != null ? audioLayer.mixVolume : 1));
+        const weights = processedAudioLayers.map(([, { mixVolume }]) => mixVolume ?? 1);
         const args = [
           ...getFfmpegCommonArgs({ enableFfmpegLog }),
-          ...flatMap(processedAudioLayers, ({ layerAudioPath }) => ['-i', layerAudioPath]),
+          ...flatMap(processedAudioLayers, ([layerAudioPath]) => ['-i', layerAudioPath]),
           '-filter_complex', `amix=inputs=${processedAudioLayers.length}:duration=longest:weights=${weights.join(' ')}`,
           '-c:a', 'flac',
           '-y',
@@ -107,7 +124,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
         ];
 
         await execa(ffmpegPath, args);
-        return { clipAudioPath };
+        return { clipAudioPath, silent: false };
       }
 
       const { clipAudioPath, silent } = await runInner();
@@ -120,7 +137,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
     }, { concurrency: 4 });
   }
 
-  async function crossFadeConcatClipAudio(clipAudio) {
+  async function crossFadeConcatClipAudio(clipAudio: { path: string, transition?: Transition | null }[]) {
     if (clipAudio.length < 2) {
       return clipAudio[0].path;
     }
@@ -134,7 +151,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
       const outStream = `[concat${i}]`;
 
       const epsilon = 0.0001; // If duration is 0, ffmpeg seems to default to 1 sec instead, hence epsilon.
-      let ret = `${inStream}[${i + 1}:a]acrossfade=d=${Math.max(epsilon, transition.duration)}:c1=${transition.audioOutCurve || 'tri'}:c2=${transition.audioInCurve || 'tri'}`;
+      let ret = `${inStream}[${i + 1}:a]acrossfade=d=${Math.max(epsilon, transition?.duration ?? 0)}:c1=${transition?.audioOutCurve ?? 'tri'}:c2=${transition?.audioInCurve ?? 'tri'}`;
 
       inStream = outStream;
 
@@ -156,7 +173,8 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
     return outPath;
   }
 
-  async function mixArbitraryAudio({ streams, audioNorm, outputVolume }) {
+  // FIXME[ts]: parseConfig sets `loop` on arbitrary audio tracks. Should that be part of the `AudioTrack` interface?
+  async function mixArbitraryAudio({ streams, audioNorm, outputVolume }: { streams: (AudioTrack & { loop?: number })[], audioNorm?: AudioNormalizationOptions, outputVolume?: number | string }) {
     let maxGain = 30;
     let gaussSize = 5;
     if (audioNorm) {
@@ -175,14 +193,14 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
 
     const volumeArg = outputVolume != null ? `,volume=${outputVolume}` : '';
     const audioNormArg = enableAudioNorm ? `,dynaudnorm=g=${gaussSize}:maxgain=${maxGain}` : '';
-    filterComplex += `;${streams.map((s, i) => `[a${i}]`).join('')}amix=inputs=${streams.length}:duration=first:dropout_transition=0:weights=${streams.map((s) => (s.mixVolume != null ? s.mixVolume : 1)).join(' ')}${audioNormArg}${volumeArg}`;
+    filterComplex += `;${streams.map((_, i) => `[a${i}]`).join('')}amix=inputs=${streams.length}:duration=first:dropout_transition=0:weights=${streams.map((s) => (s.mixVolume != null ? s.mixVolume : 1)).join(' ')}${audioNormArg}${volumeArg}`;
 
     const mixedAudioPath = join(tmpDir, 'audio-mixed.flac');
 
     const args = [
       ...getFfmpegCommonArgs({ enableFfmpegLog }),
       ...(flatMap(streams, ({ path, loop }) => ([
-        '-stream_loop', (loop || 0),
+        '-stream_loop', (loop || 0).toString(),
         '-i', path,
       ]))),
       '-vn',
@@ -199,7 +217,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
     return mixedAudioPath;
   }
 
-  async function editAudio({ keepSourceAudio, clips, arbitraryAudio, clipsAudioVolume, audioNorm, outputVolume }) {
+  async function editAudio({ keepSourceAudio, clips, arbitraryAudio, clipsAudioVolume, audioNorm, outputVolume }: EditAudioOptions) {
     // We need clips to process audio, because we need to know duration
     if (clips.length === 0) return undefined;
 
@@ -217,7 +235,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }) =
     // Merge & fade the clip audio files
     const concatedClipAudioPath = await crossFadeConcatClipAudio(clipAudio);
 
-    const streams = [
+    const streams: AudioTrack[] = [
       // The first stream is required, as it determines the length of the output audio.
       // All other streams will be truncated to its length
       { path: concatedClipAudioPath, mixVolume: clipsAudioVolume },

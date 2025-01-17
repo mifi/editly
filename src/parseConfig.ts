@@ -10,19 +10,25 @@ import {
   assertFileValid,
   checkTransition,
 } from './util.js';
-import { registerFont } from './sources/fabric.js';
-import { calcTransition } from './transitions.js';
+import { registerFont } from 'canvas';
+import { calcTransition, type CalculatedTransition } from './transitions.js';
+import type { AudioTrack, CanvasLayer, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, DefaultOptions, Clip, VideoLayer } from './types.js';
 
-const dirname = fileURLToPath(new URL('.', import.meta.url));
+export type ProcessedClip = {
+  layers: Layer[];
+  duration: number;
+  transition: CalculatedTransition;
+}
+
+const dirname = fileURLToPath(new URL('..', import.meta.url));
 
 // Cache
-const loadedFonts = [];
+const loadedFonts: string[] = [];
 
-async function validateArbitraryAudio(audio, allowRemoteRequests) {
+async function validateArbitraryAudio(audio: AudioTrack[] | undefined, allowRemoteRequests?: boolean) {
   assert(audio === undefined || Array.isArray(audio));
 
   if (audio) {
-    // eslint-disable-next-line no-restricted-syntax
     for (const { path, cutFrom, cutTo, start } of audio) {
       await assertFileValid(path, allowRemoteRequests);
 
@@ -34,7 +40,18 @@ async function validateArbitraryAudio(audio, allowRemoteRequests) {
   }
 }
 
-export default async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests, ffprobePath }) {
+type ParseConfigOptions = {
+  defaults: DefaultOptions;
+  clips: Clip[];
+  backgroundAudioVolume?: string | number;
+  backgroundAudioPath?: string;
+  loopAudio?: boolean;
+  allowRemoteRequests?: boolean;
+  ffprobePath: string;
+  arbitraryAudio: AudioTrack[];
+};
+
+export default async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests, ffprobePath }: ParseConfigOptions) {
   const defaults = {
     duration: 4,
     ...defaultsIn,
@@ -47,55 +64,61 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
     },
   };
 
-  async function handleLayer(layer) {
-    const { type, ...restLayer } = layer;
-
+  async function handleLayer(layer: Layer): Promise<Layer | Layer[]> {
     // https://github.com/mifi/editly/issues/39
-    if (['image', 'image-overlay'].includes(type)) {
-      await assertFileValid(restLayer.path, allowRemoteRequests);
-    } else if (type === 'gl') {
-      await assertFileValid(restLayer.fragmentPath, allowRemoteRequests);
+    if (layer.type === 'image' || layer.type === 'image-overlay') {
+      await assertFileValid((layer as (ImageOverlayLayer | ImageLayer)).path, allowRemoteRequests);
+    } else if (layer.type === 'gl') {
+      await assertFileValid(layer.fragmentPath, allowRemoteRequests);
     }
 
-    if (['fabric', 'canvas'].includes(type)) assert(typeof layer.func === 'function', '"func" must be a function');
+    if (['fabric', 'canvas'].includes(layer.type)) {
+      assert(typeof (layer as FabricLayer | CanvasLayer).func === 'function', '"func" must be a function');
+    }
 
-    if (['image', 'image-overlay', 'fabric', 'canvas', 'gl', 'radial-gradient', 'linear-gradient', 'fill-color'].includes(type)) return layer;
+    if (['image', 'image-overlay', 'fabric', 'canvas', 'gl', 'radial-gradient', 'linear-gradient', 'fill-color'].includes(layer.type)) {
+      return layer;
+    }
 
     // TODO if random-background radial-gradient linear etc
-    if (type === 'pause') return handleLayer({ ...restLayer, type: 'fill-color' });
+    if (layer.type === 'pause') {
+      return handleLayer({ ...layer, type: 'fill-color' });
+    }
 
-    if (type === 'rainbow-colors') return handleLayer({ type: 'gl', fragmentPath: join(dirname, 'shaders/rainbow-colors.frag') });
+    if (layer.type === 'rainbow-colors') {
+      return handleLayer({ type: 'gl', fragmentPath: join(dirname, 'shaders/rainbow-colors.frag') } as GlLayer);
+    }
 
-    if (type === 'editly-banner') {
-      const { fontPath } = layer;
+    if (layer.type === 'editly-banner') {
+      const { fontPath } = layer as EditlyBannerLayer;
       return [
-        await handleLayer({ type: 'linear-gradient' }),
-        await handleLayer({ fontPath, type: 'title', text: 'Made with\nEDITLY\nmifi.no' }),
-      ];
+        await handleLayer({ type: 'linear-gradient' } as LinearGradientLayer),
+        await handleLayer({ type: 'title', text: 'Made with\nEDITLY\nmifi.no', fontPath } as TitleLayer),
+      ].flat();
     }
 
     // For convenience
-    if (type === 'title-background') {
-      const { text, textColor, background, fontFamily, fontPath } = layer;
+    if (layer.type === 'title-background') {
+      const { text, textColor, background, fontFamily, fontPath } = layer as TitleBackgroundLayer;
       const outLayers = [];
       if (background) {
         if (background.type === 'radial-gradient') outLayers.push(await handleLayer({ type: 'radial-gradient', colors: background.colors }));
         else if (background.type === 'linear-gradient') outLayers.push(await handleLayer({ type: 'linear-gradient', colors: background.colors }));
         else if (background.color) outLayers.push(await handleLayer({ type: 'fill-color', color: background.color }));
       } else {
-        const backgroundTypes = ['radial-gradient', 'linear-gradient', 'fill-color'];
+        const backgroundTypes: ('radial-gradient' | 'linear-gradient' | 'fill-color')[] = ['radial-gradient', 'linear-gradient', 'fill-color'];
         const randomType = backgroundTypes[Math.floor(Math.random() * backgroundTypes.length)];
         outLayers.push(await handleLayer({ type: randomType }));
       }
       outLayers.push(await handleLayer({ type: 'title', fontFamily, fontPath, text, textColor }));
-      return outLayers;
+      return outLayers.flat();
     }
 
-    if (['title', 'subtitle', 'news-title', 'slide-in-text'].includes(type)) {
-      assert(layer.text, 'Please specify a text');
+    if (['title', 'subtitle', 'news-title', 'slide-in-text'].includes(layer.type)) {
+      const { fontPath, ...rest } = layer as TitleLayer | SubtitleLayer | NewsTitleLayer | SlideInTextLayer;
+      assert(rest.text, 'Please specify a text');
 
-      let { fontFamily } = layer;
-      const { fontPath, ...rest } = layer;
+      let { fontFamily } = rest;
       if (fontPath) {
         fontFamily = Buffer.from(basename(fontPath)).toString('base64');
         if (!loadedFonts.includes(fontFamily)) {
@@ -106,12 +129,12 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
       return { ...rest, fontFamily };
     }
 
-    throw new Error(`Invalid layer type ${type}`);
+    throw new Error(`Invalid layer type ${layer.type}`);
   }
 
-  const detachedAudioByClip = {};
+  const detachedAudioByClip: Record<number, AudioTrack[]> = {};
 
-  let clipsOut = await pMap(clips, async (clip, clipIndex) => {
+  let clipsOut: ProcessedClip[] = await pMap(clips, async (clip, clipIndex) => {
     assert(typeof clip === 'object', '"clips" must contain objects with one or more layers');
     const { transition: userTransition, duration: userClipDuration, layers: layersIn } = clip;
 
@@ -128,17 +151,16 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
     const userClipDurationOrDefault = userClipDuration || defaults.duration;
     if (videoLayers.length === 0) assert(userClipDurationOrDefault, `Duration parameter is required for videoless clip ${clipIndex}`);
 
-    const transition = calcTransition(defaults, userTransition, clipIndex === clips.length - 1);
+    const transition = calcTransition(defaults.transition, userTransition, clipIndex === clips.length - 1);
 
-    let layersOut = flatMap(await pMap(layers, async (layerIn) => {
+    let layersOut = flatMap(await pMap(layers, async <T extends Layer>(layerIn: T) => {
       const globalLayerDefaults = defaults.layer || {};
       const thisLayerDefaults = (defaults.layerType || {})[layerIn.type];
 
-      const layer = { ...globalLayerDefaults, ...thisLayerDefaults, ...layerIn };
-      const { type, path } = layer;
+      const layer: T = { ...globalLayerDefaults, ...thisLayerDefaults, ...layerIn };
 
-      if (type === 'video') {
-        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = await readVideoFileInfo(ffprobePath, path);
+      if (layer.type === 'video') {
+        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = await readVideoFileInfo(ffprobePath, layer.path);
         let { cutFrom, cutTo } = layer;
         if (!cutFrom) cutFrom = 0;
         cutFrom = Math.max(cutFrom, 0);
@@ -149,41 +171,41 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
         cutTo = Math.min(cutTo, fileDuration);
         assert(cutFrom < cutTo, 'cutFrom must be lower than cutTo');
 
-        const inputDuration = cutTo - cutFrom;
+        const layerDuration = cutTo - cutFrom;
 
-        const isRotated = [-90, 90, 270, -270].includes(rotation);
+        const isRotated = rotation && [-90, 90, 270, -270].includes(rotation);
         const inputWidth = isRotated ? heightIn : widthIn;
         const inputHeight = isRotated ? widthIn : heightIn;
 
-        return { ...layer, cutFrom, cutTo, inputDuration, framerateStr, inputWidth, inputHeight };
+        return { ...layer, cutFrom, cutTo, layerDuration, framerateStr, inputWidth, inputHeight } as T;
       }
 
       // Audio is handled later
-      if (['audio', 'detached-audio'].includes(type)) return layer;
+      if (['audio', 'detached-audio'].includes(layer.type)) return layer;
 
       return handleLayer(layer);
     }, { concurrency: 1 }));
 
     let clipDuration = userClipDurationOrDefault;
 
-    const firstVideoLayer = layersOut.find((layer) => layer.type === 'video');
-    if (firstVideoLayer && !userClipDuration) clipDuration = firstVideoLayer.inputDuration;
+    const firstVideoLayer = layersOut.find((layer): layer is VideoLayer => layer.type === 'video');
+    if (firstVideoLayer && !userClipDuration) clipDuration = firstVideoLayer.layerDuration!;
     assert(clipDuration);
 
     // We need to map again, because for audio, we need to know the correct clipDuration
-    layersOut = await pMap(layersOut, async (layerIn) => {
-      const { type, path, stop, start = 0 } = layerIn;
+    layersOut = (await pMap(layersOut, async <T extends Layer>(layerIn: T) => {
+      if (!layerIn.start) layerIn.start = 0
 
       // This feature allows the user to show another layer overlayed (or replacing) parts of the lower layers (start - stop)
-      const layerDuration = ((stop || clipDuration) - start);
-      assert(layerDuration > 0 && layerDuration <= clipDuration, `Invalid start ${start} or stop ${stop} (${clipDuration})`);
+      const layerDuration = ((layerIn.stop || clipDuration) - layerIn.start);
+      assert(layerDuration > 0 && layerDuration <= clipDuration, `Invalid start ${layerIn.start} or stop ${layerIn.stop} (${clipDuration})`);
       // TODO Also need to handle video layers (speedFactor etc)
       // TODO handle audio in case of start/stop
 
-      const layer = { ...layerIn, start, layerDuration };
+      const layer: T = { ...layerIn, layerDuration };
 
-      if (type === 'audio') {
-        const { duration: fileDuration } = await readAudioFileInfo(ffprobePath, path);
+      if (layer.type === 'audio') {
+        const { duration: fileDuration } = await readAudioFileInfo(ffprobePath, layer.path);
         let { cutFrom, cutTo } = layer;
 
         // console.log({ cutFrom, cutTo, fileDuration, clipDuration });
@@ -197,22 +219,20 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
         cutTo = Math.min(cutTo, fileDuration);
         assert(cutFrom < cutTo, 'cutFrom must be lower than cutTo');
 
-        const inputDuration = cutTo - cutFrom;
+        const layerDuration = cutTo - cutFrom;
 
-        const speedFactor = clipDuration / inputDuration;
+        const speedFactor = clipDuration / layerDuration;
 
         return { ...layer, cutFrom, cutTo, speedFactor };
       }
 
-      if (type === 'video') {
-        const { inputDuration } = layer;
-
+      if (layer.type === 'video') {
         let speedFactor;
 
         // If user explicitly specified duration for clip, it means that should be the output duration of the video
         if (userClipDuration) {
           // Later we will speed up or slow down video using this factor
-          speedFactor = userClipDuration / inputDuration;
+          speedFactor = userClipDuration / layerDuration;
         } else {
           speedFactor = 1;
         }
@@ -222,15 +242,14 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
 
       // These audio tracks are detached from the clips (can run over multiple clips)
       // This is useful so we can have audio start relative to their parent clip's start time
-      if (type === 'detached-audio') {
-        const { cutFrom, cutTo, mixVolume } = layer;
+      if (layer.type === 'detached-audio') {
         if (!detachedAudioByClip[clipIndex]) detachedAudioByClip[clipIndex] = [];
-        detachedAudioByClip[clipIndex].push({ path, cutFrom, cutTo, mixVolume, start });
+        detachedAudioByClip[clipIndex].push(layer);
         return undefined; // Will be filtered out
       }
 
       return layer;
-    });
+    })).filter((l) => l !== undefined);
 
     // Filter out deleted layers
     layersOut = layersOut.filter((l) => l);
@@ -243,7 +262,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
   }, { concurrency: 1 });
 
   let totalClipDuration = 0;
-  const clipDetachedAudio = [];
+  const clipDetachedAudio: AudioTrack[] = [];
 
   // Need to map again because now we know all clip durations, and we can adjust transitions so they are safe
   clipsOut = await pMap(clipsOut, async (clip, i) => {
@@ -255,11 +274,10 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
     let safeTransitionDuration = 0;
     if (nextClip) {
       // Each clip can have two transitions, make sure we leave enough room:
-      safeTransitionDuration = Math.min(clip.duration / 2, nextClip.duration / 2, clip.transition.duration);
+      safeTransitionDuration = Math.min(clip.duration / 2, nextClip.duration / 2, clip.transition!.duration!);
     }
 
     // We now know all clip durations so we can calculate the offset for detached audio tracks
-    // eslint-disable-next-line no-restricted-syntax
     for (const { start, ...rest } of (detachedAudioByClip[i] || [])) {
       clipDetachedAudio.push({ ...rest, start: totalClipDuration + (start || 0) });
     }

@@ -7,6 +7,7 @@ import {
   createFabricFrameSource,
   createFabricCanvas,
   renderFabricCanvas,
+  type FabricFrameSourceCallback,
 } from './fabric.js';
 import {
   customFabricFrameSource,
@@ -22,8 +23,12 @@ import {
 } from './fabric/fabricFrameSources.js';
 import createVideoFrameSource from './videoFrameSource.js';
 import createGlFrameSource from './glFrameSource.js';
+import type { CreateFrameSource, CreateFrameSourceOptions, DebugOptions } from '../types.js';
+import { ProcessedClip } from '../parseConfig.js';
 
-const fabricFrameSources = {
+// FIXME[ts]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fabricFrameSources: Record<string, FabricFrameSourceCallback<any>> = {
   fabric: customFabricFrameSource,
   image: imageFrameSource,
   'image-overlay': imageOverlayFrameSource,
@@ -36,7 +41,26 @@ const fabricFrameSources = {
   'slide-in-text': slideInTextFrameSource,
 };
 
-export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }) {
+// FIXME[ts]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const frameSources: Record<string, CreateFrameSource<any>> = {
+  video: createVideoFrameSource,
+  gl: createGlFrameSource,
+  canvas: createCustomCanvasFrameSource,
+};
+
+type FrameSourceOptions = DebugOptions & {
+  clip: ProcessedClip;
+  clipIndex: number;
+  ffmpegPath: string;
+  ffprobePath: string;
+  width: number,
+  height: number,
+  channels: number,
+  framerateStr: string,
+}
+
+export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }: FrameSourceOptions) {
   const { layers, duration } = clip;
 
   const visualLayers = layers.filter((layer) => layer.type !== 'audio');
@@ -45,15 +69,13 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
     const { type, ...params } = layer;
     if (verbose) console.log('createFrameSource', type, 'clip', clipIndex, 'layer', layerIndex);
 
-    let createFrameSourceFunc;
+    let createFrameSourceFunc: CreateFrameSource<typeof layer>;
     if (fabricFrameSources[type]) {
-      createFrameSourceFunc = async (opts) => createFabricFrameSource(fabricFrameSources[type], opts);
+      // FIXME[TS]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      createFrameSourceFunc = async (opts: CreateFrameSourceOptions<any>) => createFabricFrameSource(fabricFrameSources[type], opts);
     } else {
-      createFrameSourceFunc = {
-        video: createVideoFrameSource,
-        gl: createGlFrameSource,
-        canvas: createCustomCanvasFrameSource,
-      }[type];
+      createFrameSourceFunc = frameSources[type];
     }
 
     assert(createFrameSourceFunc, `Invalid type ${type}`);
@@ -62,14 +84,14 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
     return { layer, frameSource };
   }, { concurrency: 1 });
 
-  async function readNextFrame({ time }) {
+  async function readNextFrame({ time }: { time: number }) {
     const canvas = createFabricCanvas({ width, height });
 
-    // eslint-disable-next-line no-restricted-syntax
+
     for (const { frameSource, layer } of layerFrameSources) {
       // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });
-      const offsetTime = time - layer.start;
-      const offsetProgress = offsetTime / layer.layerDuration;
+      const offsetTime = time - (layer?.start ?? 0);
+      const offsetProgress = offsetTime / layer.layerDuration!;
       // console.log({ offsetProgress });
       const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
 
@@ -102,7 +124,7 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
   }
 
   async function close() {
-    await pMap(layerFrameSources, async ({ frameSource }) => frameSource.close());
+    await pMap(layerFrameSources, async ({ frameSource }) => frameSource.close?.());
   }
 
   return {

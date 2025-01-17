@@ -6,7 +6,7 @@ import pMap from 'p-map';
 import JSON5 from 'json5';
 import assert from 'assert';
 
-import Editly from './index.js';
+import Editly, { Config, Layer } from './index.js';
 
 // See also readme
 const cli = meow(`
@@ -53,22 +53,26 @@ const cli = meow(`
     keepSourceAudio: { type: 'boolean' },
     allowRemoteRequests: { type: 'boolean' },
     fast: { type: 'boolean', alias: 'f' },
+    transitionName: { type: 'string' },
     transitionDuration: { type: 'number' },
     clipDuration: { type: 'number' },
     width: { type: 'number' },
     height: { type: 'number' },
     fps: { type: 'number' },
+    fontPath: { type: 'string' },
     loopAudio: { type: 'boolean' },
     outputVolume: { type: 'string' },
+    json: { type: 'string' },
+    out: { type: 'string' },
+    audioFilePath: { type: 'string' },
   },
 });
 
 (async () => {
   let { json } = cli.flags;
-  // eslint-disable-next-line prefer-destructuring
   if (cli.input.length === 1 && /\.(json|json5|js)$/.test(cli.input[0].toLowerCase())) json = cli.input[0];
 
-  let params = {
+  let params: Partial<Config> = {
     defaults: {},
   };
 
@@ -78,7 +82,7 @@ const cli = meow(`
     const clipsIn = cli.input;
     if (clipsIn.length < 1) cli.showHelp();
 
-    const clips = await pMap(clipsIn, async (clip) => {
+    const clips: Layer[] = await pMap(clipsIn, async (clip) => {
       let match = clip.match(/^title:(.+)$/);
       if (match) return { type: 'title-background', text: match[1] };
 
@@ -91,7 +95,7 @@ const cli = meow(`
         cli.showHelp();
       }
 
-      const { mime } = fileType;
+      const mime = fileType!.mime;
 
       if (mime.startsWith('video')) return { type: 'video', path: clip };
       if (mime.startsWith('image')) return { type: 'image', path: clip };
@@ -107,15 +111,15 @@ const cli = meow(`
   const { verbose, transitionName, transitionDuration, clipDuration, width, height, fps, audioFilePath, fontPath, fast, out: outPath, keepSourceAudio, loopAudio, outputVolume, allowRemoteRequests } = cli.flags;
 
   if (transitionName || transitionDuration != null) {
-    params.defaults.transition = {};
-    if (transitionName) params.defaults.transition.name = transitionName;
-    if (transitionDuration) params.defaults.transition.duration = transitionDuration;
+    params.defaults!.transition = {};
+    if (transitionName) params.defaults!.transition!.name = transitionName;
+    if (transitionDuration) params.defaults!.transition!.duration = transitionDuration;
   }
 
-  if (clipDuration) params.defaults.duration = clipDuration;
+  if (clipDuration) params.defaults!.duration = clipDuration;
 
   if (fontPath) {
-    params.defaults.layer = {
+    params.defaults!.layer = {
       fontPath,
     };
   }
@@ -137,7 +141,7 @@ const cli = meow(`
 
   if (!params.outPath) params.outPath = './editly-out.mp4';
 
-  await Editly(params);
+  await Editly(params as Config);
 })().catch((err) => {
   console.error('Caught error', err);
   process.exitCode = 1;
