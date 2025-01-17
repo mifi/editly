@@ -15,7 +15,7 @@
     "canvas": "^2.11.2",
     "compare-versions": "^6.1.0",
     "execa": "^6.1.0",
-    "fabric": "^5.2.4",
+    "fabric": "^6.5.4",
     "file-type": "^19.1.0",
     "file-url": "^4.0.0",
     "fs-extra": "^11.2.0",
