@@ -1,4 +1,4 @@
-import type { fabric as Fabric } from 'fabric';
+import type * as Fabric from 'fabric/node';
 
 /**
  * Edit and render videos.
@@ -283,7 +283,7 @@ declare namespace Editly {
 
 	interface VideoPostProcessingFunctionArgs {
 		canvas: Fabric.Canvas;
-		image: Fabric.Image;
+		image: Fabric.FabricImage;
 		fabric: typeof Fabric,
 		progress: number;
 		time: number;

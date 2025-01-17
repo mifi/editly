@@ -7,6 +7,9 @@ module.exports = {
     node: true,
   },
   settings: {
+    'import/resolver': {
+      [require.resolve('eslint-plugin-import-exports-imports-resolver')]: {},
+    },
     'import/extensions': ['.js'],
   },
   rules: {

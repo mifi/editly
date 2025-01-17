@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric/node';
 import fileUrl from 'file-url';
 
 import { getRandomGradient, getRandomColors } from '../../colors.js';
@@ -10,7 +10,7 @@ import { blurImage } from '../fabric.js';
 
 const defaultFontFamily = 'sans-serif';
 
-const loadImage = async (pathOrUrl) => new Promise((resolve) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl), resolve));
+const loadImage = (pathOrUrl) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl));
 
 function getZoomParams({ progress, zoomDirection, zoomAmount }) {
   let scaleFactor = 1;
@@ -37,7 +37,7 @@ export async function imageFrameSource({ verbose, params, width, height }) {
 
   const imgData = await loadImage(path);
 
-  const createImg = () => new fabric.Image(imgData, {
+  const createImg = () => new fabric.FabricImage(imgData, {
     originX: 'center',
     originY: 'center',
     left: width / 2,
@@ -189,7 +189,6 @@ export async function linearGradientFrameSource({ width, height, params }) {
 
 export async function subtitleFrameSource({ width, height, params }) {
   const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
-
   async function onRender(progress, canvas) {
     const easedProgress = easeOutExpo(Math.max(0, Math.min((progress - delay) * speed, 1)));
 
@@ -234,7 +233,7 @@ export async function imageOverlayFrameSource({ params, width, height }) {
 
   const { left, top, originX, originY } = getPositionProps({ position, width, height });
 
-  const img = new fabric.Image(imgData, {
+  const img = new fabric.FabricImage(imgData, {
     originX,
     originY,
     left,
@@ -285,7 +284,7 @@ export async function titleFrameSource({ width, height, params }) {
     });
 
     // We need the text as an image in order to scale it
-    const textImage = await new Promise((r) => textBox.cloneAsImage(r));
+    const textImage = textBox.cloneAsImage();
 
     const { left, top, originX, originY } = getPositionProps({ position, width, height });
 
@@ -320,7 +319,7 @@ export async function newsTitleFrameSource({ width, height, params }) {
     const paddingV = 0.07 * min;
     const paddingH = 0.03 * min;
 
-    const textBox = new fabric.Text(text, {
+    const textBox = new fabric.FabricText(text, {
       top,
       left: paddingV + (easedTextProgress - 1) * width,
       fill: textColor,
@@ -367,10 +366,10 @@ async function getFadedObject({ object, progress }) {
     ],
   }));
 
-  const gradientMaskImg = await new Promise((r) => rect.cloneAsImage(r));
-  const fadedImage = await new Promise((r) => object.cloneAsImage(r));
+  const gradientMaskImg = rect.cloneAsImage();
+  const fadedImage = object.cloneAsImage();
 
-  fadedImage.filters.push(new fabric.Image.filters.BlendImage({
+  fadedImage.filters.push(new fabric.FabricImage.filters.BlendImage({
     image: gradientMaskImg,
     mode: 'multiply',
   }));
@@ -386,7 +385,7 @@ export async function slideInTextFrameSource({ width, height, params: { position
 
     const { left, top, originX, originY } = getPositionProps({ position, width, height });
 
-    const textBox = new fabric.Text(text, {
+    const textBox = new fabric.FabricText(text, {
       fill: color,
       fontFamily,
       fontSize: fontSizeAbs,
