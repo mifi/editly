@@ -71,7 +71,7 @@ jobs:
           node-version: ${{ matrix.nodejs }}
           cache: "npm"
           cache-dependency-path: ./package.json
-      - run: npm install --build-from-source
+      - run: npm install
       - run: npm run lint
       - run: npm run test
       - uses: actions/upload-artifact@v4
