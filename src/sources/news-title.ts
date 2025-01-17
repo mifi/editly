@@ -2,9 +2,9 @@ import { Rect, FabricText } from 'fabric/node';
 import { easeOutExpo } from '../transitions.js';
 import type { NewsTitleLayer } from '../types.js';
 import { defaultFontFamily } from '../util.js';
-import { defineFrameSource } from './index.js';
+import { defineFrameSource } from '../api/index.js';
 
-export default defineFrameSource<NewsTitleLayer>(async ({ width, height, params }) => {
+export default defineFrameSource<NewsTitleLayer>('news-title', async ({ width, height, params }) => {
   const { text, textColor = '#ffffff', backgroundColor = '#d02a42', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
   const min = Math.min(width, height);
   const fontSize = Math.round(min * 0.05);

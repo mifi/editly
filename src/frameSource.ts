@@ -1,40 +1,9 @@
-import assert from 'assert';
 import pMap from 'p-map';
 
-import customFabricFrameSource, { rgbaToFabricImage, createFabricCanvas, renderFabricCanvas } from './fabric.js';
-import canvasFrameSource from './canvas.js';
-import fillColorFrameSource from './fill-color.js';
-import glFrameSource from './gl.js';
-import imageFrameSource from './image.js';
-import imageOverlayFrameSource from './image-overlay.js';
-import linearGradientFrameSource from './linear-gradient.js';
-import newsTitleFrameSource from './news-title.js';
-import radialGradientFrameSource from './radial-gradient.js';
-import slideInTextFrameSource from './slide-in-text.js';
-import subtitleFrameSource from './subtitle.js';
-import titleFrameSource from './title.js';
-import videoFrameSource from './video.js';
-
-import type { CreateFrameSource, DebugOptions } from '../types.js';
-import type { ProcessedClip } from '../parseConfig.js';
-
-// FIXME[ts]
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const frameSources: Record<string, CreateFrameSource<any>> = {
-  'canvas': canvasFrameSource,
-  'fabric': customFabricFrameSource,
-  'fill-color': fillColorFrameSource,
-  'gl': glFrameSource,
-  'image-overlay': imageOverlayFrameSource,
-  'image': imageFrameSource,
-  'linear-gradient': linearGradientFrameSource,
-  'news-title': newsTitleFrameSource,
-  'radial-gradient': radialGradientFrameSource,
-  'slide-in-text': slideInTextFrameSource,
-  'subtitle': subtitleFrameSource,
-  'title': titleFrameSource,
-  'video': videoFrameSource,
-};
+import { rgbaToFabricImage, createFabricCanvas, renderFabricCanvas } from './sources/fabric.js';
+import type { DebugOptions } from './types.js';
+import type { ProcessedClip } from './parseConfig.js';
+import { createLayerSource } from './sources/index.js';
 
 type FrameSourceOptions = DebugOptions & {
   clip: ProcessedClip;
@@ -51,19 +20,16 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
   const visualLayers = layers.filter((layer) => layer.type !== 'audio');
 
   const layerFrameSources = await pMap(visualLayers, async (layer, layerIndex) => {
-    const { type, ...params } = layer;
-    if (verbose) console.log('createFrameSource', type, 'clip', clipIndex, 'layer', layerIndex);
-
-    const createFrameSourceFunc: CreateFrameSource<typeof layer> = frameSources[type];
-    assert(createFrameSourceFunc, `Invalid type ${type}`);
-    const frameSource = await createFrameSourceFunc({ width, height, duration, channels, verbose, logTimes, framerateStr, params });
-    return { layer, frameSource };
+    if (verbose) console.log('createFrameSource', layer.type, 'clip', clipIndex, 'layer', layerIndex);
+    const options = { width, height, duration, channels, verbose, logTimes, framerateStr, params: layer };
+    return createLayerSource(options)
   }, { concurrency: 1 });
 
   async function readNextFrame({ time }: { time: number }) {
     const canvas = createFabricCanvas({ width, height });
 
-    for (const { frameSource, layer } of layerFrameSources) {
+    for (const frameSource of layerFrameSources) {
+      const layer = frameSource.layer;
       // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });
       const offsetTime = time - (layer?.start ?? 0);
       const offsetProgress = offsetTime / layer.layerDuration!;
@@ -99,7 +65,7 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
   }
 
   async function close() {
-    await pMap(layerFrameSources, async ({ frameSource }) => frameSource.close?.());
+    await pMap(layerFrameSources, frameSource => frameSource.close?.());
   }
 
   return {

@@ -1,7 +1,7 @@
 import * as fabric from 'fabric/node';
 import { type CanvasRenderingContext2D, createCanvas, ImageData } from 'canvas';
 import { boxBlurImage } from '../BoxBlur.js';
-import { defineFrameSource } from './index.js';
+import { defineFrameSource } from '../api/index.js';
 import type { FabricLayer } from '../types.js';
 
 // Fabric is used as a fundament for compositing layers in editly
@@ -81,7 +81,7 @@ export async function blurImage({ mutableImg, width, height }: BlurImageOptions)
   return new fabric.FabricImage(canvas);
 }// http://fabricjs.com/kitchensink
 
-export default defineFrameSource<FabricLayer>(async ({ width, height, params }) => {
+export default defineFrameSource<FabricLayer>('fabric', async ({ width, height, params }) => {
   const { onRender, onClose } = await params.func(({ width, height, fabric, params }));
 
   return {

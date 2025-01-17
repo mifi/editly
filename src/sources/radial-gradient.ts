@@ -2,9 +2,9 @@ import * as fabric from 'fabric/node';
 import { getRandomGradient } from '../colors.js';
 import type { RadialGradientLayer } from '../types.js';
 import { getRekt } from '../util.js';
-import { defineFrameSource } from './index.js';
+import { defineFrameSource } from '../api/index.js';
 
-export default defineFrameSource<RadialGradientLayer>(async ({ width, height, params }) => {
+export default defineFrameSource<RadialGradientLayer>('radial-gradient', async ({ width, height, params }) => {
   const { colors: inColors } = params;
 
   const colors = inColors && inColors.length === 2 ? inColors : getRandomGradient();

@@ -1,9 +1,9 @@
 import * as fabric from 'fabric/node';
 import type { ImageOverlayLayer } from '../types.js';
 import { loadImage, getPositionProps, getZoomParams, getTranslationParams } from '../util.js';
-import { defineFrameSource } from './index.js';
+import { defineFrameSource } from '../api/index.js';
 
-export default defineFrameSource<ImageOverlayLayer>(async ({ params, width, height }) => {
+export default defineFrameSource<ImageOverlayLayer>('image-overlay', async ({ params, width, height }) => {
   const { path, position, width: relWidth, height: relHeight, zoomDirection, zoomAmount = 0.1 } = params;
 
   const imgData = await loadImage(path);

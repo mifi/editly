@@ -2,9 +2,9 @@ import * as fabric from 'fabric/node';
 import { easeInOutCubic } from '../transitions.js';
 import type { SlideInTextLayer } from '../types.js';
 import { getPositionProps, getFrameByKeyFrames, defaultFontFamily } from '../util.js';
-import { defineFrameSource } from './index.js';
+import { defineFrameSource } from '../api/index.js';
 
-export default defineFrameSource<SlideInTextLayer>(async ({ width, height, params }) => {
+export default defineFrameSource<SlideInTextLayer>('slide-in-text', async ({ width, height, params }) => {
   const { position, text, fontSize = 0.05, charSpacing = 0.1, textColor = '#ffffff', color = undefined, fontFamily = defaultFontFamily } = params;
 
   if (color) {

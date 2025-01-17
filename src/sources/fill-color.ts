@@ -1,9 +1,9 @@
 import { Rect } from 'fabric/node';
 import { getRandomColors } from '../colors.js';
 import type { FillColorLayer } from '../types.js';
-import { defineFrameSource } from './index.js';
+import { defineFrameSource } from '../api/index.js';
 
-export default defineFrameSource<FillColorLayer>(async ({ params, width, height }) => {
+export default defineFrameSource<FillColorLayer>('fill-color', async ({ params, width, height }) => {
   const { color } = params;
 
   const randomColor = getRandomColors(1)[0];

@@ -1,9 +1,9 @@
 import { createCanvas } from 'canvas';
 import type { CanvasLayer } from '../types.js';
 import { canvasToRgba } from './fabric.js';
-import { defineFrameSource } from './index.js';
+import { defineFrameSource } from '../api/index.js';
 
-export default defineFrameSource<CanvasLayer>(async ({ width, height, params }) => {
+export default defineFrameSource<CanvasLayer>('canvas', async ({ width, height, params }) => {
   const canvas = createCanvas(width, height);
   const context = canvas.getContext('2d');
 
