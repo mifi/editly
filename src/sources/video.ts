@@ -135,7 +135,6 @@ export default defineFrameSource<VideoLayer>(async ({ width: canvasWidth, height
         resolve();
         return;
       }
-      // console.log('Reading new frame', path);
 
       function onEnd() {
         resolve();
