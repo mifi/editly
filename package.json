@@ -13,7 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "canvas": "^2.11.2",
-    "compare-versions": "^4.1.4",
+    "compare-versions": "^6.1.1",
     "execa": "^6.1.0",
     "fabric": "^5.2.4",
     "file-type": "^18.0.0",
