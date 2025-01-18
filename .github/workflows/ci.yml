@@ -1,4 +1,4 @@
-name: Test
+name: CI
 
 on:
   push:
@@ -80,3 +80,15 @@ jobs:
           path: editly-out.mp4
           compression-level: 0
           if-no-files-found: error
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.nodejs }}
+          cache: "npm"
+          cache-dependency-path: ./package.json
+      - run: docker compose build
+      - run: docker compose up -d
+      - run: docker compose run editly bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"

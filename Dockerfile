@@ -1,58 +1,31 @@
-FROM jrottenberg/ffmpeg:4.3.1-ubuntu1804
+# Prebuilt binaries for canvas on linux/amd-64 are not available, so need to use node:20-bookworm.
+# Change this to node:lts-bookworm after upgrading to canvas 3
+FROM node:20-bookworm
+
+# Install ffmpeg and xvfb
+RUN apt-get update -y && \
+    apt-get -y install ffmpeg xvfb libgl1-mesa-dev dumb-init && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+
+# Confirm versions
+RUN node -v
+RUN npm -v
+RUN ffmpeg -version
+
+RUN echo "export LD_LIBRARY_PATH=/app/node_modules/canvas/build/Release/" >> /root/.bashrc
+ENV LD_LIBRARY_PATH=/app/node_modules/canvas/build/Release/
 
 WORKDIR /app
 
-# Ensures tzinfo doesn't ask for region info.
-ENV DEBIAN_FRONTEND noninteractive
-
-## INSTALL NODE VIA NVM
-
-RUN apt-get update && apt-get install -y \
-    dumb-init \
-    xvfb
-
-# Source: https://gist.github.com/remarkablemark/aacf14c29b3f01d6900d13137b21db3a
-# replace shell with bash so we can source files
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
-# update the repository sources list
-# and install dependencies
-RUN apt-get update \
-    && apt-get install -y curl \
-    && apt-get -y autoclean
-
-# nvm environment variables
-ENV NVM_VERSION 0.37.2
-ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION 14.4.0
-
-# install nvm
-# https://github.com/creationix/nvm#install-script
-RUN mkdir -p $NVM_DIR \
-    && curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/install.sh | bash
-
-# install node and npm
-RUN source ${NVM_DIR}/nvm.sh \
-    && nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default
-
-# add node and npm to path so the commands are available
-ENV NODE_PATH ${NVM_DIR}/v${NODE_VERSION}/lib/node_modules
-ENV PATH      ${NVM_DIR}/versions/node/v${NODE_VERSION}/bin:$PATH
-
-# confirm installation
-RUN node -v
-RUN npm -v
-
-## INSTALL EDITLY
-
-# ## Install app dependencies
-COPY package.json /app/
-RUN npm install
+# Install dependencies, but don't run `prepare` script yet.
+COPY package.json ./
+RUN npm install --ignore-scripts
 
 # Add app source
-COPY . /app
+COPY . .
+
+# Build typescript dependencies
+RUN npm run prepare
 
 # Ensure `editly` binary available in container
 RUN npm link
