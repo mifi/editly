@@ -72,6 +72,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: ./package.json
       - run: npm install
+      - run: npm run build
       - run: npm run lint
       - run: npm run test
       - uses: actions/upload-artifact@v4
@@ -91,4 +92,4 @@ jobs:
           cache-dependency-path: ./package.json
       - run: docker compose build
       - run: docker compose up -d
-      - run: docker compose run editly bash -c "cd examples && editly audio1.json5 --out /outputs/audio1.mp4"
+      - run: docker compose run editly bash -c "cd examples && ./run audio1.json5"

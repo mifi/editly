@@ -41,7 +41,8 @@
     "p-map": "^7.0.2"
   },
   "scripts": {
-    "prepare": "pkgroll --clean-dist --sourcemap",
+    "build": "pkgroll --clean-dist --sourcemap",
+    "prepublishOnly": "npm run build",
     "test": "tsx test/index.ts",
     "lint": "eslint ."
   },

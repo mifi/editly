@@ -8,6 +8,7 @@ How to run examples:
 git clone https://github.com/mifi/editly.git
 cd editly
 npm install
+npm run build
 cd examples
 git clone https://github.com/mifi/editly-assets.git assets
 ./run commonFeatures.json5

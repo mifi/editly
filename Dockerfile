@@ -1,31 +1,65 @@
-# Prebuilt binaries for canvas on linux/amd-64 are not available, so need to use node:20-bookworm.
-# Change this to node:lts-bookworm after upgrading to canvas 3
-FROM node:20-bookworm
+FROM node:lts-bookworm AS build
 
-# Install ffmpeg and xvfb
-RUN apt-get update -y && \
-    apt-get -y install ffmpeg xvfb libgl1-mesa-dev dumb-init && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+# Install dependencies for building canvas/gl
+RUN apt-get update -y
 
-# Confirm versions
-RUN node -v
-RUN npm -v
-RUN ffmpeg -version
-
-RUN echo "export LD_LIBRARY_PATH=/app/node_modules/canvas/build/Release/" >> /root/.bashrc
-ENV LD_LIBRARY_PATH=/app/node_modules/canvas/build/Release/
+RUN apt-get -y install \
+    build-essential \
+    libcairo2-dev \
+    libgif-dev \
+    libgl1-mesa-dev \
+    libglew-dev \
+    libglu1-mesa-dev \
+    libjpeg-dev \
+    libpango1.0-dev \
+    librsvg2-dev \
+    libxi-dev \
+    pkg-config \
+    python-is-python3
 
 WORKDIR /app
 
-# Install dependencies, but don't run `prepare` script yet.
+# Install node dependencies
 COPY package.json ./
-RUN npm install --ignore-scripts
+RUN npm install --no-fund --no-audit
 
 # Add app source
 COPY . .
 
-# Build typescript dependencies
-RUN npm run prepare
+# Build TypeScript
+RUN npm run build
+
+# Prune dev dependencies
+RUN npm prune --omit=dev
+
+# Purge build dependencies
+RUN apt-get --purge autoremove -y \
+    build-essential \
+    libcairo2-dev \
+    libgif-dev \
+    libgl1-mesa-dev \
+    libglew-dev \
+    libglu1-mesa-dev \
+    libjpeg-dev \
+    libpango1.0-dev \
+    librsvg2-dev \
+    libxi-dev \
+    pkg-config \
+    python-is-python3
+
+# Remove Apt cache
+RUN rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+
+# Final stage for app image
+FROM node:lts-bookworm
+
+# Install runtime dependencies
+RUN apt-get update -y \
+  && apt-get -y install ffmpeg dumb-init xvfb libcairo2 libpango1.0 libgif7 librsvg2-2 \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+
+WORKDIR /app
+COPY --from=build /app /app
 
 # Ensure `editly` binary available in container
 RUN npm link
