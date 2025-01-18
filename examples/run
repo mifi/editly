@@ -1,0 +1,20 @@
+#!/bin/bash
+## Run an example or all examples
+# Usage: ./run [example1.ts] [example2.json5] ...
+set -e
+
+# Get list of examples from args or all files in examples directory
+if [ "$#" -eq 0 ]; then
+  examples=$(ls *.{ts,json5})
+else
+  examples=$@
+fi
+
+for example in $examples; do
+  echo "Running $example"
+  if [[ $example == *.ts ]]; then
+    npx tsx "$example"
+  else
+    node ../dist/cli.js --fast --json "$example"
+  fi
+done

@@ -5,15 +5,12 @@ This folder contains examples and tests for different features.
 How to run examples:
 
 ```bash
-npm i -g editly
-
 git clone https://github.com/mifi/editly.git
-
-cd editly/examples
-
+cd editly
+npm install
+cd examples
 git clone https://github.com/mifi/editly-assets.git assets
-
-editly --fast commonFeatures.json5
+./run commonFeatures.json5
 ```
 
 ## Image slideshow with Ken Burns zoom

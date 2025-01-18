@@ -78,3 +78,5 @@ jobs:
         with:
           name: video-${{ runner.os }}-${{ matrix.nodejs }}
           path: editly-out.mp4
+          compression-level: 0
+          if-no-files-found: error
