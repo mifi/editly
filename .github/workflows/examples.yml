@@ -47,9 +47,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "yarn"
+          cache: "npm"
           cache-dependency-path: ./package.json
-      - run: yarn install
+      - run: npm install && npm run build
       - run: |
           cd examples
           ./run "${{ matrix.example }}"
