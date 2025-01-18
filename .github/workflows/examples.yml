@@ -60,5 +60,6 @@ jobs:
             examples/*.png
             examples/*.gif
             examples/*.mp4
+            examples/*.webp
           compression-level: 0
           if-no-files-found: error
