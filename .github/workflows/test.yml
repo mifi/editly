@@ -23,7 +23,7 @@ jobs:
         run: |
           product="${{ matrix.product }}"
           data=$(curl https://endoflife.date/api/$product.json)
-          supported=$(echo $data | jq '[.[] | select(.eol > (now | strftime("%Y-%m-%d")))]')
+          supported=$(echo $data | jq '[.[] | select(.lts != false and .eol > (now | strftime("%Y-%m-%d")))]')
           echo "${product}=$(echo $supported | jq -c 'map(.latest)')" >> $GITHUB_OUTPUT
   test:
     needs: versions
