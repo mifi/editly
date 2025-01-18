@@ -29,31 +29,22 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
     const canvas = createFabricCanvas({ width, height });
 
     for (const frameSource of layerFrameSources) {
-      const layer = frameSource.layer;
-      // console.log({ start: layer.start, stop: layer.stop, layerDuration: layer.layerDuration, time });
-      const offsetTime = time - (layer?.start ?? 0);
-      const offsetProgress = offsetTime / layer.layerDuration!;
-      // console.log({ offsetProgress });
-      const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
+      if (logTimes) console.time('frameSource.readNextFrame');
+      const rgba = await frameSource.readNextFrame(time, canvas);
+      if (logTimes) console.timeEnd('frameSource.readNextFrame');
 
-      if (shouldDrawLayer) {
-        if (logTimes) console.time('frameSource.readNextFrame');
-        const rgba = await frameSource.readNextFrame(offsetProgress, canvas, offsetTime);
-        if (logTimes) console.timeEnd('frameSource.readNextFrame');
+      // Frame sources can either render to the provided canvas and return nothing
+      // OR return an raw RGBA blob which will be drawn onto the canvas
+      if (rgba) {
+        // Optimization: Don't need to draw to canvas if there's only one layer
+        if (layerFrameSources.length === 1) return rgba;
 
-        // Frame sources can either render to the provided canvas and return nothing
-        // OR return an raw RGBA blob which will be drawn onto the canvas
-        if (rgba) {
-          // Optimization: Don't need to draw to canvas if there's only one layer
-          if (layerFrameSources.length === 1) return rgba;
-
-          if (logTimes) console.time('rgbaToFabricImage');
-          const img = await rgbaToFabricImage({ width, height, rgba });
-          if (logTimes) console.timeEnd('rgbaToFabricImage');
-          canvas.add(img);
-        } else {
-          // Assume this frame source has drawn its content to the canvas
-        }
+        if (logTimes) console.time('rgbaToFabricImage');
+        const img = await rgbaToFabricImage({ width, height, rgba });
+        if (logTimes) console.timeEnd('rgbaToFabricImage');
+        canvas.add(img);
+      } else {
+        // Assume this frame source has drawn its content to the canvas
       }
     }
     // if (verbose) console.time('Merge frames');

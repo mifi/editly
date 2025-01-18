@@ -27,22 +27,37 @@ export interface FrameSourceFactory<T extends BaseLayer> {
   setup: (fn: CreateFrameSourceOptions<T>) => Promise<FrameSource<T>>;
 }
 
-export interface FrameSourceSetupReturn {
+export interface FrameSourceImplementation {
   readNextFrame(progress: number, canvas: StaticCanvas, offsetTime: number): OptionalPromise<Buffer | void>;
   close?(): OptionalPromise<void | undefined>;
 }
 
-export type FrameSourceSetupFunction<T> = (fn: CreateFrameSourceOptions<T>) => Promise<FrameSourceSetupReturn>;
+export type FrameSourceSetupFunction<T> = (fn: CreateFrameSourceOptions<T>) => Promise<FrameSourceImplementation>;
 
-export class FrameSource<T> {
+export class FrameSource<T extends BaseLayer> {
   options: CreateFrameSourceOptions<T>;
-  readNextFrame: FrameSourceSetupReturn["readNextFrame"];
-  close?: FrameSourceSetupReturn["close"];
+  implementation: FrameSourceImplementation;
 
-  constructor(options: CreateFrameSourceOptions<T>, impl: FrameSourceSetupReturn) {
+  constructor(options: CreateFrameSourceOptions<T>, implementation: FrameSourceImplementation) {
     this.options = options;
-    this.readNextFrame = impl.readNextFrame;
-    this.close = impl.close;
+    this.implementation = implementation;
+  }
+
+  async readNextFrame(time: number, canvas: StaticCanvas) {
+    const { start, layerDuration } = this.layer;
+
+    const offsetTime = time - (start ?? 0);
+    const offsetProgress = offsetTime / layerDuration!;
+    const shouldDrawLayer = offsetProgress >= 0 && offsetProgress <= 1;
+
+    // Skip drawing if the layer has not started or has already ended
+    if (!shouldDrawLayer) return;
+
+    return await this.implementation.readNextFrame(offsetProgress, canvas, offsetTime);
+  }
+
+  async close() {
+    await this.implementation.close?.();
   }
 
   get layer() {
