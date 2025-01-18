@@ -56,6 +56,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.example }}
-          path: "*.{png,gif,mp4}"
+          path: |
+            examples/*.png
+            examples/*.gif
+            examples/*.mp4
           compression-level: 0
           if-no-files-found: error
