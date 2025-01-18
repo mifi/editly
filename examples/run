@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 ## Run an example or all examples
 # Usage: ./run [example1.ts] [example2.json5] ...
 set -e
