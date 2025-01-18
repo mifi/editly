@@ -57,3 +57,5 @@ jobs:
         with:
           name: video-${{ runner.os }}
           path: editly-out.mp4
+          compression-level: 0
+          if-no-files-found: error
