@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   editly:
     container_name: editly
@@ -9,6 +7,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - "outputs:/outputs"
+      - ./examples/assets/:/app/examples/assets/
 
 volumes:
   outputs:

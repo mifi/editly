@@ -1,5 +1,5 @@
 import editly from 'editly';
-import { CustomFabricFunctionArgs, CustomFabricFunctionCallbacks } from '../dist/index.js';
+import type { CustomFabricFunctionArgs, CustomFabricFunctionCallbacks } from 'editly';
 
 function func({ width, height, fabric }: CustomFabricFunctionArgs): CustomFabricFunctionCallbacks {
   return {
