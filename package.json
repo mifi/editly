@@ -1,7 +1,7 @@
 {
   "name": "editly",
   "description": "Simple, sexy, declarative video editing",
-  "version": "0.15.0.rc1",
+  "version": "0.15.0-rc.1",
   "module": "./dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
