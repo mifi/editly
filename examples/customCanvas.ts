@@ -24,7 +24,7 @@ function func({ canvas }: CustomCanvasFunctionArgs): CustomCanvasFunctionCallbac
   };
 }
 
-editly({
+await editly({
   // fast: true,
   // outPath: './customCanvas.mp4',
   outPath: './customCanvas.gif',
@@ -37,4 +37,4 @@ editly({
       ]
     },
   ],
-}).catch(console.error);
+});
