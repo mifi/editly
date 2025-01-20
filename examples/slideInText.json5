@@ -1,12 +1,21 @@
 {
-  outPath: './slideInText.mp4',
+  outPath: "./slideInText.mp4",
   defaults: {
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
   clips: [
-    { duration: 3, layers: [
-      { type: 'image', path: 'assets/img2.jpg' },
-      { type: 'slide-in-text', text: 'Text that slides in', color: '#fff', position: { x: 0.04, y: 0.93, originY: 'bottom', originX: 'left' }, fontSize: 0.05 },
-    ] },
+    {
+      duration: 3,
+      layers: [
+        { type: "image", path: "assets/img2.jpg" },
+        {
+          type: "slide-in-text",
+          text: "Text that slides in",
+          textColor: "#fff",
+          position: { x: 0.04, y: 0.93, originY: "bottom", originX: "left" },
+          fontSize: 0.05,
+        },
+      ],
+    },
   ],
 }

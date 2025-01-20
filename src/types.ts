@@ -1111,21 +1111,3 @@ export type Keyframe = {
   t: number;
   props: { [key: string]: number };
 };
-
-export interface FrameSource {
-  readNextFrame(progress: number, canvas: Fabric.StaticCanvas, offsetTime: number): OptionalPromise<Buffer | void>;
-  close?(): OptionalPromise<void | undefined>;
-}
-
-export type CreateFrameSourceOptions<T> = DebugOptions & {
-  ffmpegPath: string;
-  ffprobePath: string;
-  width: number,
-  height: number,
-  duration: number,
-  channels: number,
-  framerateStr: string,
-  params: Omit<T, "type">,
-};
-
-export type CreateFrameSource<T> = (options: CreateFrameSourceOptions<T>) => Promise<FrameSource>;

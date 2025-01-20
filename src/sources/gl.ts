@@ -1,11 +1,12 @@
 import GL from 'gl';
 import createShader from 'gl-shader';
 import { readFile } from 'node:fs/promises';
-import type { GlLayer, CreateFrameSourceOptions, FrameSource } from '../types.js';
+import type { GlLayer } from '../types.js';
+import { defineFrameSource } from '../api/index.js';
 
 // I have no idea what I'm doing but it works ¯\_(ツ)_/¯
 
-export default async function createGlFrameSource({ width, height, channels, params }: CreateFrameSourceOptions<GlLayer>): Promise<FrameSource> {
+export default defineFrameSource<GlLayer>('gl', async ({ width, height, channels, params }) => {
   const gl = GL(width, height);
 
   const defaultVertexSrc = `
@@ -62,7 +63,6 @@ export default async function createGlFrameSource({ width, height, channels, par
   }
 
   return {
-    readNextFrame,
-    close: () => { },
+    readNextFrame
   };
-}
+});

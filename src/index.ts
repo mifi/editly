@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid';
 import { testFf } from './ffmpeg.js';
 import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util.js';
 import { createFabricCanvas, rgbaToFabricImage } from './sources/fabric.js';
-import { createFrameSource } from './sources/frameSource.js';
+import { createFrameSource } from './frameSource.js';
 import parseConfig, { ProcessedClip } from './parseConfig.js';
 import GlTransitions, { type RunTransitionOptions } from './glTransitions.js';
 import Audio from './audio.js';
