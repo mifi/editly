@@ -33,7 +33,7 @@ await editly({
       duration: 2,
       layers: [
         { type: 'rainbow-colors' },
-        { type: 'canvas', func },
+        { type: 'canvas', func, title: 'Hello World' },
       ]
     },
   ],
