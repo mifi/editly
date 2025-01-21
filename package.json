@@ -22,7 +22,7 @@
     "@types/ndarray": "^1.0.14",
     "canvas": "^2.11.2",
     "compare-versions": "^6.1.0",
-    "execa": "^6.1.0",
+    "execa": "^8.0.1",
     "fabric": "^6.5.4",
     "file-type": "^20.0.0",
     "file-url": "^4.0.0",
