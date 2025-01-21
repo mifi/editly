@@ -1,17 +1,13 @@
 import pMap from 'p-map';
 import { join, basename, resolve } from 'path';
-import { execa } from 'execa';
 import { flatMap } from 'lodash-es';
 
-import { getFfmpegCommonArgs, getCutFromArgs } from './ffmpeg.js';
-import { readFileStreams } from './util.js';
+import { getCutFromArgs, ffmpeg } from './ffmpeg.js';
+import { readFileStreams } from './ffmpeg.js';
 
 import type { AudioLayer, AudioNormalizationOptions, AudioTrack, Clip, Config, Transition, VideoLayer } from './types.js'
 
 export type AudioOptions = {
-  ffmpegPath: string;
-  ffprobePath: string;
-  enableFfmpegLog: boolean;
   verbose: boolean;
   tmpDir: string;
 }
@@ -22,7 +18,7 @@ export type EditAudioOptions = Pick<Config, "keepSourceAudio" | "clips" | "clips
 
 type LayerWithAudio = (AudioLayer | VideoLayer) & { speedFactor: number };
 
-export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: AudioOptions) => {
+export default ({ verbose, tmpDir }: AudioOptions) => {
   async function createMixedAudioClips({ clips, keepSourceAudio }: { clips: Clip[], keepSourceAudio?: boolean }) {
     return pMap(clips, async (clip, i) => {
       const { duration, layers, transition } = clip;
@@ -33,6 +29,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
         async function createSilence() {
           if (verbose) console.log('create silence', duration);
           const args = [
+            '-nostdin',
             '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
             '-sample_fmt', 's32',
             '-ar', '48000',
@@ -41,7 +38,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
             '-y',
             clipAudioPath,
           ];
-          await execa(ffmpegPath, args);
+          await ffmpeg(args);
 
           return { silent: true, clipAudioPath };
         }
@@ -60,7 +57,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
         const processedAudioLayersRaw = await pMap(audioLayers, async (audioLayer, j) => {
           const { path, cutFrom, cutTo, speedFactor } = audioLayer;
 
-          const streams = await readFileStreams(ffprobePath, path);
+          const streams = await readFileStreams(path);
           if (!streams.some((s) => s.codec_type === 'audio')) return undefined;
 
           const layerAudioPath = join(tmpDir, `clip${i}-layer${j}-audio.flac`);
@@ -80,7 +77,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
             const cutToArg = (cutTo! - cutFrom!) * speedFactor;
 
             const args = [
-              ...getFfmpegCommonArgs({ enableFfmpegLog }),
+              '-nostdin',
               ...getCutFromArgs({ cutFrom }),
               '-i', path,
               '-t', cutToArg!.toString(),
@@ -92,8 +89,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
               layerAudioPath,
             ];
 
-            // console.log(args);
-            await execa(ffmpegPath, args);
+            await ffmpeg(args);
 
             return [
               layerAudioPath,
@@ -115,7 +111,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
         // Merge/mix all layers' audio
         const weights = processedAudioLayers.map(([, { mixVolume }]) => mixVolume ?? 1);
         const args = [
-          ...getFfmpegCommonArgs({ enableFfmpegLog }),
+          '-nostdin',
           ...flatMap(processedAudioLayers, ([layerAudioPath]) => ['-i', layerAudioPath]),
           '-filter_complex', `amix=inputs=${processedAudioLayers.length}:duration=longest:weights=${weights.join(' ')}`,
           '-c:a', 'flac',
@@ -123,7 +119,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
           clipAudioPath,
         ];
 
-        await execa(ffmpegPath, args);
+        await ffmpeg(args);
         return { clipAudioPath, silent: false };
       }
 
@@ -160,7 +156,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
     }).join(',');
 
     const args = [
-      ...getFfmpegCommonArgs({ enableFfmpegLog }),
+      '-nostdin',
       ...(flatMap(clipAudio, ({ path }) => ['-i', path])),
       '-filter_complex',
       filterGraph,
@@ -168,7 +164,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
       '-y',
       outPath,
     ];
-    await execa(ffmpegPath, args);
+    await ffmpeg(args);
 
     return outPath;
   }
@@ -198,7 +194,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
     const mixedAudioPath = join(tmpDir, 'audio-mixed.flac');
 
     const args = [
-      ...getFfmpegCommonArgs({ enableFfmpegLog }),
+      '-nostdin',
       ...(flatMap(streams, ({ path, loop }) => ([
         '-stream_loop', (loop || 0).toString(),
         '-i', path,
@@ -210,9 +206,7 @@ export default ({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir }: A
       mixedAudioPath,
     ];
 
-    if (verbose) console.log(args.join(' '));
-
-    await execa(ffmpegPath, args);
+    await ffmpeg(args);
 
     return mixedAudioPath;
   }

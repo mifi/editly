@@ -1,69 +1,10 @@
-import { execa } from 'execa';
 import assert from 'assert';
 import { sortBy } from 'lodash-es';
 import { pathExists } from 'fs-extra';
 
-import type { Keyframe, Stream } from './types.js';
+import type { Keyframe } from './types.js';
 import type { Position, PositionObject, Transition } from './types.js';
 import type { TOriginX, TOriginY } from 'fabric';
-
-export function parseFps(fps?: string) {
-  const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
-  if (match) {
-    const num = parseInt(match[1], 10);
-    const den = parseInt(match[2], 10);
-    if (den > 0) return num / den;
-  }
-  return undefined;
-}
-
-export async function readDuration(ffprobePath: string, p: string) {
-  const { stdout } = await execa(ffprobePath, ['-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', p]);
-  const parsed = parseFloat(stdout);
-  assert(!Number.isNaN(parsed));
-  return parsed;
-}
-
-export async function readFileStreams(ffprobePath: string, p: string) {
-  const { stdout } = await execa(ffprobePath, [
-    '-show_entries', 'stream', '-of', 'json', p,
-  ]);
-  return JSON.parse(stdout).streams as Stream[];
-}
-
-
-export async function readVideoFileInfo(ffprobePath: string, p: string) {
-  const streams = await readFileStreams(ffprobePath, p);
-  const stream = streams.find((s) => s.codec_type === 'video'); // TODO
-
-  if (!stream) {
-    throw new Error(`Could not find a video stream in ${p}`);
-  }
-
-  const duration = await readDuration(ffprobePath, p);
-
-  let rotation = parseInt(stream.tags?.rotate ?? '', 10);
-
-  // If we can't find rotation, try side_data_list
-  if (Number.isNaN(rotation) && stream.side_data_list?.[0]?.rotation) {
-    rotation = parseInt(stream.side_data_list[0].rotation, 10);
-  }
-
-  return {
-    // numFrames: parseInt(stream.nb_frames, 10),
-    duration,
-    width: stream.width, // TODO coded_width?
-    height: stream.height,
-    framerateStr: stream.r_frame_rate,
-    rotation: !Number.isNaN(rotation) ? rotation : undefined,
-  };
-}
-
-export async function readAudioFileInfo(ffprobePath: string, p: string) {
-  const duration = await readDuration(ffprobePath, p);
-
-  return { duration };
-}
 
 export function toArrayInteger(buffer: Buffer) {
   if (buffer.length > 0) {

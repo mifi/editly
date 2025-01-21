@@ -1,12 +1,12 @@
-import { execa, ExecaChildProcess } from 'execa';
+import { ExecaChildProcess } from 'execa';
 import assert from 'assert';
 import { join, dirname } from 'path';
 import JSON5 from 'json5';
 import fsExtra from 'fs-extra';
 import { nanoid } from 'nanoid';
 
-import { testFf } from './ffmpeg.js';
-import { parseFps, multipleOf2, assertFileValid, checkTransition } from './util.js';
+import { configureFf, ffmpeg, parseFps } from './ffmpeg.js';
+import { multipleOf2, assertFileValid, checkTransition } from './util.js';
 import { createFabricCanvas, rgbaToFabricImage } from './sources/fabric.js';
 import { createFrameSource } from './sources/frameSource.js';
 import parseConfig, { ProcessedClip } from './parseConfig.js';
@@ -26,7 +26,6 @@ export type * from './types.js';
 async function Editly(config: Config): Promise<void> {
   const {
     // Testing options:
-    enableFfmpegLog = false,
     verbose = false,
     logTimes = false,
     keepTmp = false,
@@ -49,12 +48,12 @@ async function Editly(config: Config): Promise<void> {
     outputVolume,
     customOutputArgs,
 
+    enableFfmpegLog = verbose,
     ffmpegPath = 'ffmpeg',
     ffprobePath = 'ffprobe',
   } = config;
 
-  await testFf(ffmpegPath, 'ffmpeg');
-  await testFf(ffprobePath, 'ffprobe');
+  await configureFf({ ffmpegPath, ffprobePath, enableFfmpegLog });
 
   const isGif = outPath.toLowerCase().endsWith('.gif');
 
@@ -67,7 +66,7 @@ async function Editly(config: Config): Promise<void> {
   assert(outPath, 'Please provide an output path');
   assert(clipsIn.length > 0, 'Please provide at least 1 clip');
 
-  const { clips, arbitraryAudio } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests, ffprobePath });
+  const { clips, arbitraryAudio } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests });
   if (verbose) console.log('Calculated', JSON5.stringify({ clips, arbitraryAudio }, null, 2));
 
   const outDir = dirname(outPath);
@@ -75,7 +74,7 @@ async function Editly(config: Config): Promise<void> {
   if (verbose) console.log({ tmpDir });
   await fsExtra.mkdirp(tmpDir);
 
-  const { editAudio } = Audio({ ffmpegPath, ffprobePath, enableFfmpegLog, verbose, tmpDir });
+  const { editAudio } = Audio({ verbose, tmpDir });
 
   const audioFilePath = !isGif ? await editAudio({ keepSourceAudio, arbitraryAudio, clipsAudioVolume, clips, audioNorm, outputVolume }) : undefined;
 
@@ -212,8 +211,6 @@ async function Editly(config: Config): Promise<void> {
 
   function startFfmpegWriterProcess() {
     const args = [
-      ...(enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error']),
-
       '-f', 'rawvideo',
       '-vcodec', 'rawvideo',
       '-pix_fmt', 'rgba',
@@ -230,8 +227,7 @@ async function Editly(config: Config): Promise<void> {
 
       '-y', outPath,
     ];
-    if (verbose) console.log('ffmpeg', args.join(' '));
-    return execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'pipe', stdout: process.stdout, stderr: process.stderr });
+    return ffmpeg(args, { encoding: null, buffer: false, stdin: 'pipe', stdout: process.stdout, stderr: process.stderr });
   }
 
   let outProcess: ExecaChildProcess<Buffer<ArrayBufferLike>> | undefined = undefined;
@@ -252,7 +248,7 @@ async function Editly(config: Config): Promise<void> {
   const getTransitionFromClip = () => clips[transitionFromClipId];
   const getTransitionToClip = () => clips[getTransitionToClipId()];
 
-  const getSource = async (clip: ProcessedClip, clipIndex: number) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr });
+  const getSource = async (clip: ProcessedClip, clipIndex: number) => createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, framerateStr });
   const getTransitionFromSource = async () => getSource(getTransitionFromClip(), transitionFromClipId);
   const getTransitionToSource = async () => (getTransitionToClip() && getSource(getTransitionToClip(), getTransitionToClipId()));
 
@@ -423,14 +419,16 @@ export async function renderSingleFrame(config: RenderSingleFrameConfig): Promis
 
     verbose,
     logTimes,
-    enableFfmpegLog,
     allowRemoteRequests,
-    ffprobePath = 'ffprobe',
     ffmpegPath = 'ffmpeg',
+    ffprobePath = 'ffprobe',
+    enableFfmpegLog,
     outPath = `${Math.floor(Math.random() * 1e12)}.png`,
   } = config;
 
-  const { clips } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: [], allowRemoteRequests, ffprobePath });
+  configureFf({ ffmpegPath, ffprobePath, enableFfmpegLog });
+
+  const { clips } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: [], allowRemoteRequests });
   let clipStartTime = 0;
   const clip = clips.find((c) => {
     if (clipStartTime <= time && clipStartTime + c.duration > time) return true;
@@ -439,7 +437,7 @@ export async function renderSingleFrame(config: RenderSingleFrameConfig): Promis
   });
   assert(clip, 'No clip found at requested time');
   const clipIndex = clips.indexOf(clip);
-  const frameSource = await createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr: '1' });
+  const frameSource = await createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, framerateStr: '1' });
   const rgba = await frameSource.readNextFrame({ time: time - clipStartTime });
 
   // TODO converting rgba to png can be done more easily?
