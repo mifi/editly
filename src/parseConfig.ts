@@ -3,13 +3,8 @@ import { basename, join } from 'path';
 import flatMap from 'lodash-es/flatMap.js';
 import assert from 'assert';
 import { fileURLToPath } from 'url';
-
-import {
-  readVideoFileInfo,
-  readAudioFileInfo,
-  assertFileValid,
-  checkTransition,
-} from './util.js';
+import { assertFileValid, checkTransition } from './util.js';
+import { readVideoFileInfo, readDuration } from './ffmpeg.js';
 import { registerFont } from 'canvas';
 import { calcTransition, type CalculatedTransition } from './transitions.js';
 import type { AudioTrack, CanvasLayer, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, DefaultOptions, Clip, VideoLayer } from './types.js';
@@ -47,11 +42,10 @@ type ParseConfigOptions = {
   backgroundAudioPath?: string;
   loopAudio?: boolean;
   allowRemoteRequests?: boolean;
-  ffprobePath: string;
   arbitraryAudio: AudioTrack[];
 };
 
-export default async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests, ffprobePath }: ParseConfigOptions) {
+export default async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests }: ParseConfigOptions) {
   const defaults = {
     duration: 4,
     ...defaultsIn,
@@ -160,7 +154,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
       const layer: T = { ...globalLayerDefaults, ...thisLayerDefaults, ...layerIn };
 
       if (layer.type === 'video') {
-        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = await readVideoFileInfo(ffprobePath, layer.path);
+        const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = await readVideoFileInfo(layer.path);
         let { cutFrom, cutTo } = layer;
         if (!cutFrom) cutFrom = 0;
         cutFrom = Math.max(cutFrom, 0);
@@ -205,7 +199,7 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
       const layer: T = { ...layerIn, layerDuration };
 
       if (layer.type === 'audio') {
-        const { duration: fileDuration } = await readAudioFileInfo(ffprobePath, layer.path);
+        const fileDuration = await readDuration(layer.path);
         let { cutFrom, cutTo } = layer;
 
         // console.log({ cutFrom, cutTo, fileDuration, clipDuration });

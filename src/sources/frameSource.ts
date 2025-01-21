@@ -52,15 +52,13 @@ const frameSources: Record<string, CreateFrameSource<any>> = {
 type FrameSourceOptions = DebugOptions & {
   clip: ProcessedClip;
   clipIndex: number;
-  ffmpegPath: string;
-  ffprobePath: string;
   width: number,
   height: number,
   channels: number,
   framerateStr: string,
 }
 
-export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, framerateStr }: FrameSourceOptions) {
+export async function createFrameSource({ clip, clipIndex, width, height, channels, verbose, logTimes, framerateStr }: FrameSourceOptions) {
   const { layers, duration } = clip;
 
   const visualLayers = layers.filter((layer) => layer.type !== 'audio');
@@ -80,7 +78,7 @@ export async function createFrameSource({ clip, clipIndex, width, height, channe
 
     assert(createFrameSourceFunc, `Invalid type ${type}`);
 
-    const frameSource = await createFrameSourceFunc({ ffmpegPath, ffprobePath, width, height, duration, channels, verbose, logTimes, enableFfmpegLog, framerateStr, params });
+    const frameSource = await createFrameSourceFunc({ width, height, duration, channels, verbose, logTimes, framerateStr, params });
     return { layer, frameSource };
   }, { concurrency: 1 });
 

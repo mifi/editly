@@ -2,6 +2,7 @@
 
 import type * as Fabric from 'fabric/node';
 import type { Canvas } from "canvas"
+import type { FfmpegConfig } from './ffmpeg.js';
 
 /** Little utility */
 export type OptionalPromise<T> = Promise<T> | T;
@@ -935,12 +936,11 @@ export interface AudioNormalizationOptions {
 }
 
 export interface DebugOptions {
-  enableFfmpegLog?: boolean;
   verbose?: boolean;
   logTimes?: boolean;
 }
 
-export interface Config extends DebugOptions {
+export interface Config extends DebugOptions, FfmpegConfig {
   /**
    * Output path (`.mp4` or `.mkv`, can also be a `.gif`).
    */
@@ -1064,16 +1064,6 @@ export interface Config extends DebugOptions {
   /**
    * WARNING: Undocumented feature!
    */
-  ffmpegPath?: string;
-
-  /**
-   * WARNING: Undocumented feature!
-   */
-  ffprobePath?: string;
-
-  /**
-   * WARNING: Undocumented feature!
-   */
   keepTmp?: boolean;
 };
 
@@ -1093,20 +1083,6 @@ export interface RenderSingleFrameConfig extends Config {
 
 // Internal types
 
-export type Stream = {
-  codec_type: string;
-  codec_name: string;
-  r_frame_rate: string;
-  width?: number;
-  height?: number;
-  tags?: {
-    rotate: string;
-  };
-  side_data_list?: {
-    rotation: string;
-  }[];
-};
-
 export type Keyframe = {
   t: number;
   props: { [key: string]: number };
@@ -1118,8 +1094,6 @@ export interface FrameSource {
 }
 
 export type CreateFrameSourceOptions<T> = DebugOptions & {
-  ffmpegPath: string;
-  ffprobePath: string;
   width: number,
   height: number,
   duration: number,

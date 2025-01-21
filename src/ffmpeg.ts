@@ -1,10 +1,39 @@
 import fsExtra from 'fs-extra';
-import { execa } from 'execa';
+import { execa, type Options } from 'execa';
 import assert from 'assert';
 import { compareVersions } from 'compare-versions';
 
-export function getFfmpegCommonArgs({ enableFfmpegLog }: { enableFfmpegLog?: boolean }) {
-  return enableFfmpegLog ? [] : ['-hide_banner', '-loglevel', 'error'];
+export type Stream = {
+  codec_type: string;
+  codec_name: string;
+  r_frame_rate: string;
+  width?: number;
+  height?: number;
+  tags?: {
+    rotate: string;
+  };
+  side_data_list?: {
+    rotation: string;
+  }[];
+};
+
+export type FfmpegConfig = {
+  ffmpegPath: string;
+  ffprobePath: string;
+  enableFfmpegLog?: boolean;
+}
+
+const config: FfmpegConfig = {
+  ffmpegPath: 'ffmpeg',
+  ffprobePath: 'ffprobe',
+  enableFfmpegLog: false,
+}
+
+export function getFfmpegCommonArgs() {
+  return [
+    '-hide_banner',
+    ...(config.enableFfmpegLog ? [] : ['-loglevel', 'error']),
+  ];
 }
 
 export function getCutFromArgs({ cutFrom }: { cutFrom?: number }) {
@@ -34,4 +63,69 @@ export async function testFf(exePath: string, name: string) {
   } catch (err) {
     console.error(`WARNING: ${name}:`, err);
   }
+}
+
+export async function configureFf(params: Partial<FfmpegConfig>) {
+  Object.assign(config, params);
+  await testFf(config.ffmpegPath, 'ffmpeg');
+  await testFf(config.ffprobePath, 'ffprobe');
+}
+
+export function ffmpeg(args: string[], options?: Options<null>) {
+  if (config.enableFfmpegLog) console.log(`$ ${config.ffmpegPath} ${args.join(' ')}`);
+  return execa(config.ffmpegPath, [...getFfmpegCommonArgs(), ...args], options);
+}
+
+export function ffprobe(args: string[]) {
+  return execa(config.ffprobePath, args);
+}
+
+export function parseFps(fps?: string) {
+  const match = typeof fps === 'string' && fps.match(/^([0-9]+)\/([0-9]+)$/);
+  if (match) {
+    const num = parseInt(match[1], 10);
+    const den = parseInt(match[2], 10);
+    if (den > 0) return num / den;
+  }
+  return undefined;
+}
+
+export async function readDuration(p: string) {
+  const { stdout } = await ffprobe(['-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', p]);
+  const parsed = parseFloat(stdout);
+  assert(!Number.isNaN(parsed));
+  return parsed;
+}
+
+export async function readFileStreams(p: string) {
+  const { stdout } = await ffprobe(['-show_entries', 'stream', '-of', 'json', p]);
+  return JSON.parse(stdout).streams as Stream[];
+}
+
+
+export async function readVideoFileInfo(p: string) {
+  const streams = await readFileStreams(p);
+  const stream = streams.find((s) => s.codec_type === 'video'); // TODO
+
+  if (!stream) {
+    throw new Error(`Could not find a video stream in ${p}`);
+  }
+
+  const duration = await readDuration(p);
+
+  let rotation = parseInt(stream.tags?.rotate ?? '', 10);
+
+  // If we can't find rotation, try side_data_list
+  if (Number.isNaN(rotation) && stream.side_data_list?.[0]?.rotation) {
+    rotation = parseInt(stream.side_data_list[0].rotation, 10);
+  }
+
+  return {
+    // numFrames: parseInt(stream.nb_frames, 10),
+    duration,
+    width: stream.width, // TODO coded_width?
+    height: stream.height,
+    framerateStr: stream.r_frame_rate,
+    rotation: !Number.isNaN(rotation) ? rotation : undefined,
+  };
 }

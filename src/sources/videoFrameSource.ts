@@ -1,16 +1,15 @@
-import { execa } from 'execa';
 import assert from 'assert';
 import * as fabric from 'fabric/node';
 
-import { getFfmpegCommonArgs } from '../ffmpeg.js';
-import { readFileStreams } from '../util.js';
+import { ffmpeg } from '../ffmpeg.js';
+import { readFileStreams } from '../ffmpeg.js';
 import {
   rgbaToFabricImage,
   blurImage,
 } from './fabric.js';
 import type { CreateFrameSourceOptions, VideoLayer } from '../types.js';
 
-export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, ffmpegPath, ffprobePath, enableFfmpegLog, params }: CreateFrameSourceOptions<VideoLayer>) => {
+export default async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, params }: CreateFrameSourceOptions<VideoLayer>) => {
   const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null } = params;
 
   const requestedWidth = requestedWidthRel ? Math.round(requestedWidthRel * canvasWidth) : canvasWidth;
@@ -73,7 +72,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
   // let inFrameCount = 0;
 
   // https://forum.unity.com/threads/settings-for-importing-a-video-with-an-alpha-channel.457657/
-  const streams = await readFileStreams(ffprobePath, path);
+  const streams = await readFileStreams(path);
   const firstVideoStream = streams.find((s) => s.codec_type === 'video');
   // https://superuser.com/a/1116905/658247
 
@@ -85,7 +84,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
   const args = [
-    ...getFfmpegCommonArgs({ enableFfmpegLog }),
+    '-nostdin',
     ...(inputCodec ? ['-vcodec', inputCodec] : []),
     ...(cutFrom ? ['-ss', cutFrom.toString()] : []),
     '-i', path,
@@ -97,9 +96,8 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
     '-f', 'image2pipe',
     '-',
   ];
-  if (verbose) console.log(args.join(' '));
 
-  const ps = execa(ffmpegPath, args, { encoding: null, buffer: false, stdin: 'ignore', stdout: 'pipe', stderr: process.stderr });
+  const ps = ffmpeg(args, { encoding: null, buffer: false, stdin: 'ignore', stdout: 'pipe', stderr: process.stderr });
 
   const stream = ps.stdout!;
 
@@ -138,16 +136,11 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
         resolve();
         return;
       }
-      // console.log('Reading new frame', path);
-
-      function onEnd() {
-        resolve();
-      }
 
       function cleanup() {
         stream.pause();
         stream.removeListener('data', handleChunk);
-        stream.removeListener('end', onEnd);
+        stream.removeListener('end', resolve);
         stream.removeListener('error', reject);
       }
 
@@ -184,7 +177,7 @@ export default async ({ width: canvasWidth, height: canvasHeight, channels, fram
       }, 60000);
 
       stream.on('data', handleChunk);
-      stream.on('end', onEnd);
+      stream.on('end', resolve);
       stream.on('error', reject);
       stream.resume();
     });
