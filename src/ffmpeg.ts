@@ -18,12 +18,12 @@ export type Stream = {
 };
 
 export type FfmpegConfig = {
-  ffmpegPath: string;
-  ffprobePath: string;
+  ffmpegPath?: string;
+  ffprobePath?: string;
   enableFfmpegLog?: boolean;
 }
 
-const config: FfmpegConfig = {
+const config: Required<FfmpegConfig> = {
   ffmpegPath: 'ffmpeg',
   ffprobePath: 'ffprobe',
   enableFfmpegLog: false,
