@@ -44,7 +44,8 @@
     "build": "pkgroll --clean-dist --sourcemap",
     "prepublishOnly": "npm run build",
     "test": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -57,10 +58,19 @@
     "@eslint/js": "^9.18.0",
     "@tsconfig/node-lts": "^22.0.1",
     "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
     "pkgroll": "^2.6.1",
+    "prettier": "3.4.2",
+    "prettier-plugin-organize-imports": "4.1.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0",
     "vitest": "^3.0.4"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": "eslint --fix",
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
