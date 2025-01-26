@@ -397,23 +397,23 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
  *
  * @param config - ConfigurationOptions.
  */
-export async function renderSingleFrame(config: RenderSingleFrameConfig): Promise<void> {
+export async function renderSingleFrame(input: RenderSingleFrameConfig): Promise<void> {
+  const time = input.time ?? 0;
+
+  const config = new Configuration(input);
   const {
-    time = 0,
+    clips: clipsIn,
+    allowRemoteRequests,
     width = 800,
     height = 600,
-    clips: clipsIn,
-
     verbose,
     logTimes,
-    allowRemoteRequests,
-    ffmpegPath = 'ffmpeg',
-    ffprobePath = 'ffprobe',
-    enableFfmpegLog,
     outPath = `${Math.floor(Math.random() * 1e12)}.png`,
   } = config;
 
-  configureFf({ ffmpegPath, ffprobePath, enableFfmpegLog });
+  configureFf(config);
+
+  console.log({ clipsIn })
 
   const { clips } = await parseConfig({ clips: clipsIn, arbitraryAudio: [], allowRemoteRequests });
   let clipStartTime = 0;
