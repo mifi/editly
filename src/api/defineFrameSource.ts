@@ -1,4 +1,5 @@
-import type { BaseLayer, DebugOptions, OptionalPromise } from "../types.js";
+import type { BaseLayer, OptionalPromise } from "../types.js";
+import type { DebugOptions } from "../configuration.js";
 import type { StaticCanvas } from "fabric/node";
 
 /**

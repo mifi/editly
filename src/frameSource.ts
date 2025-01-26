@@ -1,7 +1,7 @@
 import pMap from 'p-map';
 
 import { rgbaToFabricImage, createFabricCanvas, renderFabricCanvas } from './sources/fabric.js';
-import type { DebugOptions } from './types.js';
+import type { DebugOptions } from './configuration.js';
 import type { ProcessedClip } from './parseConfig.js';
 import { createLayerSource } from './sources/index.js';
 

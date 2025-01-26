@@ -1,18 +1,17 @@
 import { ExecaChildProcess } from 'execa';
 import assert from 'assert';
-import { join, dirname } from 'path';
 import JSON5 from 'json5';
 import fsExtra from 'fs-extra';
-import { nanoid } from 'nanoid';
 
 import { configureFf, ffmpeg, parseFps } from './ffmpeg.js';
-import { multipleOf2, assertFileValid, checkTransition } from './util.js';
+import { multipleOf2, assertFileValid } from './util.js';
 import { createFabricCanvas, rgbaToFabricImage } from './sources/fabric.js';
 import { createFrameSource } from './frameSource.js';
 import parseConfig, { ProcessedClip } from './parseConfig.js';
 import GlTransitions, { type RunTransitionOptions } from './glTransitions.js';
 import Audio from './audio.js';
-import type { Config, RenderSingleFrameConfig } from './types.js';
+import { Configuration, type ConfigurationOptions } from './configuration.js';
+import type { RenderSingleFrameConfig } from './types.js';
 
 const channels = 4;
 
@@ -21,9 +20,10 @@ export type * from './types.js';
 /**
  * Edit and render videos.
  *
- * @param config - Config.
+ * @param config - ConfigurationOptions.
  */
-async function Editly(config: Config): Promise<void> {
+async function Editly(input: ConfigurationOptions): Promise<void> {
+  const config = new Configuration(input);
   const {
     // Testing options:
     verbose = false,
@@ -33,12 +33,11 @@ async function Editly(config: Config): Promise<void> {
 
     outPath,
     clips: clipsIn,
-    clipsAudioVolume = 1,
-    audioTracks: arbitraryAudioIn = [],
+    clipsAudioVolume,
+    audioTracks: arbitraryAudioIn,
     width: requestedWidth,
     height: requestedHeight,
     fps: requestedFps,
-    defaults = {},
     audioFilePath: backgroundAudioPath,
     backgroundAudioVolume,
     loopAudio,
@@ -47,30 +46,19 @@ async function Editly(config: Config): Promise<void> {
     audioNorm,
     outputVolume,
     customOutputArgs,
-
-    enableFfmpegLog = verbose,
-    ffmpegPath = 'ffmpeg',
-    ffprobePath = 'ffprobe',
+    isGif,
+    tmpDir
   } = config;
 
-  await configureFf({ ffmpegPath, ffprobePath, enableFfmpegLog });
-
-  const isGif = outPath.toLowerCase().endsWith('.gif');
+  await configureFf(config);
 
   if (backgroundAudioPath) await assertFileValid(backgroundAudioPath, allowRemoteRequests);
 
-  checkTransition(defaults.transition);
-
   if (verbose) console.log(JSON5.stringify(config, null, 2));
 
-  assert(outPath, 'Please provide an output path');
-  assert(clipsIn.length > 0, 'Please provide at least 1 clip');
-
-  const { clips, arbitraryAudio } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests });
+  const { clips, arbitraryAudio } = await parseConfig({ clips: clipsIn, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests });
   if (verbose) console.log('Calculated', JSON5.stringify({ clips, arbitraryAudio }, null, 2));
 
-  const outDir = dirname(outPath);
-  const tmpDir = join(outDir, `editly-tmp-${nanoid()}`);
   if (verbose) console.log({ tmpDir });
   await fsExtra.mkdirp(tmpDir);
 
@@ -407,12 +395,11 @@ async function Editly(config: Config): Promise<void> {
  * Pure function to get a frame at a certain time.
  * TODO: I think this does not respect transition durations
  *
- * @param config - Config.
+ * @param config - ConfigurationOptions.
  */
 export async function renderSingleFrame(config: RenderSingleFrameConfig): Promise<void> {
   const {
     time = 0,
-    defaults = {},
     width = 800,
     height = 600,
     clips: clipsIn,
@@ -428,7 +415,7 @@ export async function renderSingleFrame(config: RenderSingleFrameConfig): Promis
 
   configureFf({ ffmpegPath, ffprobePath, enableFfmpegLog });
 
-  const { clips } = await parseConfig({ defaults, clips: clipsIn, arbitraryAudio: [], allowRemoteRequests });
+  const { clips } = await parseConfig({ clips: clipsIn, arbitraryAudio: [], allowRemoteRequests });
   let clipStartTime = 0;
   const clip = clips.find((c) => {
     if (clipStartTime <= time && clipStartTime + c.duration > time) return true;

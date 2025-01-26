@@ -2,6 +2,7 @@ import fsExtra from 'fs-extra';
 import { execa, type Options } from 'execa';
 import assert from 'assert';
 import { compareVersions } from 'compare-versions';
+import { FfmpegConfig } from './configuration.js';
 
 export type Stream = {
   codec_type: string;
@@ -16,12 +17,6 @@ export type Stream = {
     rotation: string;
   }[];
 };
-
-export type FfmpegConfig = {
-  ffmpegPath?: string;
-  ffprobePath?: string;
-  enableFfmpegLog?: boolean;
-}
 
 const config: Required<FfmpegConfig> = {
   ffmpegPath: 'ffmpeg',
