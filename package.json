@@ -45,7 +45,7 @@
     "prepublishOnly": "npm run build",
     "test": "vitest",
     "lint": "eslint .",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "repository": {
     "type": "git",
