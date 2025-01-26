@@ -1,10 +1,23 @@
 {
-  outPath: './gl.mp4',
+  outPath: "./gl.mp4",
   clips: [
-    { transition: null, duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/3l23Rh.frag' }] },
-    { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/MdXyzX.frag' }] },
-    { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/30daysofshade_010.frag', speed: 1 }] },
-    { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/rainbow-background.frag' }] },
-    { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/wd2yDm.frag', speed: 5 }] },
+    {
+      transition: null,
+      duration: 3,
+      layers: [{ type: "gl", fragmentPath: "./assets/shaders/3l23Rh.frag" }],
+    },
+    { duration: 3, layers: [{ type: "gl", fragmentPath: "./assets/shaders/MdXyzX.frag" }] },
+    {
+      duration: 3,
+      layers: [{ type: "gl", fragmentPath: "./assets/shaders/30daysofshade_010.frag", speed: 1 }],
+    },
+    {
+      duration: 3,
+      layers: [{ type: "gl", fragmentPath: "./assets/shaders/rainbow-background.frag" }],
+    },
+    {
+      duration: 3,
+      layers: [{ type: "gl", fragmentPath: "./assets/shaders/wd2yDm.frag", speed: 5 }],
+    },
   ],
 }

@@ -1,16 +1,75 @@
 {
-  width: 600, height: 800,
-  outPath: './videos.mp4',
+  width: 600,
+  height: 800,
+  outPath: "./videos.mp4",
   defaults: {
     transition: { duration: 0 },
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
   clips: [
-    { duration: 2, layers: [{ type: 'title-background', text: 'Editly can handle all formats and sizes with different fits', background: { type: 'radial-gradient' } }] },
-    { layers: [{ type: 'video', path: './assets/palawan.mp4', cutFrom: 0, cutTo: 2, resizeMode: 'contain' }, { type: 'title', text: 'Contain' }] },
-    { layers: [{ type: 'video', path: './assets/palawan.mp4', cutFrom: 0, cutTo: 2, resizeMode: 'contain-blur' }, { type: 'title', text: 'Contain (blur)' }] },
-    { layers: [{ type: 'video', path: './assets/IMG_1884.MOV', cutFrom: 0, cutTo: 2, resizeMode: 'contain-blur' }, { type: 'title', text: 'Contain\n(blur, vertical)' }] },
-    { layers: [{ type: 'video', path: './assets/palawan.mp4', cutFrom: 0, cutTo: 2, resizeMode: 'stretch' }, { type: 'title', text: 'Stretch' }] },
-    { layers: [{ type: 'video', path: './assets/palawan.mp4', cutFrom: 0, cutTo: 2, resizeMode: 'cover' }, { type: 'title', text: 'Cover' }] },
+    {
+      duration: 2,
+      layers: [
+        {
+          type: "title-background",
+          text: "Editly can handle all formats and sizes with different fits",
+          background: { type: "radial-gradient" },
+        },
+      ],
+    },
+    {
+      layers: [
+        {
+          type: "video",
+          path: "./assets/palawan.mp4",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "contain",
+        },
+        { type: "title", text: "Contain" },
+      ],
+    },
+    {
+      layers: [
+        {
+          type: "video",
+          path: "./assets/palawan.mp4",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "contain-blur",
+        },
+        { type: "title", text: "Contain (blur)" },
+      ],
+    },
+    {
+      layers: [
+        {
+          type: "video",
+          path: "./assets/IMG_1884.MOV",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "contain-blur",
+        },
+        { type: "title", text: "Contain\n(blur, vertical)" },
+      ],
+    },
+    {
+      layers: [
+        {
+          type: "video",
+          path: "./assets/palawan.mp4",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "stretch",
+        },
+        { type: "title", text: "Stretch" },
+      ],
+    },
+    {
+      layers: [
+        { type: "video", path: "./assets/palawan.mp4", cutFrom: 0, cutTo: 2, resizeMode: "cover" },
+        { type: "title", text: "Cover" },
+      ],
+    },
   ],
 }

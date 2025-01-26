@@ -1,13 +1,40 @@
 {
-  outPath: './speedTest.mp4',
+  outPath: "./speedTest.mp4",
   defaults: {
     transition: null,
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
   clips: [
-    { duration: 2, layers: [{ type: 'title-background', text: 'Speed up or slow down video', background: { type: 'radial-gradient' } }] },
-    { duration: 2, layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0, cutTo: 2 }, { type: 'title', text: 'Same speed' }] },
-    { duration: 1, layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0, cutTo: 4 }, { type: 'title', text: '4x' }] },
-    { duration: 2, layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0, cutTo: 1 }, { type: 'title', text: '1/2x' }] },
+    {
+      duration: 2,
+      layers: [
+        {
+          type: "title-background",
+          text: "Speed up or slow down video",
+          background: { type: "radial-gradient" },
+        },
+      ],
+    },
+    {
+      duration: 2,
+      layers: [
+        { type: "video", path: "./assets/changi.mp4", cutFrom: 0, cutTo: 2 },
+        { type: "title", text: "Same speed" },
+      ],
+    },
+    {
+      duration: 1,
+      layers: [
+        { type: "video", path: "./assets/changi.mp4", cutFrom: 0, cutTo: 4 },
+        { type: "title", text: "4x" },
+      ],
+    },
+    {
+      duration: 2,
+      layers: [
+        { type: "video", path: "./assets/changi.mp4", cutFrom: 0, cutTo: 1 },
+        { type: "title", text: "1/2x" },
+      ],
+    },
   ],
 }

@@ -1,7 +1,5 @@
 {
-  outPath: './customOutputArgs.webp',
-  clips: [
-    { duration: 2, layers: [{ type: 'title-background', text: 'Custom output args' }] },
-  ],
-  customOutputArgs: ['-compression_level', '5', '-qscale', '60', '-vcodec', 'libwebp'],
+  outPath: "./customOutputArgs.webp",
+  clips: [{ duration: 2, layers: [{ type: "title-background", text: "Custom output args" }] }],
+  customOutputArgs: ["-compression_level", "5", "-qscale", "60", "-vcodec", "libwebp"],
 }

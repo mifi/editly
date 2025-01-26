@@ -6,5 +6,5 @@ declare function boxBlurImage(
   height: number,
   radius: number,
   blurAlphaChannel: boolean,
-  iterations: number
+  iterations: number,
 );

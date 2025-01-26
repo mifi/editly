@@ -1,12 +1,33 @@
 {
-  outPath: './imageOverlay.mp4',
+  outPath: "./imageOverlay.mp4",
   clips: [
-    { layers: [
-      { type: 'video', path: './assets/changi.mp4', cutTo: 2 },
-      { type: 'image-overlay', path: './assets/overlay.svg', width: 0.2, position: { x: 0.95, y: 0.03, originX: 'right' } },
-      { type: 'image-overlay', path: './assets/emoji.png', stop: 0.5, zoomDirection: 'in' },
-      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'top', start: 0.7, stop: 1.5, width: 0.2 },
-      { type: 'image-overlay', path: './assets/emoji2.svg', position: 'bottom', start: 0.7, stop: 1.5, height: 0.2 },
-    ] },
+    {
+      layers: [
+        { type: "video", path: "./assets/changi.mp4", cutTo: 2 },
+        {
+          type: "image-overlay",
+          path: "./assets/overlay.svg",
+          width: 0.2,
+          position: { x: 0.95, y: 0.03, originX: "right" },
+        },
+        { type: "image-overlay", path: "./assets/emoji.png", stop: 0.5, zoomDirection: "in" },
+        {
+          type: "image-overlay",
+          path: "./assets/emoji2.svg",
+          position: "top",
+          start: 0.7,
+          stop: 1.5,
+          width: 0.2,
+        },
+        {
+          type: "image-overlay",
+          path: "./assets/emoji2.svg",
+          position: "bottom",
+          start: 0.7,
+          stop: 1.5,
+          height: 0.2,
+        },
+      ],
+    },
   ],
 }
