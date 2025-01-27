@@ -132,7 +132,7 @@ function getRandomTransition() {
   return AllTransitions[Math.floor(Math.random() * AllTransitions.length)];
 }
 
-export default class Transition {
+export class Transition {
   name?: string;
   duration: number;
   params?: TransitionParams;

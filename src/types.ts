@@ -69,30 +69,6 @@ export type Position =
   | PositionObject;
 
 /**
- * @see [Curve types]{@link https://trac.ffmpeg.org/wiki/AfadeCurves}
- */
-export type CurveType =
-  | "tri"
-  | "qsin"
-  | "hsin"
-  | "esin"
-  | "log"
-  | "ipar"
-  | "qua"
-  | "cub"
-  | "squ"
-  | "cbr"
-  | "par"
-  | "exp"
-  | "iqsin"
-  | "ihsin"
-  | "dese"
-  | "desi"
-  | "losi"
-  | "nofade"
-  | string;
-
-/**
  * @see [Arbitrary audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
  */
 export interface AudioTrack {

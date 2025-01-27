@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import Transition from "../src/transition.js";
+import { Transition } from "../src/transition.js";
 
 describe("constructor", () => {
   test("null", () => {

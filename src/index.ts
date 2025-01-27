@@ -14,6 +14,7 @@ import { assertFileValid, multipleOf2 } from "./util.js";
 
 const channels = 4;
 
+export type * from "./transition.js";
 export type * from "./types.js";
 
 /**
