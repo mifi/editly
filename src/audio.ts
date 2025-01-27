@@ -3,12 +3,12 @@ import pMap from "p-map";
 import { basename, join, resolve } from "path";
 import type { Configuration } from "./configuration.js";
 import { ffmpeg, getCutFromArgs, readFileStreams } from "./ffmpeg.js";
+import type { TransitionOptions } from "./transitions.js";
 import type {
   AudioLayer,
   AudioNormalizationOptions,
   AudioTrack,
   Clip,
-  Transition,
   VideoLayer,
 } from "./types.js";
 
@@ -178,7 +178,7 @@ export default ({ verbose, tmpDir }: AudioOptions) => {
   }
 
   async function crossFadeConcatClipAudio(
-    clipAudio: { path: string; transition?: Transition | null }[],
+    clipAudio: { path: string; transition?: TransitionOptions | null }[],
   ) {
     if (clipAudio.length < 2) {
       return clipAudio[0].path;

@@ -4,7 +4,7 @@ import createTexture from "gl-texture2d";
 import glTransition from "gl-transition";
 import glTransitions from "gl-transitions";
 import ndarray from "ndarray";
-import { TransitionParams } from "./types.js";
+import { TransitionParams } from "./transitions.js";
 
 const { default: createTransition } = glTransition;
 

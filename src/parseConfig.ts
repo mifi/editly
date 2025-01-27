@@ -4,7 +4,7 @@ import flatMap from "lodash-es/flatMap.js";
 import pMap from "p-map";
 import { basename } from "path";
 import { readDuration, readVideoFileInfo } from "./ffmpeg.js";
-import { calcTransition, type CalculatedTransition } from "./transitions.js";
+import Transition from "./transitions.js";
 import type {
   AudioTrack,
   CanvasLayer,
@@ -24,7 +24,7 @@ import { assertFileValid } from "./util.js";
 export type ProcessedClip = {
   layers: Layer[];
   duration: number;
-  transition: CalculatedTransition;
+  transition: Transition;
 };
 
 // Cache
@@ -129,7 +129,7 @@ export default async function parseConfig({
       if (videoLayers.length === 0)
         assert(duration, `Duration parameter is required for videoless clip ${clipIndex}`);
 
-      const transition = calcTransition(userTransition, clipIndex === clips.length - 1);
+      const transition = new Transition(userTransition, clipIndex === clips.length - 1);
 
       let layersOut = flatMap(
         await pMap(
@@ -289,14 +289,9 @@ export default async function parseConfig({
     }
 
     totalClipDuration += clip.duration - safeTransitionDuration;
+    clip.transition.duration = safeTransitionDuration;
 
-    return {
-      ...clip,
-      transition: {
-        ...clip.transition,
-        duration: safeTransitionDuration,
-      },
-    };
+    return clip;
   });
 
   // Audio can either come from `audioFilePath`, `audio` or from "detached" audio layers from clips

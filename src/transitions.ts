@@ -1,12 +1,103 @@
 import assert from "assert";
-import type { Transition } from "./types.js";
+import type { EasingFunction } from "./easings.js";
+import * as easings from "./easings.js";
 
-export type EasingFunction = (progress: number) => number;
+/**
+ * @see [Transition types]{@link https://github.com/mifi/editly#transition-types}
+ */
+export type TransitionType =
+  | "directional-left"
+  | "directional-right"
+  | "directional-up"
+  | "directional-down"
+  | "random"
+  | "dummy"
+  | string;
 
-export type CalculatedTransition = Transition & {
-  duration: number;
-  easingFunction: EasingFunction;
+/**
+ * WARNING: Undocumented feature!
+ */
+export type GLTextureLike = {
+  bind: (unit: number) => number;
+  shape: [number, number];
 };
+
+/**
+ * WARNING: Undocumented feature!
+ */
+export interface TransitionParams {
+  /**
+   * WARNING: Undocumented feature!
+   */
+  [key: string]: number | boolean | GLTextureLike | number[];
+}
+
+/**
+ * @see [Curve types]{@link https://trac.ffmpeg.org/wiki/AfadeCurves}
+ */
+export type CurveType =
+  | "tri"
+  | "qsin"
+  | "hsin"
+  | "esin"
+  | "log"
+  | "ipar"
+  | "qua"
+  | "cub"
+  | "squ"
+  | "cbr"
+  | "par"
+  | "exp"
+  | "iqsin"
+  | "ihsin"
+  | "dese"
+  | "desi"
+  | "losi"
+  | "nofade"
+  | string;
+
+export type Easing = keyof typeof easings;
+
+export interface TransitionOptions {
+  /**
+   * Transition duration.
+   *
+   * @default 0.5
+   */
+  duration?: number;
+
+  /**
+   * Transition type.
+   *
+   * @default 'random'
+   * @see [Transition types]{@link https://github.com/mifi/editly#transition-types}
+   */
+  name?: TransitionType;
+
+  /**
+   * [Fade out curve]{@link https://trac.ffmpeg.org/wiki/AfadeCurves} in audio cross fades.
+   *
+   * @default 'tri'
+   */
+  audioOutCurve?: CurveType;
+
+  /**
+   * [Fade in curve]{@link https://trac.ffmpeg.org/wiki/AfadeCurves} in audio cross fades.
+   *
+   * @default 'tri'
+   */
+  audioInCurve?: CurveType;
+
+  /**
+   * WARNING: Undocumented feature!
+   */
+  easing?: Easing | null;
+
+  /**
+   * WARNING: Undocumented feature!
+   */
+  params?: TransitionParams;
+}
 
 const randomTransitionsSet = [
   "fade",
@@ -28,62 +119,44 @@ function getRandomTransition() {
   return randomTransitionsSet[Math.floor(Math.random() * randomTransitionsSet.length)];
 }
 
-// https://easings.net/
-
-export function easeOutExpo(x: number) {
-  return x === 1 ? 1 : 1 - 2 ** (-10 * x);
-}
-
-export function easeInOutCubic(x: number) {
-  return x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2;
-}
-
-export function linear(x: number) {
-  return x;
-}
-
-function getTransitionEasingFunction(
-  easing: string | null | undefined,
-  transitionName?: string,
-): EasingFunction {
-  if (easing !== null) {
-    // FIXME[TS]: `easing` always appears to be null or undefined, so this never gets called
-    if (easing) return { easeOutExpo }[easing] || linear;
-    if (transitionName === "directional") return easeOutExpo;
-  }
-  return linear;
-}
-
-const TransitionAliases: Record<string, Partial<Transition>> = {
-  "directional-left": { name: "directional", params: { direction: [1, 0] } },
-  "directional-right": { name: "directional", params: { direction: [-1, 0] } },
-  "directional-down": { name: "directional", params: { direction: [0, 1] } },
-  "directional-up": { name: "directional", params: { direction: [0, -1] } },
+const TransitionAliases: Record<string, Partial<TransitionOptions>> = {
+  "directional-left": { name: "directional", easing: "easeOutExpo", params: { direction: [1, 0] } },
+  "directional-right": {
+    name: "directional",
+    easing: "easeOutExpo",
+    params: { direction: [-1, 0] },
+  },
+  "directional-down": { name: "directional", easing: "easeOutExpo", params: { direction: [0, 1] } },
+  "directional-up": { name: "directional", easing: "easeOutExpo", params: { direction: [0, -1] } },
 };
 
-export function calcTransition(
-  transition: Transition | null | undefined,
-  isLastClip: boolean,
-): CalculatedTransition {
-  if (!transition || isLastClip) return { duration: 0, easingFunction: linear };
+export default class Transition {
+  name?: string;
+  duration: number;
+  params?: TransitionParams;
+  easing?: Easing | null;
 
-  assert(
-    !transition.duration || transition.name,
-    "Please specify transition name or set duration to 0",
-  );
+  constructor(options?: TransitionOptions | null, isLastClip: boolean = false) {
+    if (!options || isLastClip) options = { duration: 0 };
 
-  if (transition.name === "random" && transition.duration) {
-    transition = { ...transition, name: getRandomTransition() };
+    assert(typeof options === "object", "Transition must be an object");
+    assert(
+      options.duration === 0 || options.name,
+      "Please specify transition name or set duration to 0",
+    );
+
+    if (options.name === "random") options.name = getRandomTransition();
+    const aliasedTransition = options.name && TransitionAliases[options.name];
+    if (aliasedTransition) Object.assign(options, aliasedTransition);
+
+    this.duration = options.duration ?? 0;
+    this.name = options.name;
+    this.params = options.params;
+    this.easing = options.easing;
   }
 
-  const aliasedTransition = transition.name ? TransitionAliases[transition.name] : undefined;
-  if (aliasedTransition) {
-    transition = { ...transition, ...aliasedTransition };
+  get easingFunction(): EasingFunction {
+    const easingFn = !!this.easing && easings[this.easing];
+    return easingFn || easings.linear;
   }
-
-  return {
-    ...transition,
-    duration: transition.duration || 0,
-    easingFunction: getTransitionEasingFunction(transition.easing, transition.name),
-  };
 }
