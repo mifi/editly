@@ -1,0 +1,284 @@
+{
+  fast: true,
+  outPath: "./transitions.mp4",
+  width: 1024,
+  height: 576,
+  defaults: {
+    duration: 3,
+    transition: { duration: 1 },
+  },
+  clips: [
+    {
+      layers: [{ type: "title-background", text: "Transitions" }],
+      transition: { name: "Bounce" },
+    },
+    {
+      layers: [{ type: "title-background", text: "Bounce" }],
+      transition: { name: "BowTieHorizontal" },
+    },
+    {
+      layers: [{ type: "title-background", text: "BowTieHorizontal" }],
+      transition: { name: "BowTieVertical" },
+    },
+    {
+      layers: [{ type: "title-background", text: "BowTieVertical" }],
+      transition: { name: "ButterflyWaveScrawler" },
+    },
+    {
+      layers: [{ type: "title-background", text: "ButterflyWaveScrawler" }],
+      transition: { name: "CircleCrop" },
+    },
+    {
+      layers: [{ type: "title-background", text: "CircleCrop" }],
+      transition: { name: "ColourDistance" },
+    },
+    {
+      layers: [{ type: "title-background", text: "ColourDistance" }],
+      transition: { name: "CrazyParametricFun" },
+    },
+    {
+      layers: [{ type: "title-background", text: "CrazyParametricFun" }],
+      transition: { name: "CrossZoom" },
+    },
+    {
+      layers: [{ type: "title-background", text: "CrossZoom" }],
+      transition: { name: "Directional" },
+    },
+    {
+      layers: [{ type: "title-background", text: "Directional" }],
+      transition: { name: "DoomScreenTransition" },
+    },
+    {
+      layers: [{ type: "title-background", text: "DoomScreenTransition" }],
+      transition: { name: "Dreamy" },
+    },
+    {
+      layers: [{ type: "title-background", text: "Dreamy" }],
+      transition: { name: "DreamyZoom" },
+    },
+    {
+      layers: [{ type: "title-background", text: "DreamyZoom" }],
+      transition: { name: "GlitchDisplace" },
+    },
+    {
+      layers: [{ type: "title-background", text: "GlitchDisplace" }],
+      transition: { name: "GlitchMemories" },
+    },
+    {
+      layers: [{ type: "title-background", text: "GlitchMemories" }],
+      transition: { name: "GridFlip" },
+    },
+    {
+      layers: [{ type: "title-background", text: "GridFlip" }],
+      transition: { name: "InvertedPageCurl" },
+    },
+    {
+      layers: [{ type: "title-background", text: "InvertedPageCurl" }],
+      transition: { name: "LinearBlur" },
+    },
+    {
+      layers: [{ type: "title-background", text: "LinearBlur" }],
+      transition: { name: "Mosaic" },
+    },
+    {
+      layers: [{ type: "title-background", text: "Mosaic" }],
+      transition: { name: "PolkaDotsCurtain" },
+    },
+    {
+      layers: [{ type: "title-background", text: "PolkaDotsCurtain" }],
+      transition: { name: "Radial" },
+    },
+    {
+      layers: [{ type: "title-background", text: "Radial" }],
+      transition: { name: "SimpleZoom" },
+    },
+    {
+      layers: [{ type: "title-background", text: "SimpleZoom" }],
+      transition: { name: "StereoViewer" },
+    },
+    {
+      layers: [{ type: "title-background", text: "StereoViewer" }],
+      transition: { name: "Swirl" },
+    },
+    {
+      layers: [{ type: "title-background", text: "Swirl" }],
+      transition: { name: "WaterDrop" },
+    },
+    {
+      layers: [{ type: "title-background", text: "WaterDrop" }],
+      transition: { name: "ZoomInCircles" },
+    },
+    {
+      layers: [{ type: "title-background", text: "ZoomInCircles" }],
+      transition: { name: "angular" },
+    },
+    {
+      layers: [{ type: "title-background", text: "angular" }],
+      transition: { name: "burn" },
+    },
+    {
+      layers: [{ type: "title-background", text: "burn" }],
+      transition: { name: "cannabisleaf" },
+    },
+    {
+      layers: [{ type: "title-background", text: "cannabisleaf" }],
+      transition: { name: "circle" },
+    },
+    {
+      layers: [{ type: "title-background", text: "circle" }],
+      transition: { name: "circleopen" },
+    },
+    {
+      layers: [{ type: "title-background", text: "circleopen" }],
+      transition: { name: "colorphase" },
+    },
+    {
+      layers: [{ type: "title-background", text: "colorphase" }],
+      transition: { name: "crosshatch" },
+    },
+    {
+      layers: [{ type: "title-background", text: "crosshatch" }],
+      transition: { name: "crosswarp" },
+    },
+    {
+      layers: [{ type: "title-background", text: "crosswarp" }],
+      transition: { name: "cube" },
+    },
+    {
+      layers: [{ type: "title-background", text: "cube" }],
+      transition: { name: "directionalwarp" },
+    },
+    {
+      layers: [{ type: "title-background", text: "directionalwarp" }],
+      transition: { name: "directionalwipe" },
+    },
+    {
+      layers: [{ type: "title-background", text: "directionalwipe" }],
+      transition: { name: "displacement" },
+    },
+    {
+      layers: [{ type: "title-background", text: "displacement" }],
+      transition: { name: "doorway" },
+    },
+    {
+      layers: [{ type: "title-background", text: "doorway" }],
+      transition: { name: "fade" },
+    },
+    {
+      layers: [{ type: "title-background", text: "fade" }],
+      transition: { name: "fadecolor" },
+    },
+    {
+      layers: [{ type: "title-background", text: "fadecolor" }],
+      transition: { name: "fadegrayscale" },
+    },
+    {
+      layers: [{ type: "title-background", text: "fadegrayscale" }],
+      transition: { name: "flyeye" },
+    },
+    {
+      layers: [{ type: "title-background", text: "flyeye" }],
+      transition: { name: "heart" },
+    },
+    {
+      layers: [{ type: "title-background", text: "heart" }],
+      transition: { name: "hexagonalize" },
+    },
+    {
+      layers: [{ type: "title-background", text: "hexagonalize" }],
+      transition: { name: "kaleidoscope" },
+    },
+    {
+      layers: [{ type: "title-background", text: "kaleidoscope" }],
+      transition: { name: "luma" },
+    },
+    {
+      layers: [{ type: "title-background", text: "luma" }],
+      transition: { name: "luminance_melt" },
+    },
+    {
+      layers: [{ type: "title-background", text: "luminance_melt" }],
+      transition: { name: "morph" },
+    },
+    {
+      layers: [{ type: "title-background", text: "morph" }],
+      transition: { name: "multiply_blend" },
+    },
+    {
+      layers: [{ type: "title-background", text: "multiply_blend" }],
+      transition: { name: "perlin" },
+    },
+    {
+      layers: [{ type: "title-background", text: "perlin" }],
+      transition: { name: "pinwheel" },
+    },
+    {
+      layers: [{ type: "title-background", text: "pinwheel" }],
+      transition: { name: "pixelize" },
+    },
+    {
+      layers: [{ type: "title-background", text: "pixelize" }],
+      transition: { name: "polar_function" },
+    },
+    {
+      layers: [{ type: "title-background", text: "polar_function" }],
+      transition: { name: "randomsquares" },
+    },
+    {
+      layers: [{ type: "title-background", text: "randomsquares" }],
+      transition: { name: "ripple" },
+    },
+    {
+      layers: [{ type: "title-background", text: "ripple" }],
+      transition: { name: "rotate_scale_fade" },
+    },
+    {
+      layers: [{ type: "title-background", text: "rotate_scale_fade" }],
+      transition: { name: "squareswire" },
+    },
+    {
+      layers: [{ type: "title-background", text: "squareswire" }],
+      transition: { name: "squeeze" },
+    },
+    {
+      layers: [{ type: "title-background", text: "squeeze" }],
+      transition: { name: "swap" },
+    },
+    {
+      layers: [{ type: "title-background", text: "swap" }],
+      transition: { name: "undulatingBurnOut" },
+    },
+    {
+      layers: [{ type: "title-background", text: "undulatingBurnOut" }],
+      transition: { name: "wind" },
+    },
+    {
+      layers: [{ type: "title-background", text: "wind" }],
+      transition: { name: "windowblinds" },
+    },
+    {
+      layers: [{ type: "title-background", text: "windowblinds" }],
+      transition: { name: "windowslice" },
+    },
+    {
+      layers: [{ type: "title-background", text: "windowslice" }],
+      transition: { name: "wipeDown" },
+    },
+    {
+      layers: [{ type: "title-background", text: "wipeDown" }],
+      transition: { name: "wipeLeft" },
+    },
+    {
+      layers: [{ type: "title-background", text: "wipeLeft" }],
+      transition: { name: "wipeRight" },
+    },
+    {
+      layers: [{ type: "title-background", text: "wipeRight" }],
+      transition: { name: "wipeUp" },
+    },
+    {
+      layers: [{ type: "title-background", text: "wipeUp" }],
+      transition: { duration: 0 },
+    },
+  ],
+}

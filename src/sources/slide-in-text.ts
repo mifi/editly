@@ -1,6 +1,6 @@
 import * as fabric from "fabric/node";
 import { defineFrameSource } from "../api/index.js";
-import { easeInOutCubic } from "../transitions.js";
+import { easeInOutCubic } from "../easings.js";
 import type { SlideInTextLayer } from "../types.js";
 import { defaultFontFamily, getFrameByKeyFrames, getPositionProps } from "../util.js";
 

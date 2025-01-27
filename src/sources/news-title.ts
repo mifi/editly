@@ -1,6 +1,6 @@
 import { FabricText, Rect } from "fabric/node";
 import { defineFrameSource } from "../api/index.js";
-import { easeOutExpo } from "../transitions.js";
+import { easeOutExpo } from "../easings.js";
 import type { NewsTitleLayer } from "../types.js";
 import { defaultFontFamily } from "../util.js";
 

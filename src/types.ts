@@ -3,6 +3,7 @@
 import type { Canvas } from "canvas";
 import type * as Fabric from "fabric/node";
 import { ConfigurationOptions } from "./configuration.js";
+import { TransitionOptions } from "./transition.js";
 
 /** Little utility */
 export type OptionalPromise<T> = Promise<T> | T;
@@ -66,101 +67,6 @@ export type Position =
   | "bottom-left"
   | "bottom-right"
   | PositionObject;
-
-/**
- * @see [Curve types]{@link https://trac.ffmpeg.org/wiki/AfadeCurves}
- */
-export type CurveType =
-  | "tri"
-  | "qsin"
-  | "hsin"
-  | "esin"
-  | "log"
-  | "ipar"
-  | "qua"
-  | "cub"
-  | "squ"
-  | "cbr"
-  | "par"
-  | "exp"
-  | "iqsin"
-  | "ihsin"
-  | "dese"
-  | "desi"
-  | "losi"
-  | "nofade"
-  | string;
-
-/**
- * @see [Transition types]{@link https://github.com/mifi/editly#transition-types}
- */
-export type TransitionType =
-  | "directional-left"
-  | "directional-right"
-  | "directional-up"
-  | "directional-down"
-  | "random"
-  | "dummy"
-  | string;
-
-/**
- * WARNING: Undocumented feature!
- */
-export type GLTextureLike = {
-  bind: (unit: number) => number;
-  shape: [number, number];
-};
-
-/**
- * WARNING: Undocumented feature!
- */
-export interface TransitionParams {
-  /**
-   * WARNING: Undocumented feature!
-   */
-  [key: string]: number | boolean | GLTextureLike | number[];
-}
-
-export interface Transition {
-  /**
-   * Transition duration.
-   *
-   * @default 0.5
-   */
-  duration?: number;
-
-  /**
-   * Transition type.
-   *
-   * @default 'random'
-   * @see [Transition types]{@link https://github.com/mifi/editly#transition-types}
-   */
-  name?: TransitionType;
-
-  /**
-   * [Fade out curve]{@link https://trac.ffmpeg.org/wiki/AfadeCurves} in audio cross fades.
-   *
-   * @default 'tri'
-   */
-  audioOutCurve?: CurveType;
-
-  /**
-   * [Fade in curve]{@link https://trac.ffmpeg.org/wiki/AfadeCurves} in audio cross fades.
-   *
-   * @default 'tri'
-   */
-  audioInCurve?: CurveType;
-
-  /**
-   * WARNING: Undocumented feature!
-   */
-  easing?: string | null;
-
-  /**
-   * WARNING: Undocumented feature!
-   */
-  params?: TransitionParams;
-}
 
 /**
  * @see [Arbitrary audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
@@ -797,7 +703,7 @@ export interface Clip {
    * Defaults to `defaults.transition`.
    * Set to `null` to disable transitions.
    */
-  transition?: Transition | null;
+  transition?: TransitionOptions | null;
 }
 
 export interface DefaultLayerOptions {
@@ -843,7 +749,7 @@ export interface DefaultOptions {
    * An object describing the default transition.
    * Set to `null` to disable transitions.
    */
-  transition?: Transition | null;
+  transition?: TransitionOptions | null;
 }
 
 /**
