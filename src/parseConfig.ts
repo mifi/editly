@@ -4,7 +4,7 @@ import flatMap from "lodash-es/flatMap.js";
 import pMap from "p-map";
 import { basename } from "path";
 import { readDuration, readVideoFileInfo } from "./ffmpeg.js";
-import Transition from "./transitions.js";
+import Transition from "./transition.js";
 import type {
   AudioTrack,
   CanvasLayer,

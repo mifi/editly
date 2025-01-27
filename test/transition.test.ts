@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import Transition from "../src/transitions.js";
+import Transition from "../src/transition.js";
 
 describe("constructor", () => {
   test("null", () => {
@@ -17,7 +17,12 @@ describe("constructor", () => {
     const transition = new Transition({ name: "directional-left" });
     expect(transition.name).toBe("directional");
     expect(transition.params).toEqual({ direction: [1, 0] });
-    expect(transition.easing).toBe("easeOutExpo");
+  });
+
+  test("raises error with unknown transition", () => {
+    expect(() => new Transition({ name: "unknown", duration: 1 })).toThrow(
+      "Transition not found: unknown",
+    );
   });
 });
 

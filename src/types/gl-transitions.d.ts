@@ -1,5 +1,5 @@
 declare module "gl-transitions" {
-  type GlTransition = {
+  export type GlTransition = {
     name: string;
     author: string;
     license: string;

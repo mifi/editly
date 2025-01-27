@@ -3,7 +3,7 @@ import pMap from "p-map";
 import { basename, join, resolve } from "path";
 import type { Configuration } from "./configuration.js";
 import { ffmpeg, getCutFromArgs, readFileStreams } from "./ffmpeg.js";
-import type { TransitionOptions } from "./transitions.js";
+import type { TransitionOptions } from "./transition.js";
 import type {
   AudioLayer,
   AudioNormalizationOptions,

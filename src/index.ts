@@ -7,7 +7,6 @@ import Audio from "./audio.js";
 import { Configuration, type ConfigurationOptions } from "./configuration.js";
 import { configureFf, ffmpeg, parseFps } from "./ffmpeg.js";
 import { createFrameSource } from "./frameSource.js";
-import GlTransitions, { type RunTransitionOptions } from "./glTransitions.js";
 import parseConfig, { ProcessedClip } from "./parseConfig.js";
 import { createFabricCanvas, rgbaToFabricImage } from "./sources/fabric.js";
 import type { RenderSingleFrameConfig } from "./types.js";
@@ -73,13 +72,13 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
 
   const audioFilePath = !isGif
     ? await editAudio({
-      keepSourceAudio,
-      arbitraryAudio,
-      clipsAudioVolume,
-      clips,
-      audioNorm,
-      outputVolume,
-    })
+        keepSourceAudio,
+        arbitraryAudio,
+        clipsAudioVolume,
+        clips,
+        audioNorm,
+        outputVolume,
+      })
     : undefined;
 
   // Try to detect parameters from first video
@@ -185,31 +184,6 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
       return newAcc;
     }, 0);
 
-  const { runTransitionOnFrame: runGlTransitionOnFrame } = GlTransitions({
-    width,
-    height,
-    channels,
-  });
-
-  function runTransitionOnFrame({
-    fromFrame,
-    toFrame,
-    progress,
-    transitionName,
-    transitionParams,
-  }: RunTransitionOptions) {
-    // A dummy transition can be used to have an audio transition without a video transition
-    // (Note: You will lose a portion from both clips due to overlap)
-    if (transitionName === "dummy") return progress > 0.5 ? toFrame : fromFrame;
-    return runGlTransitionOnFrame({
-      fromFrame,
-      toFrame,
-      progress,
-      transitionName,
-      transitionParams,
-    });
-  }
-
   function getOutputArgs() {
     if (customOutputArgs) {
       assert(Array.isArray(customOutputArgs), "customOutputArgs must be an array of arguments");
@@ -219,25 +193,25 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
     // https://superuser.com/questions/556029/how-do-i-convert-a-video-to-gif-using-ffmpeg-with-reasonable-quality
     const videoOutputArgs = isGif
       ? [
-        "-vf",
-        `format=rgb24,fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
-        "-loop",
-        "0",
-      ]
+          "-vf",
+          `format=rgb24,fps=${fps},scale=${width}:${height}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`,
+          "-loop",
+          "0",
+        ]
       : [
-        "-vf",
-        "format=yuv420p",
-        "-vcodec",
-        "libx264",
-        "-profile:v",
-        "high",
-        ...(fast ? ["-preset:v", "ultrafast"] : ["-preset:v", "medium"]),
-        "-crf",
-        "18",
+          "-vf",
+          "format=yuv420p",
+          "-vcodec",
+          "libx264",
+          "-profile:v",
+          "high",
+          ...(fast ? ["-preset:v", "ultrafast"] : ["-preset:v", "medium"]),
+          "-crf",
+          "18",
 
-        "-movflags",
-        "faststart",
-      ];
+          "-movflags",
+          "faststart",
+        ];
 
     const audioOutputArgs = audioFilePath ? ["-acodec", "aac", "-b:a", "128k"] : [];
 
@@ -342,9 +316,9 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
         const fromClipTime = transitionFromClip.duration * fromClipProgress;
         const toClipTime = transitionToClip && transitionToClip.duration * toClipProgress;
 
-        const currentTransition = transitionFromClip.transition!;
-
-        const transitionNumFrames = Math.round(currentTransition.duration! * fps);
+        const currentTransition = transitionFromClip.transition;
+        const transitionNumFrames = Math.round(currentTransition.duration * fps);
+        const runTransitionOnFrame = currentTransition.create({ width, height, channels });
 
         // Each clip has two transitions, make sure we leave enough room:
         const transitionNumFramesSafe = Math.floor(
@@ -412,16 +386,15 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
 
           if (frameSource2Data) {
             const progress = transitionFrameAt / transitionNumFramesSafe;
-            const easedProgress = currentTransition.easingFunction(progress);
 
             if (logTimes) console.time("runTransitionOnFrame");
+
             outFrameData = runTransitionOnFrame({
               fromFrame: frameSource1Data!,
               toFrame: frameSource2Data,
-              progress: easedProgress,
-              transitionName: currentTransition.name,
-              transitionParams: currentTransition.params,
+              progress: progress,
             });
+
             if (logTimes) console.timeEnd("runTransitionOnFrame");
           } else {
             console.warn("Got no frame data from transitionToClip!");
@@ -522,7 +495,7 @@ export async function renderSingleFrame(input: RenderSingleFrameConfig): Promise
 
   configureFf(config);
 
-  console.log({ clipsIn })
+  console.log({ clipsIn });
 
   const { clips } = await parseConfig({ clips: clipsIn, arbitraryAudio: [], allowRemoteRequests });
   let clipStartTime = 0;

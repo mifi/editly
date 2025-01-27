@@ -3,7 +3,7 @@
 import type { Canvas } from "canvas";
 import type * as Fabric from "fabric/node";
 import { ConfigurationOptions } from "./configuration.js";
-import { TransitionOptions } from "./transitions.js";
+import { TransitionOptions } from "./transition.js";
 
 /** Little utility */
 export type OptionalPromise<T> = Promise<T> | T;
