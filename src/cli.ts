@@ -6,7 +6,8 @@ import pMap from 'p-map';
 import JSON5 from 'json5';
 import assert from 'assert';
 
-import Editly, { Config, Layer } from './index.js';
+import Editly, { Layer } from './index.js';
+import { ConfigurationOptions } from './configuration.js';
 
 // See also readme
 const cli = meow(`
@@ -72,7 +73,7 @@ const cli = meow(`
   let { json } = cli.flags;
   if (cli.input.length === 1 && /\.(json|json5|js)$/.test(cli.input[0].toLowerCase())) json = cli.input[0];
 
-  let params: Partial<Config> = {
+  let params: Partial<ConfigurationOptions> = {
     defaults: {},
   };
 
@@ -141,7 +142,7 @@ const cli = meow(`
 
   if (!params.outPath) params.outPath = './editly-out.mp4';
 
-  await Editly(params as Config);
+  await Editly(params as ConfigurationOptions);
 })().catch((err) => {
   console.error('Caught error', err);
   process.exitCode = 1;

@@ -2,7 +2,7 @@
 
 import type * as Fabric from 'fabric/node';
 import type { Canvas } from "canvas"
-import type { FfmpegConfig } from './ffmpeg.js';
+import { ConfigurationOptions } from './configuration.js';
 
 /** Little utility */
 export type OptionalPromise<T> = Promise<T> | T;
@@ -935,139 +935,7 @@ export interface AudioNormalizationOptions {
 
 }
 
-export interface DebugOptions {
-  verbose?: boolean;
-  logTimes?: boolean;
-}
-
-export interface Config extends DebugOptions, FfmpegConfig {
-  /**
-   * Output path (`.mp4` or `.mkv`, can also be a `.gif`).
-   */
-  outPath: string;
-
-  /**
-   * List of clip objects that will be played in sequence.
-   * Each clip can have one or more layers.
-   *
-   * @default []
-   */
-  clips: Clip[];
-
-  /**
-   * Width which all media will be converted to.
-   *
-   * @default 640
-   */
-  width?: number;
-
-  /**
-   * Height which all media will be converted to.
-   * Decides height based on `width` and aspect ratio of the first video by default.
-   */
-  height?: number;
-
-  /**
-   * FPS which all videos will be converted to.
-   * Defaults to first video's FPS or `25`.
-   */
-  fps?: number;
-
-  /**
-   * Specify custom output codec/format arguments for ffmpeg.
-   * Automatically adds codec options (normally `h264`) by default.
-   *
-   * @see [Example]{@link https://github.com/mifi/editly/blob/master/examples/customOutputArgs.json5}
-   */
-  customOutputArgs?: string[];
-
-  /**
-   * Allow remote URLs as paths.
-   *
-   * @default false
-   */
-  allowRemoteRequests?: boolean;
-
-  /**
-   * Fast mode (low resolution and FPS, useful for getting a quick preview ⏩).
-   *
-   * @default false
-   */
-  fast?: boolean;
-
-  /**
-   * An object describing default options for clips and layers.
-   */
-  defaults?: DefaultOptions;
-
-  /**
-   * List of arbitrary audio tracks.
-   *
-   * @default []
-   * @see [Audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
-   */
-  audioTracks?: AudioTrack[];
-
-  /**
-   * Set an audio track for the whole video..
-   *
-   * @see [Audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
-   */
-  audioFilePath?: string;
-
-  /**
-   * Background Volume
-   *
-   * @see [Audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
-   */
-  backgroundAudioVolume?: string | number;
-
-  /**
-   * Loop the audio track if it is shorter than video?
-   *
-   * @default false
-   */
-  loopAudio?: boolean;
-
-  /**
-   * Keep source audio from `clips`?
-   *
-   * @default false
-   */
-  keepSourceAudio?: boolean;
-
-  /**
-   * Volume of audio from `clips` relative to `audioTracks`.
-   *
-   * @default 1
-   * @see [Audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
-   */
-  clipsAudioVolume?: number | string;
-
-  /**
-   * Adjust output [volume]{@link http://ffmpeg.org/ffmpeg-filters.html#volume} (final stage).
-   *
-   * @default 1
-   * @see [Example]{@link https://github.com/mifi/editly/blob/master/examples/audio-volume.json5}
-   * @example
-   * 0.5
-   * @example
-   * '10db'
-   */
-  outputVolume?: number | string;
-
-  /**
-   * Audio normalization.
-   */
-  audioNorm?: AudioNormalizationOptions;
-
-  /**
-   * WARNING: Undocumented feature!
-   */
-  keepTmp?: boolean;
-};
-
-export interface RenderSingleFrameConfig extends Config {
+export interface RenderSingleFrameConfig extends ConfigurationOptions {
 
   /**
    * Output path (`.mp4` or `.mkv`, can also be a `.gif`).

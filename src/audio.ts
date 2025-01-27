@@ -5,14 +5,15 @@ import { flatMap } from 'lodash-es';
 import { getCutFromArgs, ffmpeg } from './ffmpeg.js';
 import { readFileStreams } from './ffmpeg.js';
 
-import type { AudioLayer, AudioNormalizationOptions, AudioTrack, Clip, Config, Transition, VideoLayer } from './types.js'
+import type { AudioLayer, AudioNormalizationOptions, AudioTrack, Clip, Transition, VideoLayer } from './types.js'
+import type { Configuration } from './configuration.js'
 
 export type AudioOptions = {
   verbose: boolean;
   tmpDir: string;
 }
 
-export type EditAudioOptions = Pick<Config, "keepSourceAudio" | "clips" | "clipsAudioVolume" | "audioNorm" | "outputVolume"> & {
+export type EditAudioOptions = Pick<Configuration, "keepSourceAudio" | "clips" | "clipsAudioVolume" | "audioNorm" | "outputVolume"> & {
   arbitraryAudio: AudioTrack[]
 };
 

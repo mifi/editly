@@ -3,7 +3,7 @@ import { sortBy } from 'lodash-es';
 import { pathExists } from 'fs-extra';
 import * as fabric from 'fabric/node';
 import fileUrl from 'file-url';
-import type { KenBurns, Keyframe, Position, PositionObject, Transition } from './types.js';
+import type { KenBurns, Keyframe, Position, PositionObject } from './types.js';
 import type { TOriginX, TOriginY } from 'fabric';
 
 export function toArrayInteger(buffer: Buffer) {
@@ -117,11 +117,6 @@ export const assertFileValid = async (path: string, allowRemoteRequests?: boolea
   }
   assert(await pathExists(path), `File does not exist ${path}`);
 };
-
-// See #16
-export function checkTransition(transition?: Transition | null) {
-  assert(transition == null || typeof transition === 'object', 'Transition must be an object');
-}
 
 export const loadImage = (pathOrUrl: string) => fabric.util.loadImage(isUrl(pathOrUrl) ? pathOrUrl : fileUrl(pathOrUrl)); export const defaultFontFamily = 'sans-serif';
 

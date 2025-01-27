@@ -44,25 +44,23 @@ const TransitionAliases: Record<string, Partial<Transition>> = {
   'directional-up': { name: 'directional', params: { direction: [0, -1] } },
 }
 
-export function calcTransition(defaults: Transition | null | undefined, transition: Transition | null | undefined, isLastClip: boolean): CalculatedTransition {
-  if (transition === null || isLastClip) return { duration: 0, easingFunction: linear };
+export function calcTransition(transition: Transition | null | undefined, isLastClip: boolean): CalculatedTransition {
+  if (!transition || isLastClip) return { duration: 0, easingFunction: linear };
 
-  let transitionOrDefault: Transition = { ...defaults, ...transition }
+  assert(!transition.duration || transition.name, 'Please specify transition name or set duration to 0');
 
-  assert(!transitionOrDefault.duration || transitionOrDefault.name, 'Please specify transition name or set duration to 0');
-
-  if (transitionOrDefault.name === 'random' && transitionOrDefault.duration) {
-    transitionOrDefault = { ...transitionOrDefault, name: getRandomTransition() };
+  if (transition.name === 'random' && transition.duration) {
+    transition = { ...transition, name: getRandomTransition() };
   }
 
-  const aliasedTransition = transitionOrDefault.name ? TransitionAliases[transitionOrDefault.name] : undefined;
+  const aliasedTransition = transition.name ? TransitionAliases[transition.name] : undefined;
   if (aliasedTransition) {
-    transitionOrDefault = { ...transitionOrDefault, ...aliasedTransition };
+    transition = { ...transition, ...aliasedTransition };
   }
 
   return {
-    ...transitionOrDefault,
-    duration: transitionOrDefault.duration || 0,
-    easingFunction: getTransitionEasingFunction(transitionOrDefault.easing, transitionOrDefault.name),
+    ...transition,
+    duration: transition.duration || 0,
+    easingFunction: getTransitionEasingFunction(transition.easing, transition.name),
   };
 }

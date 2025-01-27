@@ -1,21 +1,18 @@
 import pMap from 'p-map';
-import { basename, join } from 'path';
+import { basename } from 'path';
 import flatMap from 'lodash-es/flatMap.js';
 import assert from 'assert';
-import { fileURLToPath } from 'url';
-import { assertFileValid, checkTransition } from './util.js';
+import { assertFileValid } from './util.js';
 import { readVideoFileInfo, readDuration } from './ffmpeg.js';
 import { registerFont } from 'canvas';
 import { calcTransition, type CalculatedTransition } from './transitions.js';
-import type { AudioTrack, CanvasLayer, EditlyBannerLayer, FabricLayer, GlLayer, ImageLayer, ImageOverlayLayer, Layer, LinearGradientLayer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleBackgroundLayer, TitleLayer, DefaultOptions, Clip, VideoLayer } from './types.js';
+import type { AudioTrack, CanvasLayer, FabricLayer, ImageLayer, ImageOverlayLayer, Layer, NewsTitleLayer, SlideInTextLayer, SubtitleLayer, TitleLayer, Clip, VideoLayer } from './types.js';
 
 export type ProcessedClip = {
   layers: Layer[];
   duration: number;
   transition: CalculatedTransition;
 }
-
-const dirname = fileURLToPath(new URL('..', import.meta.url));
 
 // Cache
 const loadedFonts: string[] = [];
@@ -36,7 +33,6 @@ async function validateArbitraryAudio(audio: AudioTrack[] | undefined, allowRemo
 }
 
 type ParseConfigOptions = {
-  defaults: DefaultOptions;
   clips: Clip[];
   backgroundAudioVolume?: string | number;
   backgroundAudioPath?: string;
@@ -45,19 +41,7 @@ type ParseConfigOptions = {
   arbitraryAudio: AudioTrack[];
 };
 
-export default async function parseConfig({ defaults: defaultsIn = {}, clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests }: ParseConfigOptions) {
-  const defaults = {
-    duration: 4,
-    ...defaultsIn,
-    transition: defaultsIn.transition === null ? null : {
-      duration: 0.5,
-      name: 'random',
-      audioOutCurve: 'tri',
-      audioInCurve: 'tri',
-      ...defaultsIn.transition,
-    },
-  };
-
+export default async function parseConfig({ clips, arbitraryAudio: arbitraryAudioIn, backgroundAudioPath, backgroundAudioVolume, loopAudio, allowRemoteRequests }: ParseConfigOptions) {
   async function handleLayer(layer: Layer): Promise<Layer | Layer[]> {
     // https://github.com/mifi/editly/issues/39
     if (layer.type === 'image' || layer.type === 'image-overlay') {
@@ -72,40 +56,6 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
 
     if (['image', 'image-overlay', 'fabric', 'canvas', 'gl', 'radial-gradient', 'linear-gradient', 'fill-color'].includes(layer.type)) {
       return layer;
-    }
-
-    // TODO if random-background radial-gradient linear etc
-    if (layer.type === 'pause') {
-      return handleLayer({ ...layer, type: 'fill-color' });
-    }
-
-    if (layer.type === 'rainbow-colors') {
-      return handleLayer({ type: 'gl', fragmentPath: join(dirname, 'shaders/rainbow-colors.frag') } as GlLayer);
-    }
-
-    if (layer.type === 'editly-banner') {
-      const { fontPath } = layer as EditlyBannerLayer;
-      return [
-        await handleLayer({ type: 'linear-gradient' } as LinearGradientLayer),
-        await handleLayer({ type: 'title', text: 'Made with\nEDITLY\nmifi.no', fontPath } as TitleLayer),
-      ].flat();
-    }
-
-    // For convenience
-    if (layer.type === 'title-background') {
-      const { text, textColor, background, fontFamily, fontPath } = layer as TitleBackgroundLayer;
-      const outLayers = [];
-      if (background) {
-        if (background.type === 'radial-gradient') outLayers.push(await handleLayer({ type: 'radial-gradient', colors: background.colors }));
-        else if (background.type === 'linear-gradient') outLayers.push(await handleLayer({ type: 'linear-gradient', colors: background.colors }));
-        else if (background.color) outLayers.push(await handleLayer({ type: 'fill-color', color: background.color }));
-      } else {
-        const backgroundTypes: ('radial-gradient' | 'linear-gradient' | 'fill-color')[] = ['radial-gradient', 'linear-gradient', 'fill-color'];
-        const randomType = backgroundTypes[Math.floor(Math.random() * backgroundTypes.length)];
-        outLayers.push(await handleLayer({ type: randomType }));
-      }
-      outLayers.push(await handleLayer({ type: 'title', fontFamily, fontPath, text, textColor }));
-      return outLayers.flat();
     }
 
     if (['title', 'subtitle', 'news-title', 'slide-in-text'].includes(layer.type)) {
@@ -129,30 +79,15 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
   const detachedAudioByClip: Record<number, AudioTrack[]> = {};
 
   let clipsOut: ProcessedClip[] = await pMap(clips, async (clip, clipIndex) => {
-    assert(typeof clip === 'object', '"clips" must contain objects with one or more layers');
-    const { transition: userTransition, duration: userClipDuration, layers: layersIn } = clip;
-
-    // Validation
-    let layers = layersIn;
-    if (!Array.isArray(layers)) layers = [layers]; // Allow single layer for convenience
-    assert(layers.every((layer) => layer != null && typeof layer === 'object'), '"clip.layers" must contain one or more objects');
-    assert(layers.every((layer) => layer.type != null), 'All "layers" must have a type');
-
-    checkTransition(userTransition);
+    const { transition: userTransition, duration, layers } = clip;
 
     const videoLayers = layers.filter((layer) => layer.type === 'video');
 
-    const userClipDurationOrDefault = userClipDuration || defaults.duration;
-    if (videoLayers.length === 0) assert(userClipDurationOrDefault, `Duration parameter is required for videoless clip ${clipIndex}`);
+    if (videoLayers.length === 0) assert(duration, `Duration parameter is required for videoless clip ${clipIndex}`);
 
-    const transition = calcTransition(defaults.transition, userTransition, clipIndex === clips.length - 1);
+    const transition = calcTransition(userTransition, clipIndex === clips.length - 1);
 
-    let layersOut = flatMap(await pMap(layers, async <T extends Layer>(layerIn: T) => {
-      const globalLayerDefaults = defaults.layer || {};
-      const thisLayerDefaults = (defaults.layerType || {})[layerIn.type];
-
-      const layer: T = { ...globalLayerDefaults, ...thisLayerDefaults, ...layerIn };
-
+    let layersOut = flatMap(await pMap(layers, async <T extends Layer>(layer: T) => {
       if (layer.type === 'video') {
         const { duration: fileDuration, width: widthIn, height: heightIn, framerateStr, rotation } = await readVideoFileInfo(layer.path);
         let { cutFrom, cutTo } = layer;
@@ -180,10 +115,10 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
       return handleLayer(layer);
     }, { concurrency: 1 }));
 
-    let clipDuration = userClipDurationOrDefault;
+    let clipDuration = duration;
 
     const firstVideoLayer = layersOut.find((layer): layer is VideoLayer => layer.type === 'video');
-    if (firstVideoLayer && !userClipDuration) clipDuration = firstVideoLayer.layerDuration!;
+    if (firstVideoLayer && !duration) clipDuration = firstVideoLayer.layerDuration!;
     assert(clipDuration);
 
     // We need to map again, because for audio, we need to know the correct clipDuration
@@ -224,9 +159,9 @@ export default async function parseConfig({ defaults: defaultsIn = {}, clips, ar
         let speedFactor;
 
         // If user explicitly specified duration for clip, it means that should be the output duration of the video
-        if (userClipDuration) {
+        if (duration) {
           // Later we will speed up or slow down video using this factor
-          speedFactor = userClipDuration / layerDuration;
+          speedFactor = duration / layerDuration;
         } else {
           speedFactor = 1;
         }
