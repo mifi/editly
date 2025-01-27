@@ -1,21 +1,67 @@
 {
   // width: 200, height: 500,
-  width: 500, height: 500,
-  outPath: './mosaic.mp4',
+  width: 500,
+  height: 500,
+  outPath: "./mosaic.mp4",
   defaults: {
     transition: { duration: 0 },
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
     layerType: {
       video: { width: 0.4, height: 0.4 },
-    }
+    },
   },
   clips: [
-    { duration: 2, layers: [
-      { type: 'video', path: './assets/palawan.mp4', cutFrom: 0, cutTo: 2, resizeMode: 'cover', top: 0.5, left: 0.5, originY: 'center', originX: 'center' },
-      { type: 'video', path: './assets/palawan.mp4', cutFrom: 0, cutTo: 2, resizeMode: 'contain' },
-      { type: 'video', path: './assets/palawan.mp4', cutFrom: 0, cutTo: 2, resizeMode: 'contain-blur', left: 1, originX: 'right' },
-      { type: 'video', path: './assets/IMG_1884.MOV', cutFrom: 0, cutTo: 2, resizeMode: 'contain-blur', left: 1, top: 1, originX: 'right', originY: 'bottom' },
-      { type: 'video', path: './assets/palawan.mp4', cutFrom: 0, cutTo: 2, resizeMode: 'stretch', top: 1, originY: 'bottom' },
-    ] },
+    {
+      duration: 2,
+      layers: [
+        {
+          type: "video",
+          path: "./assets/palawan.mp4",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "cover",
+          top: 0.5,
+          left: 0.5,
+          originY: "center",
+          originX: "center",
+        },
+        {
+          type: "video",
+          path: "./assets/palawan.mp4",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "contain",
+        },
+        {
+          type: "video",
+          path: "./assets/palawan.mp4",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "contain-blur",
+          left: 1,
+          originX: "right",
+        },
+        {
+          type: "video",
+          path: "./assets/IMG_1884.MOV",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "contain-blur",
+          left: 1,
+          top: 1,
+          originX: "right",
+          originY: "bottom",
+        },
+        {
+          type: "video",
+          path: "./assets/palawan.mp4",
+          cutFrom: 0,
+          cutTo: 2,
+          resizeMode: "stretch",
+          top: 1,
+          originY: "bottom",
+        },
+      ],
+    },
   ],
 }

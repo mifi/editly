@@ -1,47 +1,162 @@
 {
   // width: 2166, height: 1650, fps: 30,
-  width: 720, height: 1280, fps: 30,
-  outPath: './commonFeatures.mp4',
+  width: 720,
+  height: 1280,
+  fps: 30,
+  outPath: "./commonFeatures.mp4",
   // outPath: './commonFeatures.gif',
-  audioFilePath: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a',
+  audioFilePath: "./assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a",
   defaults: {
-    transition: { name: 'random' },
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    transition: { name: "random" },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
   clips: [
-    { duration: 3, transition: { name: 'directional-left' }, layers: [{ type: 'title-background', text: 'EDITLY\nVideo editing framework', background: { type: 'linear-gradient', colors: ['#02aab0', '#00cdac'] } }] },
-    { duration: 4, transition: { name: 'dreamyzoom' }, layers: [{ type: 'title-background', text: 'Multi-line text with animated linear or radial gradients', background: { type: 'radial-gradient' } }] },
-    { duration: 3, transition: { name: 'directional-right' }, layers: [{ type: 'rainbow-colors' }, { type: 'title', text: 'Colorful backgrounds' }] },
-    { duration: 3, layers: [{ type: 'pause' }, { type: 'title', text: 'and separators' }] },
+    {
+      duration: 3,
+      transition: { name: "directional-left" },
+      layers: [
+        {
+          type: "title-background",
+          text: "EDITLY\nVideo editing framework",
+          background: { type: "linear-gradient", colors: ["#02aab0", "#00cdac"] },
+        },
+      ],
+    },
+    {
+      duration: 4,
+      transition: { name: "dreamyzoom" },
+      layers: [
+        {
+          type: "title-background",
+          text: "Multi-line text with animated linear or radial gradients",
+          background: { type: "radial-gradient" },
+        },
+      ],
+    },
+    {
+      duration: 3,
+      transition: { name: "directional-right" },
+      layers: [{ type: "rainbow-colors" }, { type: "title", text: "Colorful backgrounds" }],
+    },
+    { duration: 3, layers: [{ type: "pause" }, { type: "title", text: "and separators" }] },
 
-    { duration: 3, transition: { name: 'fadegrayscale' }, layers: [{ type: 'title-background', text: 'Image slideshows with Ken Burns effect', background: { type: 'linear-gradient' } }] },
-    { duration: 2.5, transition: { name: 'directionalWarp' }, layers: [{ type: 'image', path: './assets/vertical.jpg', zoomDirection: 'out' }] },
-    { duration: 3, transition: { name: 'dreamyzoom' }, layers: [{ type: 'image', path: './assets/img1.jpg', duration: 2.5, zoomDirection: 'in' }, { type: 'subtitle', text: 'Indonesia has many spectacular locations. Here is the volcano Kelimutu, which has three lakes in its core, some days with three different colors!' }, { type: 'title', position: 'top', text: 'With text' }] },
-    { duration: 3, transition: { name: 'colorphase' }, layers: [{ type: 'image', path: './assets/img2.jpg', zoomDirection: 'out' }, { type: 'subtitle', text: 'Komodo national park is the only home of the endangered Komodo dragons' }] },
-    { duration: 2.5, transition: { name: 'simplezoom' }, layers: [{ type: 'image', path: './assets/img3.jpg', zoomDirection: 'in' }] },
+    {
+      duration: 3,
+      transition: { name: "fadegrayscale" },
+      layers: [
+        {
+          type: "title-background",
+          text: "Image slideshows with Ken Burns effect",
+          background: { type: "linear-gradient" },
+        },
+      ],
+    },
+    {
+      duration: 2.5,
+      transition: { name: "directionalWarp" },
+      layers: [{ type: "image", path: "./assets/vertical.jpg", zoomDirection: "out" }],
+    },
+    {
+      duration: 3,
+      transition: { name: "dreamyzoom" },
+      layers: [
+        { type: "image", path: "./assets/img1.jpg", duration: 2.5, zoomDirection: "in" },
+        {
+          type: "subtitle",
+          text: "Indonesia has many spectacular locations. Here is the volcano Kelimutu, which has three lakes in its core, some days with three different colors!",
+        },
+        { type: "title", position: "top", text: "With text" },
+      ],
+    },
+    {
+      duration: 3,
+      transition: { name: "colorphase" },
+      layers: [
+        { type: "image", path: "./assets/img2.jpg", zoomDirection: "out" },
+        {
+          type: "subtitle",
+          text: "Komodo national park is the only home of the endangered Komodo dragons",
+        },
+      ],
+    },
+    {
+      duration: 2.5,
+      transition: { name: "simplezoom" },
+      layers: [{ type: "image", path: "./assets/img3.jpg", zoomDirection: "in" }],
+    },
 
-    { duration: 1.5, transition: { name: 'crosszoom', duration: 0.3 }, layers: [{ type: 'video', path: 'assets/kohlipe1.mp4', cutTo: 58 }, { type: 'title', text: 'Videos' }] },
-    { duration: 3, transition: { name: 'fade' }, layers: [{ type: 'video', path: 'assets/kohlipe1.mp4', cutFrom: 58 }] },
-    { transition: { name: 'fade' }, layers: [{ type: 'video', path: 'assets/kohlipe2.mp4', cutTo: 2.5 }] },
-    { duration: 1.5, layers: [{ type: 'video', path: 'assets/kohlipe3.mp4', cutFrom: 3, cutTo: 30 }] },
+    {
+      duration: 1.5,
+      transition: { name: "crosszoom", duration: 0.3 },
+      layers: [
+        { type: "video", path: "assets/kohlipe1.mp4", cutTo: 58 },
+        { type: "title", text: "Videos" },
+      ],
+    },
+    {
+      duration: 3,
+      transition: { name: "fade" },
+      layers: [{ type: "video", path: "assets/kohlipe1.mp4", cutFrom: 58 }],
+    },
+    {
+      transition: { name: "fade" },
+      layers: [{ type: "video", path: "assets/kohlipe2.mp4", cutTo: 2.5 }],
+    },
+    {
+      duration: 1.5,
+      layers: [{ type: "video", path: "assets/kohlipe3.mp4", cutFrom: 3, cutTo: 30 }],
+    },
 
-    { duration: 3, transition: { name: 'crosszoom' }, layers: [{ type: 'gl', fragmentPath: './assets/shaders/3l23Rh.frag' }, { type: 'title', text: 'OpenGL\nshaders' }] },
-    { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/MdXyzX.frag' }] },
-    { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/30daysofshade_010.frag' }] },
-    { duration: 3, layers: [{ type: 'gl', fragmentPath: './assets/shaders/wd2yDm.frag', speed: 5 }] },
+    {
+      duration: 3,
+      transition: { name: "crosszoom" },
+      layers: [
+        { type: "gl", fragmentPath: "./assets/shaders/3l23Rh.frag" },
+        { type: "title", text: "OpenGL\nshaders" },
+      ],
+    },
+    { duration: 3, layers: [{ type: "gl", fragmentPath: "./assets/shaders/MdXyzX.frag" }] },
+    {
+      duration: 3,
+      layers: [{ type: "gl", fragmentPath: "./assets/shaders/30daysofshade_010.frag" }],
+    },
+    {
+      duration: 3,
+      layers: [{ type: "gl", fragmentPath: "./assets/shaders/wd2yDm.frag", speed: 5 }],
+    },
 
-    { duration: 3, layers: [
-      { type: 'image', path: './assets/91083241_573589476840991_4224678072281051330_n.jpg' },
-      { type: 'news-title', text: 'BREAKING NEWS' },
-      { type: 'subtitle', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.', backgroundColor: 'rgba(0,0,0,0.5)' }
-    ] },
+    {
+      duration: 3,
+      layers: [
+        { type: "image", path: "./assets/91083241_573589476840991_4224678072281051330_n.jpg" },
+        { type: "news-title", text: "BREAKING NEWS" },
+        {
+          type: "subtitle",
+          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+          backgroundColor: "rgba(0,0,0,0.5)",
+        },
+      ],
+    },
 
-    { duration: 3, layers: [
-      { type: 'rainbow-colors' },
-      { type: 'video', path: './assets/tungestolen.mp4', resizeMode: 'contain', width: 0.4, height: 0.4, top: 0.05, left: 0.95, originY: 'top', originX: 'right' },
-      { type: 'title', position: 'bottom', text: 'Picture-in-Picture' }
-    ] },
+    {
+      duration: 3,
+      layers: [
+        { type: "rainbow-colors" },
+        {
+          type: "video",
+          path: "./assets/tungestolen.mp4",
+          resizeMode: "contain",
+          width: 0.4,
+          height: 0.4,
+          top: 0.05,
+          left: 0.95,
+          originY: "top",
+          originX: "right",
+        },
+        { type: "title", position: "bottom", text: "Picture-in-Picture" },
+      ],
+    },
 
-    { duration: 3, layers: [{ type: 'editly-banner' }] },
+    { duration: 3, layers: [{ type: "editly-banner" }] },
   ],
 }

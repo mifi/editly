@@ -1,15 +1,44 @@
-import assert from 'assert';
-import * as fabric from 'fabric/node';
-import { ffmpeg, readFileStreams } from '../ffmpeg.js';
-import { rgbaToFabricImage, blurImage } from './fabric.js';
-import { defineFrameSource } from '../api/index.js';
-import type { VideoLayer } from '../types.js';
+import assert from "assert";
+import * as fabric from "fabric/node";
+import { defineFrameSource } from "../api/index.js";
+import { ffmpeg, readFileStreams } from "../ffmpeg.js";
+import type { VideoLayer } from "../types.js";
+import { blurImage, rgbaToFabricImage } from "./fabric.js";
 
-export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidth, height: canvasHeight, channels, framerateStr, verbose, logTimes, params }) => {
-  const { path, cutFrom, cutTo, resizeMode = 'contain-blur', speedFactor, inputWidth, inputHeight, width: requestedWidthRel, height: requestedHeightRel, left: leftRel = 0, top: topRel = 0, originX = 'left', originY = 'top', fabricImagePostProcessing = null } = params;
+export default defineFrameSource<VideoLayer>("video", async (options) => {
+  const {
+    width: canvasWidth,
+    height: canvasHeight,
+    channels,
+    framerateStr,
+    verbose,
+    logTimes,
+    params,
+  } = options;
 
-  const requestedWidth = requestedWidthRel ? Math.round(requestedWidthRel * canvasWidth) : canvasWidth;
-  const requestedHeight = requestedHeightRel ? Math.round(requestedHeightRel * canvasHeight) : canvasHeight;
+  const {
+    path,
+    cutFrom,
+    cutTo,
+    resizeMode = "contain-blur",
+    speedFactor,
+    inputWidth,
+    inputHeight,
+    width: requestedWidthRel,
+    height: requestedHeightRel,
+    left: leftRel = 0,
+    top: topRel = 0,
+    originX = "left",
+    originY = "top",
+    fabricImagePostProcessing = null,
+  } = params;
+
+  const requestedWidth = requestedWidthRel
+    ? Math.round(requestedWidthRel * canvasWidth)
+    : canvasWidth;
+  const requestedHeight = requestedHeightRel
+    ? Math.round(requestedHeightRel * canvasHeight)
+    : canvasHeight;
 
   const left = leftRel * canvasWidth;
   const top = topRel * canvasHeight;
@@ -22,7 +51,7 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
   let targetHeight = requestedHeight;
 
   let scaleFilter;
-  if (['contain', 'contain-blur'].includes(resizeMode)) {
+  if (["contain", "contain-blur"].includes(resizeMode)) {
     if (ratioW > ratioH) {
       targetHeight = requestedHeight;
       targetWidth = Math.round(requestedHeight * inputAspectRatio);
@@ -32,7 +61,7 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
     }
 
     scaleFilter = `scale=${targetWidth}:${targetHeight}`;
-  } else if (resizeMode === 'cover') {
+  } else if (resizeMode === "cover") {
     let scaledWidth;
     let scaledHeight;
 
@@ -46,15 +75,16 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
 
     // TODO improve performance by crop first, then scale?
     scaleFilter = `scale=${scaledWidth}:${scaledHeight},crop=${targetWidth}:${targetHeight}`;
-  } else { // 'stretch'
+  } else {
+    // 'stretch'
     scaleFilter = `scale=${targetWidth}:${targetHeight}`;
   }
 
   if (verbose) console.log(scaleFilter);
 
-  let ptsFilter = '';
+  let ptsFilter = "";
   if (speedFactor !== 1) {
-    if (verbose) console.log('speedFactor', speedFactor);
+    if (verbose) console.log("speedFactor", speedFactor);
     ptsFilter = `setpts=${speedFactor}*PTS,`;
   }
 
@@ -69,40 +99,52 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
 
   // https://forum.unity.com/threads/settings-for-importing-a-video-with-an-alpha-channel.457657/
   const streams = await readFileStreams(path);
-  const firstVideoStream = streams.find((s) => s.codec_type === 'video');
+  const firstVideoStream = streams.find((s) => s.codec_type === "video");
   // https://superuser.com/a/1116905/658247
 
   let inputCodec;
-  if (firstVideoStream?.codec_name === 'vp8') inputCodec = 'libvpx';
-  else if (firstVideoStream?.codec_name === 'vp9') inputCodec = 'libvpx-vp9';
+  if (firstVideoStream?.codec_name === "vp8") inputCodec = "libvpx";
+  else if (firstVideoStream?.codec_name === "vp9") inputCodec = "libvpx-vp9";
 
   // http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
   // Testing: ffmpeg -i 'vid.mov' -t 1 -vcodec rawvideo -pix_fmt rgba -f image2pipe - | ffmpeg -f rawvideo -vcodec rawvideo -pix_fmt rgba -s 2166x1650 -i - -vf format=yuv420p -vcodec libx264 -y out.mp4
   // https://trac.ffmpeg.org/wiki/ChangingFrameRate
   const args = [
-    '-nostdin',
-    ...(inputCodec ? ['-vcodec', inputCodec] : []),
-    ...(cutFrom ? ['-ss', cutFrom.toString()] : []),
-    '-i', path,
-    ...(cutTo ? ['-t', ((cutTo - cutFrom!) * speedFactor!).toString()] : []),
-    '-vf', `${ptsFilter}fps=${framerateStr},${scaleFilter}`,
-    '-map', 'v:0',
-    '-vcodec', 'rawvideo',
-    '-pix_fmt', 'rgba',
-    '-f', 'image2pipe',
-    '-',
+    "-nostdin",
+    ...(inputCodec ? ["-vcodec", inputCodec] : []),
+    ...(cutFrom ? ["-ss", cutFrom.toString()] : []),
+    "-i",
+    path,
+    ...(cutTo ? ["-t", ((cutTo - cutFrom!) * speedFactor!).toString()] : []),
+    "-vf",
+    `${ptsFilter}fps=${framerateStr},${scaleFilter}`,
+    "-map",
+    "v:0",
+    "-vcodec",
+    "rawvideo",
+    "-pix_fmt",
+    "rgba",
+    "-f",
+    "image2pipe",
+    "-",
   ];
 
-  const ps = ffmpeg(args, { encoding: null, buffer: false, stdin: 'ignore', stdout: 'pipe', stderr: process.stderr });
+  const ps = ffmpeg(args, {
+    encoding: null,
+    buffer: false,
+    stdin: "ignore",
+    stdout: "pipe",
+    stderr: process.stderr,
+  });
 
   const stream = ps.stdout!;
 
   let timeout: NodeJS.Timeout;
   let ended = false;
 
-  stream.once('end', () => {
+  stream.once("end", () => {
     clearTimeout(timeout);
-    if (verbose) console.log(path, 'ffmpeg video stream ended');
+    if (verbose) console.log(path, "ffmpeg video stream ended");
     ended = true;
   });
 
@@ -128,16 +170,16 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
       }
 
       if (ended) {
-        console.log(path, 'Tried to read next video frame after ffmpeg video stream ended');
+        console.log(path, "Tried to read next video frame after ffmpeg video stream ended");
         resolve();
         return;
       }
 
       function cleanup() {
         stream.pause();
-        stream.removeListener('data', handleChunk);
-        stream.removeListener('end', resolve);
-        stream.removeListener('error', reject);
+        stream.removeListener("data", handleChunk);
+        stream.removeListener("end", resolve);
+        stream.removeListener("error", reject);
       }
 
       function handleChunk(chunk: Buffer) {
@@ -147,10 +189,10 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
         const out = getNextFrame();
         const restLength = chunk.length - nCopied;
         if (restLength > 0) {
-          if (verbose) console.log('Left over data', nCopied, chunk.length, restLength);
+          if (verbose) console.log("Left over data", nCopied, chunk.length, restLength);
           // make sure the buffer can store all chunk data
           if (chunk.length > buf.length) {
-            if (verbose) console.log('resizing buffer', buf.length, chunk.length);
+            if (verbose) console.log("resizing buffer", buf.length, chunk.length);
             const newBuf = Buffer.allocUnsafe(chunk.length);
             buf.copy(newBuf, 0, 0, length);
             buf = newBuf;
@@ -167,14 +209,14 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
       }
 
       timeout = setTimeout(() => {
-        console.warn('Timeout on read video frame');
+        console.warn("Timeout on read video frame");
         cleanup();
         resolve();
       }, 60000);
 
-      stream.on('data', handleChunk);
-      stream.on('end', resolve);
-      stream.on('error', reject);
+      stream.on("data", handleChunk);
+      stream.on("end", resolve);
+      stream.on("error", reject);
       stream.resume();
     });
 
@@ -182,9 +224,9 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
 
     assert(rgba.length === frameByteSize);
 
-    if (logTimes) console.time('rgbaToFabricImage');
+    if (logTimes) console.time("rgbaToFabricImage");
     const img = await rgbaToFabricImage({ width: targetWidth, height: targetHeight, rgba });
-    if (logTimes) console.timeEnd('rgbaToFabricImage');
+    if (logTimes) console.timeEnd("rgbaToFabricImage");
 
     img.set({
       originX,
@@ -193,9 +235,9 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
 
     let centerOffsetX = 0;
     let centerOffsetY = 0;
-    if (resizeMode === 'contain' || resizeMode === 'contain-blur') {
-      const dirX = originX === 'left' ? 1 : -1;
-      const dirY = originY === 'top' ? 1 : -1;
+    if (resizeMode === "contain" || resizeMode === "contain-blur") {
+      const dirX = originX === "left" ? 1 : -1;
+      const dirY = originY === "top" ? 1 : -1;
       centerOffsetX = (dirX * (requestedWidth - targetWidth)) / 2;
       centerOffsetY = (dirY * (requestedHeight - targetHeight)) / 2;
     }
@@ -205,9 +247,13 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
       top: top + centerOffsetY,
     });
 
-    if (resizeMode === 'contain-blur') {
+    if (resizeMode === "contain-blur") {
       const mutableImg = img.cloneAsImage({});
-      const blurredImg = await blurImage({ mutableImg, width: requestedWidth, height: requestedHeight });
+      const blurredImg = await blurImage({
+        mutableImg,
+        width: requestedWidth,
+        height: requestedHeight,
+      });
       blurredImg.set({
         left,
         top,
@@ -225,7 +271,7 @@ export default defineFrameSource<VideoLayer>('video', async ({ width: canvasWidt
   }
 
   const close = () => {
-    if (verbose) console.log('Close', path);
+    if (verbose) console.log("Close", path);
     ps.cancel();
   };
 

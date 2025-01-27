@@ -1,19 +1,23 @@
 {
   // enableFfmpegLog: true,
-  outPath: './audio2.mp4',
-  width: 200, height: 200,
+  outPath: "./audio2.mp4",
+  width: 200,
+  height: 200,
   defaults: {
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
   clips: [
-    { layers: [{ type: 'video', path: './assets/lofoten.mp4', cutFrom: 1, cutTo: 2 }] },
-    { duration: 15, layers: { type: 'title-background', text: 'Audio track' } },
+    { layers: [{ type: "video", path: "./assets/lofoten.mp4", cutFrom: 1, cutTo: 2 }] },
+    { duration: 15, layers: { type: "title-background", text: "Audio track" } },
   ],
   audioNorm: { enable: true, gaussSize: 3, maxGain: 100 },
   clipsAudioVolume: 50,
   audioTracks: [
-    { path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', cutFrom: 18 },
-    { path: './assets/winxp.mp3', mixVolume: 10, cutFrom: 1, cutTo: 2, start: 2 },
-    { path: './assets/Julen_ribas.m4a', mixVolume: 50, cutTo: 7, start: 5 },
+    {
+      path: "./assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a",
+      cutFrom: 18,
+    },
+    { path: "./assets/winxp.mp3", mixVolume: 10, cutFrom: 1, cutTo: 2, start: 2 },
+    { path: "./assets/Julen_ribas.m4a", mixVolume: 50, cutTo: 7, start: 5 },
   ],
 }

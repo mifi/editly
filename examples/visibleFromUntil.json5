@@ -1,21 +1,37 @@
 {
   // enableFfmpegLog: true,
-  outPath: './visibleFromUntil.mp4',
+  outPath: "./visibleFromUntil.mp4",
   defaults: {
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
   clips: [
-    { duration: 2, layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.4, cutTo: 2 },
-      { type: 'video', path: './assets/dancer1.webm', resizeMode: 'contain', cutFrom: 0, cutTo: 6, start: 0.5, stop: 1 },
-    ] },
-    { duration: 2, layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0.5, cutTo: 3.5 },
-      { type: 'news-title', text: 'Hei', start: 0.5, stop: 1  },
-    ] },
-    { layers: [
-      { type: 'video', path: './assets/lofoten.mp4', cutFrom: 0, cutTo: 4 },
-      { type: 'video', path: './assets/changi.mp4', cutFrom: 0, cutTo: 1, start: 1, stop: 2 },
-    ] },
+    {
+      duration: 2,
+      layers: [
+        { type: "video", path: "./assets/lofoten.mp4", cutFrom: 0.4, cutTo: 2 },
+        {
+          type: "video",
+          path: "./assets/dancer1.webm",
+          resizeMode: "contain",
+          cutFrom: 0,
+          cutTo: 6,
+          start: 0.5,
+          stop: 1,
+        },
+      ],
+    },
+    {
+      duration: 2,
+      layers: [
+        { type: "video", path: "./assets/lofoten.mp4", cutFrom: 0.5, cutTo: 3.5 },
+        { type: "news-title", text: "Hei", start: 0.5, stop: 1 },
+      ],
+    },
+    {
+      layers: [
+        { type: "video", path: "./assets/lofoten.mp4", cutFrom: 0, cutTo: 4 },
+        { type: "video", path: "./assets/changi.mp4", cutFrom: 0, cutTo: 1, start: 1, stop: 2 },
+      ],
+    },
   ],
 }

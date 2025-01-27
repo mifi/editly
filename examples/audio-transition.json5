@@ -1,48 +1,75 @@
 {
   // enableFfmpegLog: true,
-  outPath: './audio-transition.mp4',
+  outPath: "./audio-transition.mp4",
   keepSourceAudio: true,
   defaults: {
     duration: 3,
-    transition: { duration: 1, name: 'directional' },
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    transition: { duration: 1, name: "directional" },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
   clips: [
-    { layers: [
-      { type: 'title-background', text: 'Default transition' },
-      { type: 'audio', path: './assets/sample1.m4a' }
-    ] },
-    { transition: { duration: 0.2 }, layers: [
-      { type: 'title-background', text: 'Fast transition' },
-      { type: 'audio', path: './assets/sample2.m4a' }
-    ] },
-    { transition: { duration: 0 }, layers: [
-      { type: 'title-background', text: 'No transition' },
-      { type: 'audio', path: './assets/sample1.m4a' }
-    ] },
-    { transition: { audioInCurve: 'exp', audioOutCurve: 'exp' }, layers: [
-      { type: 'title-background', text: 'Exp curve' },
-      { type: 'audio', path: './assets/sample2.m4a' }
-    ] },
-    { transition: { name: 'dummy' }, layers: [
-      { type: 'title-background', text: 'Dummy' },
-      { type: 'audio', path: './assets/sample1.m4a' }
-    ] },
-    { transition: { duration: 2 }, layers: [
-      { type: 'title-background', text: 'Too short' },
-      { type: 'audio', path: './assets/sample2.m4a' }
-    ] },
-    { duration: 1, transition: { duration: 2 }, layers: [
-      { type: 'title-background', text: 'Too short' },
-      { type: 'audio', path: './assets/sample2.m4a' }
-    ] },
-    { duration: 1, transition: { duration: 2 }, layers: [
-      { type: 'title-background', text: 'Too short' },
-      { type: 'audio', path: './assets/sample2.m4a' }
-    ] },
-    { layers: [
-      { type: 'title-background', text: 'THE END' },
-      { type: 'audio', path: './assets/sample2.m4a' }
-    ] },
+    {
+      layers: [
+        { type: "title-background", text: "Default transition" },
+        { type: "audio", path: "./assets/sample1.m4a" },
+      ],
+    },
+    {
+      transition: { duration: 0.2 },
+      layers: [
+        { type: "title-background", text: "Fast transition" },
+        { type: "audio", path: "./assets/sample2.m4a" },
+      ],
+    },
+    {
+      transition: { duration: 0 },
+      layers: [
+        { type: "title-background", text: "No transition" },
+        { type: "audio", path: "./assets/sample1.m4a" },
+      ],
+    },
+    {
+      transition: { audioInCurve: "exp", audioOutCurve: "exp" },
+      layers: [
+        { type: "title-background", text: "Exp curve" },
+        { type: "audio", path: "./assets/sample2.m4a" },
+      ],
+    },
+    {
+      transition: { name: "dummy" },
+      layers: [
+        { type: "title-background", text: "Dummy" },
+        { type: "audio", path: "./assets/sample1.m4a" },
+      ],
+    },
+    {
+      transition: { duration: 2 },
+      layers: [
+        { type: "title-background", text: "Too short" },
+        { type: "audio", path: "./assets/sample2.m4a" },
+      ],
+    },
+    {
+      duration: 1,
+      transition: { duration: 2 },
+      layers: [
+        { type: "title-background", text: "Too short" },
+        { type: "audio", path: "./assets/sample2.m4a" },
+      ],
+    },
+    {
+      duration: 1,
+      transition: { duration: 2 },
+      layers: [
+        { type: "title-background", text: "Too short" },
+        { type: "audio", path: "./assets/sample2.m4a" },
+      ],
+    },
+    {
+      layers: [
+        { type: "title-background", text: "THE END" },
+        { type: "audio", path: "./assets/sample2.m4a" },
+      ],
+    },
   ],
 }

@@ -1,26 +1,29 @@
-import type { BaseLayer, OptionalPromise } from "../types.js";
-import type { DebugOptions } from "../configuration.js";
 import type { StaticCanvas } from "fabric/node";
+import type { DebugOptions } from "../configuration.js";
+import type { BaseLayer, OptionalPromise } from "../types.js";
 
 /**
  * A public API for defining new frame sources.
  */
-export function defineFrameSource<T extends BaseLayer>(type: T["type"], setup: FrameSourceSetupFunction<T>): FrameSourceFactory<T> {
+export function defineFrameSource<T extends BaseLayer>(
+  type: T["type"],
+  setup: FrameSourceSetupFunction<T>,
+): FrameSourceFactory<T> {
   return {
     type,
     async setup(options: CreateFrameSourceOptions<T>) {
       return new FrameSource<T>(options, await setup(options));
-    }
-  }
+    },
+  };
 }
 
 export type CreateFrameSourceOptions<T> = DebugOptions & {
-  width: number,
-  height: number,
-  duration: number,
-  channels: number,
-  framerateStr: string,
-  params: T,
+  width: number;
+  height: number;
+  duration: number;
+  channels: number;
+  framerateStr: string;
+  params: T;
 };
 
 export interface FrameSourceFactory<T extends BaseLayer> {
@@ -29,11 +32,17 @@ export interface FrameSourceFactory<T extends BaseLayer> {
 }
 
 export interface FrameSourceImplementation {
-  readNextFrame(progress: number, canvas: StaticCanvas, offsetTime: number): OptionalPromise<Buffer | void>;
+  readNextFrame(
+    progress: number,
+    canvas: StaticCanvas,
+    offsetTime: number,
+  ): OptionalPromise<Buffer | void>;
   close?(): OptionalPromise<void | undefined>;
 }
 
-export type FrameSourceSetupFunction<T> = (fn: CreateFrameSourceOptions<T>) => Promise<FrameSourceImplementation>;
+export type FrameSourceSetupFunction<T> = (
+  fn: CreateFrameSourceOptions<T>,
+) => Promise<FrameSourceImplementation>;
 
 export class FrameSource<T extends BaseLayer> {
   options: CreateFrameSourceOptions<T>;

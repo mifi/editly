@@ -63,7 +63,6 @@ git clone https://github.com/mifi/editly-assets.git assets
 - [audio1.json5](https://github.com/mifi/editly/blob/master/examples/audio1.json5)
 - [audio2.json5](https://github.com/mifi/editly/blob/master/examples/audio2.json5)
 
-
 ## Custom HTML5 canvas Javascript
 
 ![](https://github.com/mifi/gifs/raw/master/customCanvas.gif)

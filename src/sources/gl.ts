@@ -1,12 +1,12 @@
-import GL from 'gl';
-import createShader from 'gl-shader';
-import { readFile } from 'node:fs/promises';
-import type { GlLayer } from '../types.js';
-import { defineFrameSource } from '../api/index.js';
+import GL from "gl";
+import createShader from "gl-shader";
+import { readFile } from "node:fs/promises";
+import { defineFrameSource } from "../api/index.js";
+import type { GlLayer } from "../types.js";
 
 // I have no idea what I'm doing but it works ¯\_(ツ)_/¯
 
-export default defineFrameSource<GlLayer>('gl', async ({ width, height, channels, params }) => {
+export default defineFrameSource<GlLayer>("gl", async ({ width, height, channels, params }) => {
   const gl = GL(width, height);
 
   const defaultVertexSrc = `
@@ -20,7 +20,7 @@ export default defineFrameSource<GlLayer>('gl', async ({ width, height, channels
     fragmentPath,
     vertexSrc: vertexSrcIn,
     fragmentSrc: fragmentSrcIn,
-    speed = 1
+    speed = 1,
   } = params;
 
   let fragmentSrc = fragmentSrcIn;
@@ -31,7 +31,7 @@ export default defineFrameSource<GlLayer>('gl', async ({ width, height, channels
 
   if (!vertexSrc) vertexSrc = defaultVertexSrc;
 
-  const shader = createShader(gl, vertexSrc, fragmentSrc ?? '');
+  const shader = createShader(gl, vertexSrc, fragmentSrc ?? "");
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   // https://blog.mayflower.de/4584-Playing-around-with-pixel-shaders-in-WebGL.html
@@ -63,6 +63,6 @@ export default defineFrameSource<GlLayer>('gl', async ({ width, height, channels
   }
 
   return {
-    readNextFrame
+    readNextFrame,
   };
 });

@@ -1,8 +1,8 @@
 // TODO[ts]: Move these elsewhere
 
-import type * as Fabric from 'fabric/node';
-import type { Canvas } from "canvas"
-import { ConfigurationOptions } from './configuration.js';
+import type { Canvas } from "canvas";
+import type * as Fabric from "fabric/node";
+import { ConfigurationOptions } from "./configuration.js";
 
 /** Little utility */
 export type OptionalPromise<T> = Promise<T> | T;
@@ -22,17 +22,12 @@ export type OriginY = Fabric.TOriginY;
  * @see [Example 'image.json5']{@link https://github.com/mifi/editly/blob/master/examples/image.json5}
  * @see [Example 'videos.json5']{@link https://github.com/mifi/editly/blob/master/examples/videos.json5}
  */
-export type ResizeMode =
-  'contain' |
-  'contain-blur' |
-  'cover' |
-  'stretch';
+export type ResizeMode = "contain" | "contain-blur" | "cover" | "stretch";
 
 /**
  * An object, where `{ x: 0, y: 0 }` is the upper left corner of the screen and `{ x: 1, y: 1 }` is the lower right corner.
  */
 export interface PositionObject {
-
   /**
    * X-position relative to video width.
    */
@@ -52,7 +47,6 @@ export interface PositionObject {
    * Y-anchor position of the object.
    */
   originY?: OriginY;
-
 }
 
 /**
@@ -62,71 +56,69 @@ export interface PositionObject {
  * @see [Example 'position.json5']{@link https://github.com/mifi/editly/blob/master/examples/position.json5}
  */
 export type Position =
-  'top' |
-  'top-left' |
-  'top-right' |
-  'center' |
-  'center-left' |
-  'center-right' |
-  'bottom' |
-  'bottom-left' |
-  'bottom-right' |
-  PositionObject;
+  | "top"
+  | "top-left"
+  | "top-right"
+  | "center"
+  | "center-left"
+  | "center-right"
+  | "bottom"
+  | "bottom-left"
+  | "bottom-right"
+  | PositionObject;
 
 /**
  * @see [Curve types]{@link https://trac.ffmpeg.org/wiki/AfadeCurves}
  */
 export type CurveType =
-  'tri' |
-  'qsin' |
-  'hsin' |
-  'esin' |
-  'log' |
-  'ipar' |
-  'qua' |
-  'cub' |
-  'squ' |
-  'cbr' |
-  'par' |
-  'exp' |
-  'iqsin' |
-  'ihsin' |
-  'dese' |
-  'desi' |
-  'losi' |
-  'nofade' |
-  string;
+  | "tri"
+  | "qsin"
+  | "hsin"
+  | "esin"
+  | "log"
+  | "ipar"
+  | "qua"
+  | "cub"
+  | "squ"
+  | "cbr"
+  | "par"
+  | "exp"
+  | "iqsin"
+  | "ihsin"
+  | "dese"
+  | "desi"
+  | "losi"
+  | "nofade"
+  | string;
 
 /**
  * @see [Transition types]{@link https://github.com/mifi/editly#transition-types}
  */
 export type TransitionType =
-  'directional-left' |
-  'directional-right' |
-  'directional-up' |
-  'directional-down' |
-  'random' |
-  'dummy' |
-  string;
+  | "directional-left"
+  | "directional-right"
+  | "directional-up"
+  | "directional-down"
+  | "random"
+  | "dummy"
+  | string;
 
 /**
  * WARNING: Undocumented feature!
  */
 export type GLTextureLike = {
-  bind: (unit: number) => number,
-  shape: [number, number],
+  bind: (unit: number) => number;
+  shape: [number, number];
 };
 
 /**
  * WARNING: Undocumented feature!
  */
 export interface TransitionParams {
-
   /**
    * WARNING: Undocumented feature!
    */
   [key: string]: number | boolean | GLTextureLike | number[];
-
 }
 
 export interface Transition {
@@ -168,14 +160,12 @@ export interface Transition {
    * WARNING: Undocumented feature!
    */
   params?: TransitionParams;
-
 }
 
 /**
  * @see [Arbitrary audio tracks]{@link https://github.com/mifi/editly#arbitrary-audio-tracks}
  */
 export interface AudioTrack {
-
   /**
    * File path for this track.
    */
@@ -206,19 +196,17 @@ export interface AudioTrack {
    * @default 0
    */
   start?: number;
-
 }
 
 /**
  * @see [Ken Burns parameters]{@link https://github.com/mifi/editly#ken-burns-parameters}
  */
 export interface KenBurns {
-
   /**
    * Zoom direction for Ken Burns effect.
    * Use `null` to disable.
    */
-  zoomDirection?: 'in' | 'out' | 'left' | `right` | null;
+  zoomDirection?: "in" | "out" | "left" | `right` | null;
 
   /**
    * Zoom amount for Ken Burns effect.
@@ -226,32 +214,30 @@ export interface KenBurns {
    * @default 0.1
    */
   zoomAmount?: number;
-
 }
 
 export type LayerType =
-  'video' |
-  'audio' |
-  'detached-audio' |
-  'image' |
-  'image-overlay' |
-  'title' |
-  'subtitle' |
-  'title-background' |
-  'news-title' |
-  'slide-in-text' |
-  'fill-color' |
-  'pause' |
-  'radial-gradient' |
-  'linear-gradient' |
-  'rainbow-colors' |
-  'canvas' |
-  'fabric' |
-  'gl' |
-  'editly-banner';
+  | "video"
+  | "audio"
+  | "detached-audio"
+  | "image"
+  | "image-overlay"
+  | "title"
+  | "subtitle"
+  | "title-background"
+  | "news-title"
+  | "slide-in-text"
+  | "fill-color"
+  | "pause"
+  | "radial-gradient"
+  | "linear-gradient"
+  | "rainbow-colors"
+  | "canvas"
+  | "fabric"
+  | "gl"
+  | "editly-banner";
 
 export interface BaseLayer {
-
   /**
    * Layer type.
    */
@@ -303,7 +289,7 @@ export interface TextLayer extends BaseLayer {
 export interface VideoPostProcessingFunctionArgs {
   canvas: Fabric.StaticCanvas;
   image: Fabric.FabricImage;
-  fabric: typeof Fabric,
+  fabric: typeof Fabric;
   progress: number;
   time: number;
 }
@@ -314,11 +300,10 @@ export interface VideoPostProcessingFunctionArgs {
  * If the layer has audio, it will be kept (and mixed with other audio layers if present).
  */
 export interface VideoLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'video';
+  type: "video";
 
   /**
    * Path to video file.
@@ -417,11 +402,10 @@ export interface VideoLayer extends BaseLayer {
  * The slow down/speed-up operation is limited to values between `0.5x` and `100x`.
  */
 export interface AudioLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'audio';
+  type: "audio";
 
   /**
    * Path to audio file.
@@ -447,7 +431,6 @@ export interface AudioLayer extends BaseLayer {
    * @default 1
    */
   mixVolume?: number | string;
-
 }
 
 /**
@@ -458,23 +441,20 @@ export interface AudioLayer extends BaseLayer {
  * except `start` time is relative to the clip's start.
  */
 export interface DetachedAudioLayer extends BaseLayer, AudioTrack {
-
   /**
    * Layer type.
    */
-  type: 'detached-audio';
-
+  type: "detached-audio";
 }
 
 /**
  * Full screen image.
  */
 export interface ImageLayer extends BaseLayer, KenBurns {
-
   /**
    * Layer type.
    */
-  type: 'image';
+  type: "image";
 
   /**
    * Path to image file.
@@ -490,18 +470,16 @@ export interface ImageLayer extends BaseLayer, KenBurns {
    * WARNING: Undocumented feature!
    */
   duration?: number;
-
 }
 
 /**
  * Image overlay with a custom position and size on the screen.
  */
 export interface ImageOverlayLayer extends BaseLayer, KenBurns {
-
   /**
    * Layer type.
    */
-  type: 'image-overlay';
+  type: "image-overlay";
 
   /**
    * Path to image file.
@@ -522,29 +500,25 @@ export interface ImageOverlayLayer extends BaseLayer, KenBurns {
    * Height (from 0 to 1) where 1 is screen height.
    */
   height?: number;
-
 }
 
 export interface TitleLayer extends TextLayer, KenBurns {
-
   /**
    * Layer type.
    */
-  type: 'title';
+  type: "title";
 
   /**
    * Position.
    */
   position?: Position;
-
 }
 
 export interface SubtitleLayer extends TextLayer {
-
   /**
    * Layer type.
    */
-  type: 'subtitle';
+  type: "subtitle";
 
   /**
    * WARNING: Undocumented feature!
@@ -559,26 +533,23 @@ export interface SubtitleLayer extends TextLayer {
  * Title with background.
  */
 export interface TitleBackgroundLayer extends TextLayer {
-
   /**
    * Layer type.
    */
-  type: 'title-background';
+  type: "title-background";
 
   /**
    * Background layer.
    * Defaults to random background.
    */
   background?: BackgroundLayer;
-
 }
 
 export interface NewsTitleLayer extends TextLayer {
-
   /**
    * Layer type.
    */
-  type: 'news-title';
+  type: "news-title";
 
   /**
    * Background color.
@@ -596,11 +567,10 @@ export interface NewsTitleLayer extends TextLayer {
 }
 
 export interface SlideInTextLayer extends TextLayer {
-
   /**
    * Layer type.
    */
-  type: 'slide-in-text';
+  type: "slide-in-text";
 
   /**
    * Font size.
@@ -622,76 +592,65 @@ export interface SlideInTextLayer extends TextLayer {
    * Position.
    */
   position?: Position;
-
 }
 
 export interface FillColorLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'fill-color';
+  type: "fill-color";
 
   /**
    * Color to fill background.
    * Defaults to random color.
    */
   color?: string;
-
 }
 
 export interface PauseLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'pause';
+  type: "pause";
 
   /**
    * Color to fill background.
    * Defaults to random color.
    */
   color?: string;
-
 }
 
 export interface RadialGradientLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'radial-gradient';
+  type: "radial-gradient";
 
   /**
    * Array of two colors.
    * Defaults to random colors.
    */
   colors?: [string, string];
-
 }
 
 export interface LinearGradientLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'linear-gradient';
+  type: "linear-gradient";
 
   /**
    * Array of two colors.
    * Defaults to random colors.
    */
   colors?: [string, string];
-
 }
 
 export interface RainbowColorsLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'rainbow-colors';
-
+  type: "rainbow-colors";
 }
 
 export interface CustomFabricFunctionCallbacks {
@@ -710,20 +669,20 @@ export interface CustomCanvasFunctionCallbacks {
   onClose?: () => OptionalPromise<void>;
 }
 
-export type CustomCanvasFunction = (args: CustomCanvasFunctionArgs) => OptionalPromise<CustomCanvasFunctionCallbacks>;
+export type CustomCanvasFunction = (
+  args: CustomCanvasFunctionArgs,
+) => OptionalPromise<CustomCanvasFunctionCallbacks>;
 
 export interface CanvasLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'canvas';
+  type: "canvas";
 
   /**
    * Custom JavaScript function.
    */
   func: CustomCanvasFunction;
-
 }
 
 export interface CustomFabricFunctionArgs {
@@ -733,28 +692,27 @@ export interface CustomFabricFunctionArgs {
   params: unknown;
 }
 
-export type CustomFabricFunction = (args: CustomFabricFunctionArgs) => OptionalPromise<CustomFabricFunctionCallbacks>;
+export type CustomFabricFunction = (
+  args: CustomFabricFunctionArgs,
+) => OptionalPromise<CustomFabricFunctionCallbacks>;
 
 export interface FabricLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'fabric';
+  type: "fabric";
 
   /**
    * Custom JavaScript function.
    */
   func: CustomFabricFunction;
-
 }
 
 export interface GlLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'gl';
+  type: "gl";
 
   /**
    * Fragment path (`.frag` file)
@@ -779,11 +737,10 @@ export interface GlLayer extends BaseLayer {
  * WARNING: Undocumented feature!
  */
 export interface EditlyBannerLayer extends BaseLayer {
-
   /**
    * Layer type.
    */
-  type: 'editly-banner';
+  type: "editly-banner";
 
   /**
    * Set font (`.ttf`).
@@ -797,36 +754,32 @@ export interface EditlyBannerLayer extends BaseLayer {
  * @see [Example 'commonFeatures.json5']{@link https://github.com/mifi/editly/blob/master/examples/commonFeatures.json5}
  */
 export type Layer =
-  VideoLayer |
-  AudioLayer |
-  DetachedAudioLayer |
-  ImageLayer |
-  ImageOverlayLayer |
-  TitleLayer |
-  SubtitleLayer |
-  TitleBackgroundLayer |
-  NewsTitleLayer |
-  SlideInTextLayer |
-  FillColorLayer |
-  PauseLayer |
-  RadialGradientLayer |
-  LinearGradientLayer |
-  RainbowColorsLayer |
-  CanvasLayer |
-  FabricLayer |
-  GlLayer |
-  EditlyBannerLayer;
+  | VideoLayer
+  | AudioLayer
+  | DetachedAudioLayer
+  | ImageLayer
+  | ImageOverlayLayer
+  | TitleLayer
+  | SubtitleLayer
+  | TitleBackgroundLayer
+  | NewsTitleLayer
+  | SlideInTextLayer
+  | FillColorLayer
+  | PauseLayer
+  | RadialGradientLayer
+  | LinearGradientLayer
+  | RainbowColorsLayer
+  | CanvasLayer
+  | FabricLayer
+  | GlLayer
+  | EditlyBannerLayer;
 
 /**
  * Special layers that can be used f.e. in the 'title-background' layer.
  */
-export type BackgroundLayer =
-  RadialGradientLayer |
-  LinearGradientLayer |
-  FillColorLayer;
+export type BackgroundLayer = RadialGradientLayer | LinearGradientLayer | FillColorLayer;
 
 export interface Clip {
-
   /**
    * List of layers within the current clip that will be overlaid in their natural order (final layer on top).
    */
@@ -845,11 +798,9 @@ export interface Clip {
    * Set to `null` to disable transitions.
    */
   transition?: Transition | null;
-
 }
 
 export interface DefaultLayerOptions {
-
   /**
    * Set default font (`.ttf`).
    * Defaults to system font.
@@ -861,20 +812,16 @@ export interface DefaultLayerOptions {
    */
   // FIXME[ts]: Define a type for this
   [key: string]: unknown;
-
 }
 
 export type DefaultLayerTypeOptions = {
-
   /**
    * Set any layer parameter that all layers of the same type (specified in key) will inherit.
    */
-  [P in LayerType]?: Partial<Omit<Extract<Layer, { type: P }>, 'type'>>;
-
-}
+  [P in LayerType]?: Partial<Omit<Extract<Layer, { type: P }>, "type">>;
+};
 
 export interface DefaultOptions {
-
   /**
    * Set default clip duration for clips that don't have an own duration (in seconds).
    *
@@ -897,7 +844,6 @@ export interface DefaultOptions {
    * Set to `null` to disable transitions.
    */
   transition?: Transition | null;
-
 }
 
 /**
@@ -908,7 +854,6 @@ export interface DefaultOptions {
  * @see [Example of audio ducking]{@link https://github.com/mifi/editly/blob/master/examples/audio2.json5}
  */
 export interface AudioNormalizationOptions {
-
   /**
    * Enable audio normalization?
    *
@@ -932,11 +877,9 @@ export interface AudioNormalizationOptions {
    * @see [Audio normalization]{@link https://github.com/mifi/editly#audio-normalization}
    */
   maxGain?: number;
-
 }
 
 export interface RenderSingleFrameConfig extends ConfigurationOptions {
-
   /**
    * Output path (`.mp4` or `.mkv`, can also be a `.gif`).
    */
@@ -946,7 +889,6 @@ export interface RenderSingleFrameConfig extends ConfigurationOptions {
    * Timestamp to render.
    */
   time?: number;
-
 }
 
 // Internal types

@@ -1,11 +1,11 @@
 {
-  outPath: './kenBurns.mp4',
+  outPath: "./kenBurns.mp4",
   defaults: {
-    transition: { name: 'fade' },
+    transition: { name: "fade" },
   },
   clips: [
-    { duration: 3, layers: [{ type: 'image', path: './assets/img2.jpg', zoomDirection: 'out' }] },
-    { duration: 3, layers: [{ type: 'image', path: './assets/img3.jpg', zoomDirection: 'in' }] },
-    { duration: 3, layers: [{ type: 'image', path: './assets/img1.jpg', zoomDirection: null }] },
+    { duration: 3, layers: [{ type: "image", path: "./assets/img2.jpg", zoomDirection: "out" }] },
+    { duration: 3, layers: [{ type: "image", path: "./assets/img3.jpg", zoomDirection: "in" }] },
+    { duration: 3, layers: [{ type: "image", path: "./assets/img1.jpg", zoomDirection: null }] },
   ],
 }

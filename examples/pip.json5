@@ -1,15 +1,40 @@
 {
-  outPath: './pip.mp4',
-  width: 1280, height: 720, fps: 30,
+  outPath: "./pip.mp4",
+  width: 1280,
+  height: 720,
+  fps: 30,
   defaults: {
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
   clips: [
-    { duration: 4, layers: [
-      { type: 'rainbow-colors' },
-      { type: 'video', path: './assets/tungestolen.mp4', resizeMode: 'cover', width: 0.3, height: 0.4, top: 0.05, left: 0.95, originY: 'top', originX: 'right' },
-      { type: 'video', path: './assets/tungestolen.mp4', resizeMode: 'cover', width: 0.4, height: 0.2, top: 0.05, left: 0.05, originY: 'top', originX: 'left' },
-      { type: 'title', position: 'bottom', text: 'Picture-in-Picture' }
-    ] },
+    {
+      duration: 4,
+      layers: [
+        { type: "rainbow-colors" },
+        {
+          type: "video",
+          path: "./assets/tungestolen.mp4",
+          resizeMode: "cover",
+          width: 0.3,
+          height: 0.4,
+          top: 0.05,
+          left: 0.95,
+          originY: "top",
+          originX: "right",
+        },
+        {
+          type: "video",
+          path: "./assets/tungestolen.mp4",
+          resizeMode: "cover",
+          width: 0.4,
+          height: 0.2,
+          top: 0.05,
+          left: 0.05,
+          originY: "top",
+          originX: "left",
+        },
+        { type: "title", position: "bottom", text: "Picture-in-Picture" },
+      ],
+    },
   ],
 }

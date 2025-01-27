@@ -1,14 +1,13 @@
 {
-  outPath: './audioLoop.mp4',
-  width: 200, height: 200,
-  audioFilePath: './assets/winxp.mp3',
+  outPath: "./audioLoop.mp4",
+  width: 200,
+  height: 200,
+  audioFilePath: "./assets/winxp.mp3",
   loopAudio: true,
   // Should properly cut off and not crash with EPIPE if loopAudio=false and audio duration is shorter than total duration
   // loopAudio: false,
   defaults: {
-    layer: { fontPath: './assets/Patua_One/PatuaOne-Regular.ttf' },
+    layer: { fontPath: "./assets/Patua_One/PatuaOne-Regular.ttf" },
   },
-  clips: [
-    { duration: 10, layers: [{ type: 'title-background', text: 'Looping audio!' }] },
-  ],
+  clips: [{ duration: 10, layers: [{ type: "title-background", text: "Looping audio!" }] }],
 }

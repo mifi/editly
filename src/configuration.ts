@@ -1,20 +1,20 @@
-import { AudioNormalizationOptions, AudioTrack, Clip, DefaultOptions } from "./types.js";
-import { dirname, join } from "path";
 import assert from "assert";
+import { merge } from "lodash-es";
 import { nanoid } from "nanoid";
-import { merge } from "lodash-es"
+import { dirname, join } from "path";
 import { expandLayerAliases } from "./sources/index.js";
+import type { AudioNormalizationOptions, AudioTrack, Clip, DefaultOptions } from "./types.js";
 
 export type DebugOptions = {
   verbose?: boolean;
   logTimes?: boolean;
-}
+};
 
 export type FfmpegConfig = {
   ffmpegPath?: string;
   ffprobePath?: string;
   enableFfmpegLog?: boolean;
-}
+};
 
 export type ConfigurationOptions = {
   /**
@@ -141,17 +141,21 @@ export type ConfigurationOptions = {
    * WARNING: Undocumented feature!
    */
   keepTmp?: boolean;
-} & DebugOptions & FfmpegConfig;
+} & DebugOptions &
+  FfmpegConfig;
 
-export type LayerSourceConfig = Pick<Configuration, "verbose" | "allowRemoteRequests" | "logTimes" | "tmpDir">;
+export type LayerSourceConfig = Pick<
+  Configuration,
+  "verbose" | "allowRemoteRequests" | "logTimes" | "tmpDir"
+>;
 
 const globalDefaults = {
   duration: 4,
   transition: {
     duration: 0.5,
-    name: 'random',
-    audioOutCurve: 'tri',
-    audioInCurve: 'tri',
+    name: "random",
+    audioOutCurve: "tri",
+    audioInCurve: "tri",
   },
 };
 
@@ -188,52 +192,66 @@ export class Configuration {
   ffprobePath: string;
 
   constructor(input: ConfigurationOptions) {
-    assert(input.outPath, 'Please provide an output path');
-    assert(Array.isArray(input.clips) && input.clips.length > 0, 'Please provide at least 1 clip');
-    assert(!input.customOutputArgs || Array.isArray(input.customOutputArgs), 'customOutputArgs must be an array of arguments');
+    assert(input.outPath, "Please provide an output path");
+    assert(Array.isArray(input.clips) && input.clips.length > 0, "Please provide at least 1 clip");
+    assert(
+      !input.customOutputArgs || Array.isArray(input.customOutputArgs),
+      "customOutputArgs must be an array of arguments",
+    );
 
     this.outPath = input.outPath;
-    this.width = input.width
-    this.height = input.height
-    this.fps = input.fps
-    this.audioFilePath = input.audioFilePath
-    this.backgroundAudioVolume = input.backgroundAudioVolume
-    this.loopAudio = input.loopAudio
-    this.clipsAudioVolume = input.clipsAudioVolume ?? 1
-    this.audioTracks = input.audioTracks ?? []
-    this.keepSourceAudio = input.keepSourceAudio
-    this.allowRemoteRequests = input.allowRemoteRequests ?? false
-    this.audioNorm = input.audioNorm
-    this.outputVolume = input.outputVolume
-    this.customOutputArgs = input.customOutputArgs
+    this.width = input.width;
+    this.height = input.height;
+    this.fps = input.fps;
+    this.audioFilePath = input.audioFilePath;
+    this.backgroundAudioVolume = input.backgroundAudioVolume;
+    this.loopAudio = input.loopAudio;
+    this.clipsAudioVolume = input.clipsAudioVolume ?? 1;
+    this.audioTracks = input.audioTracks ?? [];
+    this.keepSourceAudio = input.keepSourceAudio;
+    this.allowRemoteRequests = input.allowRemoteRequests ?? false;
+    this.audioNorm = input.audioNorm;
+    this.outputVolume = input.outputVolume;
+    this.customOutputArgs = input.customOutputArgs;
     this.defaults = merge({}, globalDefaults, input.defaults);
 
-    this.clips = input.clips.map(clip => {
-      const { transition, duration } = merge({}, this.defaults, clip)
-      let { layers } = clip
+    this.clips = input.clips.map((clip) => {
+      const { transition, duration } = merge({}, this.defaults, clip);
+      let { layers } = clip;
 
       if (layers && !Array.isArray(layers)) layers = [layers]; // Allow single layer for convenience
-      assert(Array.isArray(layers) && layers.length > 0, 'clip.layers must be an array with at least one layer.');
-      assert(transition == null || typeof transition === 'object', 'Transition must be an object');
+      assert(
+        Array.isArray(layers) && layers.length > 0,
+        "clip.layers must be an array with at least one layer.",
+      );
+      assert(transition == null || typeof transition === "object", "Transition must be an object");
 
-      layers = layers.map(expandLayerAliases).flat().map(layer => {
-        assert(layer.type, 'All "layers" must have a type');
-        return merge({}, this.defaults.layer ?? {}, this.defaults.layerType?.[layer.type] ?? {}, layer)
-      });
+      layers = layers
+        .map(expandLayerAliases)
+        .flat()
+        .map((layer) => {
+          assert(layer.type, 'All "layers" must have a type');
+          return merge(
+            {},
+            this.defaults.layer ?? {},
+            this.defaults.layerType?.[layer.type] ?? {},
+            layer,
+          );
+        });
 
       return { transition, duration, layers };
     });
 
     // Testing options:
-    this.verbose = input.verbose ?? false
-    this.enableFfmpegLog = input.enableFfmpegLog ?? this.verbose
-    this.logTimes = input.logTimes ?? false
-    this.keepTmp = input.keepTmp ?? false
-    this.fast = input.fast ?? false
+    this.verbose = input.verbose ?? false;
+    this.enableFfmpegLog = input.enableFfmpegLog ?? this.verbose;
+    this.logTimes = input.logTimes ?? false;
+    this.keepTmp = input.keepTmp ?? false;
+    this.fast = input.fast ?? false;
 
-    this.defaults = input.defaults ?? {}
-    this.ffmpegPath = input.ffmpegPath ?? 'ffmpeg'
-    this.ffprobePath = input.ffprobePath ?? 'ffprobe'
+    this.defaults = input.defaults ?? {};
+    this.ffmpegPath = input.ffmpegPath ?? "ffmpeg";
+    this.ffprobePath = input.ffprobePath ?? "ffprobe";
 
     this.tmpDir = join(this.outDir, `editly-tmp-${nanoid()}`);
   }
@@ -243,6 +261,6 @@ export class Configuration {
   }
 
   get isGif() {
-    return this.outPath.toLowerCase().endsWith('.gif');
+    return this.outPath.toLowerCase().endsWith(".gif");
   }
 }

@@ -1,13 +1,22 @@
 {
   fast: true,
-  outPath: './transitionEasing.mp4',
+  outPath: "./transitionEasing.mp4",
   defaults: {
     duration: 2,
   },
   clips: [
-    { transition: { name: 'directional', duration: 0.5 }, layers: [{ type: 'video', path: 'assets/changi.mp4', cutTo: 2 }] },
-    { transition: { name: 'directional', duration: 0.5, params: { direction: [1, 0] } }, layers: [{ type: 'video', path: 'assets/lofoten.mp4', cutTo: 2 }] },
-    { transition: { name: 'directional', duration: 0.5, easing: null }, layers: [{ type: 'video', path: 'assets/lofoten.mp4', cutTo: 2 }] },
-    { layers: [{ type: 'pause' }] },
+    {
+      transition: { name: "directional", duration: 0.5 },
+      layers: [{ type: "video", path: "assets/changi.mp4", cutTo: 2 }],
+    },
+    {
+      transition: { name: "directional", duration: 0.5, params: { direction: [1, 0] } },
+      layers: [{ type: "video", path: "assets/lofoten.mp4", cutTo: 2 }],
+    },
+    {
+      transition: { name: "directional", duration: 0.5, easing: null },
+      layers: [{ type: "video", path: "assets/lofoten.mp4", cutTo: 2 }],
+    },
+    { layers: [{ type: "pause" }] },
   ],
 }

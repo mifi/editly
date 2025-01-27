@@ -1,7 +1,15 @@
 {
-  outPath: './timeoutTest.mp4',
+  outPath: "./timeoutTest.mp4",
   clips: [
-    { duration: 1.5, transition: { name: 'crosszoom', duration: 0.3 }, layers: [{ type: 'video', path: './assets/tungestolen.mp4', cutTo: 58 }] },
-    { duration: 3, transition: { name: 'fade' }, layers: [{ type: 'video', path: './assets/tungestolen.mp4', cutFrom: 0 }] },
+    {
+      duration: 1.5,
+      transition: { name: "crosszoom", duration: 0.3 },
+      layers: [{ type: "video", path: "./assets/tungestolen.mp4", cutTo: 58 }],
+    },
+    {
+      duration: 3,
+      transition: { name: "fade" },
+      layers: [{ type: "video", path: "./assets/tungestolen.mp4", cutFrom: 0 }],
+    },
   ],
 }

@@ -1,13 +1,33 @@
 {
   // enableFfmpegLog: true,
-  outPath: './smartFit.mp4',
+  outPath: "./smartFit.mp4",
   defaults: {
     transition: null,
-    layer: { backgroundColor: 'white' },
+    layer: { backgroundColor: "white" },
   },
   clips: [
-    { layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0.4, cutTo: 2 }] },
-    { layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0.4, cutTo: 2, resizeMode: 'contain' }] },
-    { layers: [{ type: 'video', path: './assets/changi.mp4', cutFrom: 0.4, cutTo: 2, resizeMode: 'stretch' }] },
+    { layers: [{ type: "video", path: "./assets/changi.mp4", cutFrom: 0.4, cutTo: 2 }] },
+    {
+      layers: [
+        {
+          type: "video",
+          path: "./assets/changi.mp4",
+          cutFrom: 0.4,
+          cutTo: 2,
+          resizeMode: "contain",
+        },
+      ],
+    },
+    {
+      layers: [
+        {
+          type: "video",
+          path: "./assets/changi.mp4",
+          cutFrom: 0.4,
+          cutTo: 2,
+          resizeMode: "stretch",
+        },
+      ],
+    },
   ],
 }

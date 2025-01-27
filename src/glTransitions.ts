@@ -1,10 +1,10 @@
-import GL from 'gl';
-import ndarray from 'ndarray';
-import createBuffer from 'gl-buffer';
-import glTransitions from 'gl-transitions';
-import glTransition from 'gl-transition';
-import createTexture from 'gl-texture2d';
-import { TransitionParams } from './types.js';
+import GL from "gl";
+import createBuffer from "gl-buffer";
+import createTexture from "gl-texture2d";
+import glTransition from "gl-transition";
+import glTransitions from "gl-transitions";
+import ndarray from "ndarray";
+import { TransitionParams } from "./types.js";
 
 const { default: createTransition } = glTransition;
 
@@ -14,34 +14,47 @@ export type RunTransitionOptions = {
   progress: number;
   transitionName?: string;
   transitionParams?: TransitionParams;
-}
+};
 
-export default ({ width, height, channels }: { width: number, height: number, channels: number }) => {
+export default ({
+  width,
+  height,
+  channels,
+}: {
+  width: number;
+  height: number;
+  channels: number;
+}) => {
   const gl = GL(width, height);
 
   if (!gl) {
-    throw new Error('gl returned null, this probably means that some dependencies are not installed. See README.');
+    throw new Error(
+      "gl returned null, this probably means that some dependencies are not installed. See README.",
+    );
   }
 
-  function runTransitionOnFrame({ fromFrame, toFrame, progress, transitionName, transitionParams = {} }: RunTransitionOptions) {
+  function runTransitionOnFrame({
+    fromFrame,
+    toFrame,
+    progress,
+    transitionName,
+    transitionParams = {},
+  }: RunTransitionOptions) {
     function convertFrame(buf: Buffer) {
       // @see https://github.com/stackgl/gl-texture2d/issues/16
       return ndarray(buf, [width, height, channels], [channels, width * channels, 1]);
     }
 
-    const buffer = createBuffer(
-      gl,
-      [-1, -1, -1, 4, 4, -1],
-      gl.ARRAY_BUFFER,
-      gl.STATIC_DRAW,
-    );
+    const buffer = createBuffer(gl, [-1, -1, -1, 4, 4, -1], gl.ARRAY_BUFFER, gl.STATIC_DRAW);
 
     let transition;
 
     try {
-      const resizeMode = 'stretch';
+      const resizeMode = "stretch";
 
-      const transitionSource = glTransitions.find((t) => t.name.toLowerCase() === transitionName?.toLowerCase());
+      const transitionSource = glTransitions.find(
+        (t) => t.name.toLowerCase() === transitionName?.toLowerCase(),
+      );
 
       transition = createTransition(gl, transitionSource!, { resizeMode });
 
@@ -60,7 +73,14 @@ export default ({ width, height, channels }: { width: number, height: number, ch
       textureTo.magFilter = gl.LINEAR;
 
       buffer.bind();
-      transition.draw(progress, textureFrom, textureTo, gl.drawingBufferWidth, gl.drawingBufferHeight, transitionParams);
+      transition.draw(
+        progress,
+        textureFrom,
+        textureTo,
+        gl.drawingBufferWidth,
+        gl.drawingBufferHeight,
+        transitionParams,
+      );
 
       textureFrom.dispose();
       textureTo.dispose();

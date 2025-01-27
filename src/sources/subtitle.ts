@@ -1,11 +1,18 @@
-import { Rect, Textbox } from 'fabric/node';
-import { easeOutExpo } from '../transitions.js';
-import type { SubtitleLayer } from '../types.js';
-import { defaultFontFamily } from '../util.js';
-import { defineFrameSource } from '../api/index.js';
+import { Rect, Textbox } from "fabric/node";
+import { defineFrameSource } from "../api/index.js";
+import { easeOutExpo } from "../transitions.js";
+import type { SubtitleLayer } from "../types.js";
+import { defaultFontFamily } from "../util.js";
 
-export default defineFrameSource<SubtitleLayer>('subtitle', async ({ width, height, params }) => {
-  const { text, textColor = '#ffffff', backgroundColor = 'rgba(0,0,0,0.3)', fontFamily = defaultFontFamily, delay = 0, speed = 1 } = params;
+export default defineFrameSource<SubtitleLayer>("subtitle", async ({ width, height, params }) => {
+  const {
+    text,
+    textColor = "#ffffff",
+    backgroundColor = "rgba(0,0,0,0.3)",
+    fontFamily = defaultFontFamily,
+    delay = 0,
+    speed = 1,
+  } = params;
 
   return {
     async readNextFrame(progress, canvas) {
@@ -19,11 +26,11 @@ export default defineFrameSource<SubtitleLayer>('subtitle', async ({ width, heig
         fontFamily,
 
         fontSize: min / 20,
-        textAlign: 'left',
+        textAlign: "left",
         width: width - padding * 2,
-        originX: 'center',
-        originY: 'bottom',
-        left: (width / 2) + (-1 + easedProgress) * padding,
+        originX: "center",
+        originY: "bottom",
+        left: width / 2 + (-1 + easedProgress) * padding,
         top: height - padding,
         opacity: easedProgress,
       });
@@ -33,13 +40,13 @@ export default defineFrameSource<SubtitleLayer>('subtitle', async ({ width, heig
         width,
         height: textBox.height + padding * 2,
         top: height,
-        originY: 'bottom',
+        originY: "bottom",
         fill: backgroundColor,
         opacity: easedProgress,
       });
 
       canvas.add(rect);
       canvas.add(textBox);
-    }
-  }
+    },
+  };
 });

@@ -1,10 +1,10 @@
 {
-  outPath: './remote.mp4',
+  outPath: "./remote.mp4",
   allowRemoteRequests: true,
-  audioFilePath: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a',
+  audioFilePath: "./assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a",
   clips: [
-    { layers: [{ type: 'image', path: 'https://picsum.photos/400/400' }] },
-    { layers: [{ type: 'image', path: 'https://picsum.photos/200/400' }] },
-    { layers: [{ type: 'image', path: 'https://picsum.photos/400/200' }] },
+    { layers: [{ type: "image", path: "https://picsum.photos/400/400" }] },
+    { layers: [{ type: "image", path: "https://picsum.photos/200/400" }] },
+    { layers: [{ type: "image", path: "https://picsum.photos/400/200" }] },
   ],
 }

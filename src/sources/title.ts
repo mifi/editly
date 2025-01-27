@@ -1,18 +1,29 @@
-import { Textbox } from 'fabric/node';
-import type { TitleLayer } from '../types.js';
-import { getPositionProps } from '../util.js';
-import { defaultFontFamily, getZoomParams, getTranslationParams } from '../util.js';
-import { defineFrameSource } from '../api//index.js';
+import { Textbox } from "fabric/node";
+import { defineFrameSource } from "../api//index.js";
+import type { TitleLayer } from "../types.js";
+import {
+  defaultFontFamily,
+  getPositionProps,
+  getTranslationParams,
+  getZoomParams,
+} from "../util.js";
 
-export default defineFrameSource<TitleLayer>('title', async ({ width, height, params }) => {
-  const { text, textColor = '#ffffff', fontFamily = defaultFontFamily, position = 'center', zoomDirection = 'in', zoomAmount = 0.2 } = params;
+export default defineFrameSource<TitleLayer>("title", async ({ width, height, params }) => {
+  const {
+    text,
+    textColor = "#ffffff",
+    fontFamily = defaultFontFamily,
+    position = "center",
+    zoomDirection = "in",
+    zoomAmount = 0.2,
+  } = params;
   const fontSize = Math.round(Math.min(width, height) * 0.1);
 
   const textBox = new Textbox(text, {
     fill: textColor,
     fontFamily,
     fontSize,
-    textAlign: 'center',
+    textAlign: "center",
     width: width * 0.8,
   });
 
@@ -36,6 +47,6 @@ export default defineFrameSource<TitleLayer>('title', async ({ width, height, pa
       });
 
       canvas.add(textImage);
-    }
+    },
   };
 });

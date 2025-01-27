@@ -1,11 +1,13 @@
 {
-  outPath: './audio-volume.mp4',
-  width: 200, height: 200,
-  clips: [
-    { duration: 2, layers: [{ type: 'title-background', text: 'Audio output volume' }] },
-  ],
+  outPath: "./audio-volume.mp4",
+  width: 200,
+  height: 200,
+  clips: [{ duration: 2, layers: [{ type: "title-background", text: "Audio output volume" }] }],
   audioTracks: [
-    { path: './assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a', cutFrom: 18 },
+    {
+      path: "./assets/High [NCS Release] - JPB  (No Copyright Music)-R8ZRCXy5vhA.m4a",
+      cutFrom: 18,
+    },
   ],
-  outputVolume: '-10dB',
+  outputVolume: "-10dB",
 }
