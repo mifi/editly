@@ -1,4 +1,5 @@
 import assert from "assert";
+import { ExecaError } from "execa";
 import * as fabric from "fabric/node";
 import { defineFrameSource } from "../api/index.js";
 import { ffmpeg, readFileStreams } from "../ffmpeg.js";
@@ -129,15 +130,27 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
     "-",
   ];
 
+  const controller = new AbortController();
+
   const ps = ffmpeg(args, {
-    encoding: null,
+    encoding: "buffer",
     buffer: false,
     stdin: "ignore",
     stdout: "pipe",
     stderr: process.stderr,
+    // ffmpeg doesn't like to stop, force it
+    killSignal: "SIGKILL",
+    cancelSignal: controller.signal,
+  });
+
+  // Ignore errors if the process is aborted
+  ps.catch((err: ExecaError) => {
+    if (!err.isCanceled) throw err;
+    if (verbose) console.log("ffmpeg process aborted", path);
   });
 
   const stream = ps.stdout!;
+  stream.pause();
 
   let timeout: NodeJS.Timeout;
   let ended = false;
@@ -272,7 +285,7 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
 
   const close = () => {
     if (verbose) console.log("Close", path);
-    ps.cancel();
+    controller.abort();
   };
 
   return {
