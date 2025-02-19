@@ -250,7 +250,6 @@ export class Configuration {
     this.keepTmp = input.keepTmp ?? false;
     this.fast = input.fast ?? false;
 
-    this.defaults = input.defaults ?? {};
     this.ffmpegPath = input.ffmpegPath ?? "ffmpeg";
     this.ffprobePath = input.ffprobePath ?? "ffprobe";
 
