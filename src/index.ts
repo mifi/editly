@@ -1,5 +1,5 @@
 import assert from "assert";
-import { ExecaChildProcess } from "execa";
+import { Options, ResultPromise } from "execa";
 import fsExtra from "fs-extra";
 import JSON5 from "json5";
 
@@ -247,7 +247,7 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
       outPath,
     ];
     return ffmpeg(args, {
-      encoding: null,
+      encoding: "buffer",
       buffer: false,
       stdin: "pipe",
       stdout: process.stdout,
@@ -255,7 +255,7 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
     });
   }
 
-  let outProcess: ExecaChildProcess<Buffer<ArrayBufferLike>> | undefined = undefined;
+  let outProcess: ResultPromise<Options> | undefined;
   let outProcessExitCode;
 
   let frameSource1;
@@ -465,7 +465,7 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
       await outProcess;
     } catch (err) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (outProcessExitCode !== 0 && !(err as any).killed) throw err;
+      if (outProcessExitCode !== 0 && !(err as any).isTerminated) throw err;
     }
   } finally {
     if (!keepTmp) await fsExtra.remove(tmpDir);

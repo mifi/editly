@@ -130,7 +130,7 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
   ];
 
   const ps = ffmpeg(args, {
-    encoding: null,
+    encoding: "buffer",
     buffer: false,
     stdin: "ignore",
     stdout: "pipe",
@@ -138,6 +138,7 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
   });
 
   const stream = ps.stdout!;
+  stream.pause();
 
   let timeout: NodeJS.Timeout;
   let ended = false;
@@ -272,7 +273,7 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
 
   const close = () => {
     if (verbose) console.log("Close", path);
-    ps.cancel();
+    ps.kill();
   };
 
   return {

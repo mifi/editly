@@ -74,7 +74,7 @@ export async function configureFf(params: Partial<FfmpegConfig>) {
   await testFf(config.ffprobePath, "ffprobe");
 }
 
-export function ffmpeg(args: string[], options?: Options<null>) {
+export function ffmpeg(args: string[], options?: Options) {
   if (config.enableFfmpegLog) console.log(`$ ${config.ffmpegPath} ${args.join(" ")}`);
   return execa(config.ffmpegPath, [...getFfmpegCommonArgs(), ...args], options);
 }
