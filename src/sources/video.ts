@@ -1,8 +1,8 @@
-import assert from "assert";
 import { ExecaError } from "execa";
 import * as fabric from "fabric/node";
 import { defineFrameSource } from "../api/index.js";
 import { ffmpeg, readFileStreams } from "../ffmpeg.js";
+import { rawVideoToFrames } from "../transforms/rawVideoToFrames.js";
 import type { VideoLayer } from "../types.js";
 import { blurImage, rgbaToFabricImage } from "./fabric.js";
 
@@ -89,15 +89,6 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
     ptsFilter = `setpts=${speedFactor}*PTS,`;
   }
 
-  const frameByteSize = targetWidth * targetHeight * channels;
-
-  // TODO assert that we have read the correct amount of frames
-
-  let buf = Buffer.allocUnsafe(frameByteSize);
-  const frameBuffer = Buffer.allocUnsafe(frameByteSize);
-  let length = 0;
-  // let inFrameCount = 0;
-
   // https://forum.unity.com/threads/settings-for-importing-a-video-with-an-alpha-channel.457657/
   const streams = await readFileStreams(path);
   const firstVideoStream = streams.find((s) => s.codec_type === "video");
@@ -131,15 +122,20 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
   ];
 
   const controller = new AbortController();
-
+  const transform = rawVideoToFrames({
+    width: targetWidth,
+    height: targetHeight,
+    channels,
+    signal: controller.signal,
+  });
   const ps = ffmpeg(args, {
     encoding: "buffer",
     buffer: false,
     stdin: "ignore",
-    stdout: "pipe",
+    stdout: { transform },
     stderr: process.stderr,
     // ffmpeg doesn't like to stop, force it
-    killSignal: "SIGKILL",
+    forceKillAfterDelay: 1000,
     cancelSignal: controller.signal,
   });
 
@@ -149,96 +145,28 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
     if (verbose) console.log("ffmpeg process aborted", path);
   });
 
-  const stream = ps.stdout!;
-  stream.pause();
-
-  let timeout: NodeJS.Timeout;
-  let ended = false;
-
-  stream.once("end", () => {
-    clearTimeout(timeout);
-    if (verbose) console.log(path, "ffmpeg video stream ended");
-    ended = true;
-  });
-
-  // returns a frame from the buffer if available
-  function getNextFrame() {
-    if (length >= frameByteSize) {
-      // copy the frame
-      buf.copy(frameBuffer, 0, 0, frameByteSize);
-      // move remaining buffer content to the beginning
-      buf.copy(buf, 0, frameByteSize, length);
-      length -= frameByteSize;
-      return frameBuffer;
-    }
-    return null;
-  }
+  // Convert process to iterator to fetch frame data
+  const iterator = ps.iterable();
 
   async function readNextFrame(progress: number, canvas: fabric.StaticCanvas, time: number) {
-    const rgba = await new Promise<Buffer<ArrayBuffer> | void>((resolve, reject) => {
-      const frame = getNextFrame();
-      if (frame) {
-        resolve(frame);
-        return;
-      }
+    const { value: rgba, done } = await iterator.next();
 
-      if (ended) {
-        console.log(path, "Tried to read next video frame after ffmpeg video stream ended");
-        resolve();
-        return;
-      }
+    if (done) {
+      if (verbose) console.log(path, "ffmpeg video stream ended");
+      return;
+    }
 
-      function cleanup() {
-        stream.pause();
-        stream.removeListener("data", handleChunk);
-        stream.removeListener("end", resolve);
-        stream.removeListener("error", reject);
-      }
-
-      function handleChunk(chunk: Buffer) {
-        const nCopied = Math.min(buf.length - length, chunk.length);
-        chunk.copy(buf, length, 0, nCopied);
-        length += nCopied;
-        const out = getNextFrame();
-        const restLength = chunk.length - nCopied;
-        if (restLength > 0) {
-          if (verbose) console.log("Left over data", nCopied, chunk.length, restLength);
-          // make sure the buffer can store all chunk data
-          if (chunk.length > buf.length) {
-            if (verbose) console.log("resizing buffer", buf.length, chunk.length);
-            const newBuf = Buffer.allocUnsafe(chunk.length);
-            buf.copy(newBuf, 0, 0, length);
-            buf = newBuf;
-          }
-          chunk.copy(buf, length, nCopied);
-          length += restLength;
-        }
-
-        if (out) {
-          clearTimeout(timeout);
-          cleanup();
-          resolve(out);
-        }
-      }
-
-      timeout = setTimeout(() => {
-        console.warn("Timeout on read video frame");
-        cleanup();
-        resolve();
-      }, 60000);
-
-      stream.on("data", handleChunk);
-      stream.on("end", resolve);
-      stream.on("error", reject);
-      stream.resume();
-    });
-
-    if (!rgba) return;
-
-    assert(rgba.length === frameByteSize);
+    if (!rgba) {
+      if (verbose) console.log(path, "No frame data received");
+      return;
+    }
 
     if (logTimes) console.time("rgbaToFabricImage");
-    const img = await rgbaToFabricImage({ width: targetWidth, height: targetHeight, rgba });
+    const img = await rgbaToFabricImage({
+      width: targetWidth,
+      height: targetHeight,
+      rgba: Buffer.from(rgba),
+    });
     if (logTimes) console.timeEnd("rgbaToFabricImage");
 
     img.set({
@@ -285,7 +213,7 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
 
   const close = () => {
     if (verbose) console.log("Close", path);
-    controller.abort();
+    if (!ps.exitCode) controller.abort();
   };
 
   return {
