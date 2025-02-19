@@ -80,7 +80,6 @@ describe("Configuration", () => {
         audioInCurve: "tri",
       });
 
-      expect(config.clips[1].duration).toBe(5);
       expect(config.clips[1].transition).toEqual({
         duration: 1,
         name: "random",

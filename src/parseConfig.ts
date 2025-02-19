@@ -3,12 +3,12 @@ import { registerFont } from "canvas";
 import flatMap from "lodash-es/flatMap.js";
 import pMap from "p-map";
 import { basename } from "path";
+import { Configuration } from "./configuration.js";
 import { readDuration, readVideoFileInfo } from "./ffmpeg.js";
 import { Transition } from "./transition.js";
 import type {
   AudioTrack,
   CanvasLayer,
-  Clip,
   FabricLayer,
   ImageLayer,
   ImageOverlayLayer,
@@ -49,13 +49,12 @@ async function validateArbitraryAudio(
 }
 
 type ParseConfigOptions = {
-  clips: Clip[];
-  backgroundAudioVolume?: string | number;
   backgroundAudioPath?: string;
-  loopAudio?: boolean;
-  allowRemoteRequests?: boolean;
   arbitraryAudio: AudioTrack[];
-};
+} & Pick<
+  Configuration,
+  "clips" | "backgroundAudioVolume" | "loopAudio" | "allowRemoteRequests" | "defaults"
+>;
 
 export default async function parseConfig({
   clips,
@@ -64,6 +63,7 @@ export default async function parseConfig({
   backgroundAudioVolume,
   loopAudio,
   allowRemoteRequests,
+  defaults,
 }: ParseConfigOptions) {
   async function handleLayer(layer: Layer): Promise<Layer | Layer[]> {
     // https://github.com/mifi/editly/issues/39
@@ -122,14 +122,8 @@ export default async function parseConfig({
   let clipsOut: ProcessedClip[] = await pMap(
     clips,
     async (clip, clipIndex) => {
-      const { transition: userTransition, duration, layers } = clip;
-
-      const videoLayers = layers.filter((layer) => layer.type === "video");
-
-      if (videoLayers.length === 0)
-        assert(duration, `Duration parameter is required for videoless clip ${clipIndex}`);
-
-      const transition = new Transition(userTransition, clipIndex === clips.length - 1);
+      const { layers } = clip;
+      const transition = new Transition(clip.transition, clipIndex === clips.length - 1);
 
       let layersOut = flatMap(
         await pMap(
@@ -179,13 +173,14 @@ export default async function parseConfig({
         ),
       );
 
-      let clipDuration = duration;
+      let clipDuration = clip.duration;
 
-      const firstVideoLayer = layersOut.find(
-        (layer): layer is VideoLayer => layer.type === "video",
-      );
-      if (firstVideoLayer && !duration) clipDuration = firstVideoLayer.layerDuration!;
-      assert(clipDuration);
+      if (!clipDuration) {
+        const video = layersOut.find((layer): layer is VideoLayer => layer.type === "video");
+        clipDuration = video?.layerDuration ?? defaults.duration;
+      }
+
+      assert(clipDuration, `Duration parameter is required for videoless clip ${clipIndex}`);
 
       // We need to map again, because for audio, we need to know the correct clipDuration
       layersOut = (
@@ -229,9 +224,9 @@ export default async function parseConfig({
             let speedFactor;
 
             // If user explicitly specified duration for clip, it means that should be the output duration of the video
-            if (duration) {
+            if (clipDuration) {
               // Later we will speed up or slow down video using this factor
-              speedFactor = duration / layerDuration;
+              speedFactor = clipDuration / layerDuration;
             } else {
               speedFactor = 1;
             }

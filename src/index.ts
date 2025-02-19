@@ -48,6 +48,7 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
     customOutputArgs,
     isGif,
     tmpDir,
+    defaults,
   } = config;
 
   await configureFf(config);
@@ -63,6 +64,7 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
     backgroundAudioVolume,
     loopAudio,
     allowRemoteRequests,
+    defaults,
   });
   if (verbose) console.log("Calculated", JSON5.stringify({ clips, arbitraryAudio }, null, 2));
 
@@ -492,13 +494,19 @@ export async function renderSingleFrame(input: RenderSingleFrameConfig): Promise
     verbose,
     logTimes,
     outPath = `${Math.floor(Math.random() * 1e12)}.png`,
+    defaults,
   } = config;
 
   configureFf(config);
 
   console.log({ clipsIn });
 
-  const { clips } = await parseConfig({ clips: clipsIn, arbitraryAudio: [], allowRemoteRequests });
+  const { clips } = await parseConfig({
+    clips: clipsIn,
+    arbitraryAudio: [],
+    allowRemoteRequests,
+    defaults,
+  });
   let clipStartTime = 0;
   const clip = clips.find((c) => {
     if (clipStartTime <= time && clipStartTime + c.duration > time) return true;

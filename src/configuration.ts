@@ -216,7 +216,6 @@ export class Configuration {
     this.defaults = merge({}, globalDefaults, input.defaults);
 
     this.clips = input.clips.map((clip) => {
-      const { transition, duration } = merge({}, this.defaults, clip);
       let { layers } = clip;
 
       if (layers && !Array.isArray(layers)) layers = [layers]; // Allow single layer for convenience
@@ -224,7 +223,6 @@ export class Configuration {
         Array.isArray(layers) && layers.length > 0,
         "clip.layers must be an array with at least one layer.",
       );
-      assert(transition == null || typeof transition === "object", "Transition must be an object");
 
       layers = layers
         .map(expandLayerAliases)
@@ -239,7 +237,10 @@ export class Configuration {
           );
         });
 
-      return { transition, duration, layers };
+      const { transition } = merge({}, this.defaults, clip);
+      assert(transition == null || typeof transition === "object", "Transition must be an object");
+
+      return { transition, layers, duration: clip.duration };
     });
 
     // Testing options:
