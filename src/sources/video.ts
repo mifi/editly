@@ -149,7 +149,8 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
   const iterator = ps.iterable();
 
   async function readNextFrame(progress: number, canvas: fabric.StaticCanvas, time: number) {
-    const { value: rgba, done } = await iterator.next();
+    const { value, done } = await iterator.next();
+    const rgba = value as Uint8ClampedArray;
 
     if (done) {
       if (verbose) console.log(path, "ffmpeg video stream ended");
@@ -165,7 +166,7 @@ export default defineFrameSource<VideoLayer>("video", async (options) => {
     const img = await rgbaToFabricImage({
       width: targetWidth,
       height: targetHeight,
-      rgba: Buffer.from(rgba),
+      rgba: rgba,
     });
     if (logTimes) console.timeEnd("rgbaToFabricImage");
 

@@ -36,7 +36,7 @@ export interface FrameSourceImplementation {
     progress: number,
     canvas: StaticCanvas,
     offsetTime: number,
-  ): OptionalPromise<Buffer | void>;
+  ): OptionalPromise<Uint8ClampedArray | void>;
   close?(): OptionalPromise<void | undefined>;
 }
 

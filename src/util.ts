@@ -6,17 +6,6 @@ import { pathExists } from "fs-extra";
 import { sortBy } from "lodash-es";
 import type { KenBurns, Keyframe, Position, PositionObject } from "./types.js";
 
-export function toArrayInteger(buffer: Buffer) {
-  if (buffer.length > 0) {
-    const data = new Uint8ClampedArray(buffer.length);
-    for (let i = 0; i < buffer.length; i += 1) {
-      data[i] = buffer[i];
-    }
-    return data;
-  }
-  return [];
-}
-
 // x264 requires multiple of 2
 export const multipleOf2 = (x: number) => Math.round(x / 2) * 2;
 

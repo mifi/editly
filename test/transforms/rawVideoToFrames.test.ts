@@ -3,13 +3,13 @@ import { rawVideoToFrames } from "../../src/transforms/rawVideoToFrames.js";
 
 test("handles chunk of correct size", () => {
   const transform = rawVideoToFrames({ width: 2, height: 2, channels: 4 });
-  const chunk = new Uint8Array(2 * 2 * 4).fill(128);
+  const chunk = new Uint8Array(16).fill(128);
 
   transform.write(chunk);
 
-  const frame: Uint8Array = transform.read();
-  expect(frame).toBeInstanceOf(Uint8Array);
-  expect(frame).toEqual(chunk);
+  const frame: Uint8ClampedArray = transform.read();
+  expect(frame).toBeInstanceOf(Uint8ClampedArray);
+  expect(frame).toEqual(new Uint8ClampedArray(16).fill(128));
 });
 
 test("partial frames", () => {
@@ -23,10 +23,10 @@ test("partial frames", () => {
   // Write rest of the frame and two extra bytes
   transform.write(new Uint8Array(10).fill(128));
 
-  const frame: Uint8Array = transform.read();
-  expect(frame).toEqual(new Uint8Array(16).fill(128));
+  const frame: Uint8ClampedArray = transform.read();
+  expect(frame).toEqual(new Uint8ClampedArray(16).fill(128));
 
   // Remaining bytes
   transform.write(new Uint8Array(14).fill(128));
-  expect(transform.read()).toBeInstanceOf(Uint8Array);
+  expect(transform.read()).toBeInstanceOf(Uint8ClampedArray);
 });

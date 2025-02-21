@@ -11,7 +11,7 @@ export interface RawVideoToFramesOptions extends Omit<TransformOptions, "transfo
  */
 export function rawVideoToFrames({ width, height, channels, ...options }: RawVideoToFramesOptions) {
   const frameByteSize = width * height * channels;
-  let buffer = new Uint8Array(frameByteSize);
+  let buffer = new Uint8ClampedArray(frameByteSize);
   let bytesRead = 0;
 
   return new Transform({
@@ -33,7 +33,7 @@ export function rawVideoToFrames({ width, height, channels, ...options }: RawVid
           this.push(buffer);
 
           // Reset data buffer
-          buffer = new Uint8Array(frameByteSize);
+          buffer = new Uint8ClampedArray(frameByteSize);
         }
 
         // Move to next frame

@@ -59,7 +59,7 @@ export default defineFrameSource<GlLayer>("gl", async ({ width, height, channels
       outArray[i + 2] = upsideDownArray[outArray.length - i + 2];
       outArray[i + 3] = upsideDownArray[outArray.length - i + 3];
     }
-    return outArray;
+    return new Uint8ClampedArray(outArray.buffer);
   }
 
   return {

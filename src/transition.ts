@@ -54,8 +54,8 @@ export interface TransitionParams {
 }
 
 export type RunTransitionOptions = {
-  fromFrame: Buffer;
-  toFrame: Buffer;
+  fromFrame: Uint8ClampedArray;
+  toFrame: Uint8ClampedArray;
   progress: number;
   transitionName?: string;
   transitionParams?: TransitionParams;
@@ -178,7 +178,7 @@ export class Transition {
       );
     }
 
-    function convertFrame(buf: Buffer) {
+    function convertFrame(buf: Uint8ClampedArray) {
       // @see https://github.com/stackgl/gl-texture2d/issues/16
       return ndarray(buf, [width, height, channels], [channels, width * channels, 1]);
     }

@@ -1,7 +1,8 @@
+import { ImageData } from "canvas";
+import { StaticCanvas } from "fabric/node";
 import pMap from "p-map";
 import type { DebugOptions } from "./configuration.js";
 import type { ProcessedClip } from "./parseConfig.js";
-import { createFabricCanvas, renderFabricCanvas, rgbaToFabricImage } from "./sources/fabric.js";
 import { createLayerSource } from "./sources/index.js";
 
 type FrameSourceOptions = DebugOptions & {
@@ -47,8 +48,11 @@ export async function createFrameSource({
     { concurrency: 1 },
   );
 
+  const canvas = new StaticCanvas(undefined, { width, height });
+  const ctx = canvas.getNodeCanvas().getContext("2d");
+
   async function readNextFrame({ time }: { time: number }) {
-    const canvas = createFabricCanvas({ width, height });
+    canvas.clear();
 
     for (const frameSource of layerFrameSources) {
       if (logTimes) console.time("frameSource.readNextFrame");
@@ -61,24 +65,21 @@ export async function createFrameSource({
         // Optimization: Don't need to draw to canvas if there's only one layer
         if (layerFrameSources.length === 1) return rgba;
 
-        if (logTimes) console.time("rgbaToFabricImage");
-        const img = await rgbaToFabricImage({ width, height, rgba });
-        if (logTimes) console.timeEnd("rgbaToFabricImage");
-        canvas.add(img);
+        if (logTimes) console.time("putImageData");
+        ctx.putImageData(new ImageData(Uint8ClampedArray.from(rgba), width, height), 0, 0);
+        if (logTimes) console.timeEnd("putImageData");
       } else {
-        // Assume this frame source has drawn its content to the canvas
+        // Assume this frame source has drawn its content to the canvas, go ahead and render it
+        canvas.renderAll();
       }
     }
-    // if (verbose) console.time('Merge frames');
 
-    if (logTimes) console.time("renderFabricCanvas");
-    const rgba = await renderFabricCanvas(canvas);
-    if (logTimes) console.timeEnd("renderFabricCanvas");
-    return rgba;
+    return ctx.getImageData(0, 0, width, height).data;
   }
 
   async function close() {
     await pMap(layerFrameSources, (frameSource) => frameSource.close?.());
+    await canvas.dispose();
   }
 
   return {

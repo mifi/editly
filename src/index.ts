@@ -3,12 +3,12 @@ import { Options, ResultPromise } from "execa";
 import fsExtra from "fs-extra";
 import JSON5 from "json5";
 
+import { createCanvas, ImageData } from "canvas";
 import Audio from "./audio.js";
 import { Configuration, type ConfigurationOptions } from "./configuration.js";
 import { configureFf, ffmpeg, parseFps } from "./ffmpeg.js";
 import { createFrameSource } from "./frameSource.js";
 import parseConfig, { ProcessedClip } from "./parseConfig.js";
-import { createFabricCanvas, rgbaToFabricImage } from "./sources/fabric.js";
 import type { RenderSingleFrameConfig } from "./types.js";
 import { assertFileValid, multipleOf2 } from "./util.js";
 
@@ -438,8 +438,10 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
 
         if (logTimes) console.time("outProcess.write");
 
+        assert(outFrameData);
         // If we don't wait, then we get EINVAL when dealing with high resolution files (big writes)
-        if (!nullOutput) await new Promise((r) => outProcess?.stdin?.write(outFrameData, r));
+        if (!nullOutput)
+          await new Promise((r) => outProcess?.stdin?.write(new Uint8Array(outFrameData), r));
 
         if (logTimes) console.timeEnd("outProcess.write");
 
@@ -527,15 +529,10 @@ export async function renderSingleFrame(input: RenderSingleFrameConfig): Promise
   });
   const rgba = await frameSource.readNextFrame({ time: time - clipStartTime });
 
-  // TODO converting rgba to png can be done more easily?
-  const canvas = createFabricCanvas({ width, height });
-  const fabricImage = await rgbaToFabricImage({ width, height, rgba });
-  canvas.add(fabricImage);
-  canvas.renderAll();
-  const internalCanvas = canvas.getNodeCanvas();
-  await fsExtra.writeFile(outPath, internalCanvas.toBuffer("image/png"));
-  canvas.clear();
-  canvas.dispose();
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext("2d");
+  ctx.putImageData(new ImageData(rgba, width, height), 0, 0);
+  await fsExtra.writeFile(outPath, canvas.toBuffer("image/png"));
   await frameSource.close();
 }
 
