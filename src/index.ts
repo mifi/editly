@@ -255,6 +255,7 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
     });
   }
 
+  if (logTimes) console.profile();
   let outProcess: ResultPromise<Options> | undefined;
   let outProcessExitCode;
 
@@ -473,6 +474,7 @@ async function Editly(input: ConfigurationOptions): Promise<void> {
     if (!keepTmp) await fsExtra.remove(tmpDir);
   }
 
+  if (logTimes) console.profileEnd();
   console.log();
   console.log("Done. Output file can be found at:");
   console.log(outPath);
