@@ -3,6 +3,7 @@ import assert from "assert";
 import { fileTypeFromFile } from "file-type";
 import { readFileSync } from "fs";
 import JSON5 from "json5";
+import YAML from "yaml";
 import meow from "meow";
 import pMap from "p-map";
 import { ConfigurationOptions } from "./configuration.js";
@@ -22,9 +23,14 @@ const cli = meow(
     $ editly --json JSON_PATH
     where JSON_PATH is the path to an edit spec JSON file, can be a normal JSON or JSON5
 
+  Or alternatively:
+    $ editly --yaml YAML_PATH
+    where YAML_PATH is the path to an edit spec YAML file
+
   Options
     --out  Out video path (defaults to ./editly-out.mp4) - can also be a .gif
     --json  Use JSON edit spec
+    --yaml  Use YAML edit spec
     --transition-name  Name of default transition to use (default: random)
     --transition-duration  Default transition duration
     --clip-duration  Default clip duration
@@ -47,6 +53,7 @@ const cli = meow(
   Examples
     $ editly title:'My video' clip1.mov clip2.mov title:'My slideshow' img1.jpg img2.jpg title:'THE END' --audio-file-path /path/to/music.mp3 --font-path /path/to/my-favorite-font.ttf
     $ editly my-editly.json5 --out output.gif
+    $ editly my-editly.yaml --out output.gif
 `,
   {
     importMeta: import.meta,
@@ -65,6 +72,7 @@ const cli = meow(
       loopAudio: { type: "boolean" },
       outputVolume: { type: "string" },
       json: { type: "string" },
+      yaml: { type: "string" },
       out: { type: "string" },
       audioFilePath: { type: "string" },
     },
@@ -72,9 +80,13 @@ const cli = meow(
 );
 
 (async () => {
-  let { json } = cli.flags;
-  if (cli.input.length === 1 && /\.(json|json5|js)$/.test(cli.input[0].toLowerCase()))
-    json = cli.input[0];
+  let { json, yaml } = cli.flags;
+  if (cli.input.length === 1) {
+    if (/\.(json|json5|js)$/.test(cli.input[0].toLowerCase()))
+      json = cli.input[0];
+    else if (/\.(yml|yaml)$/.test(cli.input[0].toLowerCase()))
+      yaml = cli.input[0];
+  }
 
   let params: Partial<ConfigurationOptions> = {
     defaults: {},
@@ -82,6 +94,8 @@ const cli = meow(
 
   if (json) {
     params = JSON5.parse(readFileSync(json, "utf-8"));
+  } else if (yaml) {
+    params = YAML.parse(readFileSync(yaml, "utf-8"));
   } else {
     const clipsIn = cli.input;
     if (clipsIn.length < 1) cli.showHelp();
