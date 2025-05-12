@@ -60,7 +60,7 @@
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "husky": "^9.1.7",
-    "lint-staged": "^15.4.3",
+    "lint-staged": "^16.0.0",
     "pkgroll": "^2.6.1",
     "prettier": "3.5.1",
     "prettier-plugin-organize-imports": "4.1.0",
