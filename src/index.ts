@@ -539,6 +539,4 @@ export async function renderSingleFrame(input: RenderSingleFrameConfig): Promise
   await frameSource.close();
 }
 
-Editly.renderSingleFrame = renderSingleFrame;
-
-export default Editly;
+export default Object.assign(Editly, { renderSingleFrame });
